@@ -1,0 +1,10 @@
+{
+    "ui": ["story_mode", "freeplay", "mods", "credits", "awards", "donate", "options"],
+    "bg": "menuBG",
+    "fnfVer": [12, 696],
+    "peVer": [12, 676],
+    "tfeVer": [12, 656],
+ 
+    "customText1": ["", "", "", ""],
+    "customText2": ["", "", "", ""]
+}
