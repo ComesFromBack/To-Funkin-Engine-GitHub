@@ -9,7 +9,9 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.frames.FlxFrame;
 import flixel.group.FlxGroup;
+import flixel.tweens.FlxTween;
 import flixel.input.gamepad.FlxGamepad;
+
 import tjson.TJSON as Json;
 
 import lime.app.Application;
@@ -99,6 +101,8 @@ class TitleState extends MusicBeatState
 
 		ClientPrefs.loadPrefs();
 
+		Application.current.window.title = "Friday Night Funkin': To Funkin Engine("+ClientPrefs.data.styleEngine+") v0.1.5.2";
+
 		if(FlxG.random.int(0, 100) > 90)
 			Application.current.window.title = "Friday Night Funkin': BlueBrrey Engine";
 
@@ -180,8 +184,12 @@ class TitleState extends MusicBeatState
 	{
 		if (!initialized)
 		{
-			if(FlxG.sound.music == null) {
-				FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+			if(FlxG.sound.music == null)
+			{
+				if(ClientPrefs.data.styleEngine == 'Kade')
+					FlxG.sound.playMusic(Paths.music('freakyMenuKE'), 0);
+				else if(ClientPrefs.data.styleEngine == 'Psych' || ClientPrefs.data.styleEngine == 'Vanilla')
+					FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
 			}
 		}
 
@@ -201,15 +209,28 @@ class TitleState extends MusicBeatState
 		// bg.updateHitbox();
 		add(bg);
 
-		logoBl = new FlxSprite(titleJSON.titlex, titleJSON.titley);
-		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
-		logoBl.antialiasing = ClientPrefs.data.antialiasing;
+		if(ClientPrefs.data.styleEngine == 'Psych' || ClientPrefs.data.styleEngine == 'Vanilla')
+		{
+			logoBl = new FlxSprite(titleJSON.titlex, titleJSON.titley);
+			logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
+			logoBl.antialiasing = ClientPrefs.data.antialiasing;
 
-		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24, false);
-		logoBl.animation.play('bump');
-		logoBl.updateHitbox();
-		// logoBl.screenCenter();
-		// logoBl.color = FlxColor.BLACK;
+		
+			logoBl.animation.addByPrefix('bump', 'logo bumpin', 24, false);
+			logoBl.animation.play('bump');
+			logoBl.updateHitbox();
+			// logoBl.screenCenter();
+			// logoBl.color = FlxColor.BLACK;
+		}
+		else if(ClientPrefs.data.styleEngine == 'Kade')
+		{
+			var rA:Bool = true;
+			logoBl = new FlxSprite(-60, -25).loadGraphic(Paths.image('KadeEngineLogoOld'));
+			logoBl.antialiasing = ClientPrefs.data.antialiasing;
+			logoBl.updateHitbox();
+			logoBl.scale.x = 1.5;
+			logoBl.scale.y = 1.5;
+		}
 
 		if(ClientPrefs.data.shaders) swagShader = new ColorSwap();
 		gfDance = new FlxSprite(titleJSON.gfx, titleJSON.gfy);
@@ -576,22 +597,32 @@ class TitleState extends MusicBeatState
 			{
 				case 1:
 					//FlxG.sound.music.stop();
-					FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
-					FlxG.sound.music.fadeIn(4, 0, 0.7);
+					if(ClientPrefs.data.styleEngine == 'Kade')
+						FlxG.sound.playMusic(Paths.music('freakyMenuKE'), 0);
+					else
+						FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+					FlxG.sound.music.fadeIn(4, 0, 0.75);
 				case 2:
-					#if PSYCH_WATERMARKS
-					createCoolText(['Psych Engine by'], 40);
-					#else
-					createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
-					#end
+					if(ClientPrefs.data.styleEngine == 'Psych')
+						createCoolText(['Psych Engine by'], 40);
+					else if(ClientPrefs.data.styleEngine == 'Kade')
+					{
+						createCoolText(['Kade Engine'], 40);
+						createCoolText(['By'], 100);
+					}
+					else if(ClientPrefs.data.styleEngine == 'Vanilla')
+						createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
 				// credTextShit.visible = true;
 				case 4:
-					#if PSYCH_WATERMARKS
-					addMoreText('Shadow Mario', 40);
-					addMoreText('Riveren', 40);
-					#else
-					addMoreText('present');
-					#end
+					if(ClientPrefs.data.styleEngine == 'Psych')
+					{
+						addMoreText('Shadow Mario', 40);
+						addMoreText('Riveren', 40);
+					}
+					else if(ClientPrefs.data.styleEngine == 'Kade')
+						addMoreText('Kadedeveloper', 40);
+					else if(ClientPrefs.data.styleEngine == 'Vanilla')
+						addMoreText('present');
 				// credTextShit.text += '\npresent...';
 				// credTextShit.addText();
 				case 5:
@@ -600,11 +631,11 @@ class TitleState extends MusicBeatState
 				// credTextShit.text = 'In association \nwith';
 				// credTextShit.screenCenter();
 				case 6:
-					#if PSYCH_WATERMARKS
-					createCoolText(['Not associated', 'with'], -40);
-					#else
-					createCoolText(['In association', 'with'], -40);
-					#end
+					if(ClientPrefs.data.styleEngine != 'Vanilla')
+						createCoolText(['Not associated', 'with'], -40);
+					else
+						createCoolText(['In association', 'with'], -40);
+					
 				case 8:
 					addMoreText('newgrounds', -40);
 					ngSpr.visible = true;
@@ -635,7 +666,8 @@ class TitleState extends MusicBeatState
 				// credTextShit.text += '\nNight';
 				case 16:
 					addMoreText('Funkin'); // credTextShit.text += '\nFunkin';
-
+					if(ClientPrefs.data.styleEngine == 'Kade')
+						addMoreText('Kade Engine');
 				case 17:
 					skipIntro();
 			}

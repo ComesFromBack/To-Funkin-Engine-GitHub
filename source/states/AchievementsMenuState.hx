@@ -22,6 +22,7 @@ class AchievementsMenuState extends MusicBeatState
 
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, 0xFF5EFF00);
 		bg.alpha = 0.45;
+		bg.color = 0x00FFF2;
 		add(bg);
 		var bgGrid:FlxBackdrop = new FlxBackdrop(FlxGridOverlay.createGrid(80, 80, 160, 160, true, 0x11FFFFFF, 0x0));
 		bgGrid.alpha = 1;

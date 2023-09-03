@@ -256,7 +256,7 @@ class ModsMenuState extends MusicBeatState
 				try
 				{
 					FileSystemHelper.deletePath(path);//FUCK YOU HAXE WHY DONT YOU WORK WAAAAAAAAAAAAH
-													  //OK. I FIX IT. :) (BY COMES_FROMBACK)
+													  //I FIX IT. :) (BY COMES_FROMBACK)
 					trace('Done!');
 					var icon = mods[curSelected].icon;
 					var alphabet = mods[curSelected].alphabet;

@@ -27,15 +27,17 @@ class SaveVariables {
 	public var camZoomingMult:Float = 1;
 	public var hideHud:Bool = false;
 	public var msDisplay:Bool = false;
+	public var zoomMode:String = 'Section';
 	public var haveVoices:Bool = false;
 	public var blueberry:Bool = false;
+	public var rs:Bool = false;
 	public var rainbowFPS:Bool = false;
-	public var oldS:Bool = false;
 	public var keHealth:String = 'Psych';
 	public var language:String = 'English';
-	public var keStyle:Bool = false;
+	public var styleEngine:String = 'Psych';
 	public var oldVHB:Bool = false;
 	public var noteOffset:Int = 0;
+	public var imagesPersist:Bool = false;
 	public var arrowRGB:Array<Array<FlxColor>> = [
 		[0xFFC24B99, 0xFFFFFFFF, 0xFF3C1F56],
 		[0xFF00FFFF, 0xFFFFFFFF, 0xFF1542B7],

@@ -115,10 +115,11 @@ class VisualsUISubState extends BaseOptionsMenu
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Kade style',
-			"If unchecked, HUD is kade style.",
-			'keStyle',
-			'bool');
+		var option:Option = new Option('Engine style',
+			"Check to Engine Style",
+			'styleEngine',
+			'string',
+			['Psych', 'Kade', 'Vanilla']);
 		addOption(option);
 
 		var option:Option = new Option('Score Text Zoom on Hit',
@@ -183,8 +184,8 @@ class VisualsUISubState extends BaseOptionsMenu
 			'float');
 		option.displayFormat = '%vx';
 		option.scrollSpeed = 5;
-		option.minValue = 1.0;
-		option.maxValue = 2.5;
+		option.minValue = 0.5;
+		option.maxValue = 3;
 		option.changeValue = 0.1;
 		addOption(option);
 

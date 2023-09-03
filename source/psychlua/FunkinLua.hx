@@ -197,7 +197,7 @@ class FunkinLua {
 		set('buildTarget', getBuildTarget());
 
 		//To Funkin LUA
-		set('keStyle', ClientPrefs.data.keStyle);
+		set('styleEngine', ClientPrefs.data.styleEngine);
 		set('healthMode', ClientPrefs.data.keHealth);
 
 		for (name => func in customFunctions)

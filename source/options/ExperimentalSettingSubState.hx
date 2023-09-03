@@ -19,10 +19,11 @@ class ExperimentalSettingSubState extends BaseOptionsMenu
 			'bool');
 		addOption(option);
 
-		var option:Option = new Option('Old Version Lua Support',
-			'If checked, scripts support in version 0.6.x',
-			'oldS',
-			'bool');
+		var option:Option = new Option('Zoom Mode',
+			'Zoom Modes, Section, Beat or Step',
+			'zoomMode',
+			'string',
+			['Section', 'Beat', 'Step']);
 		addOption(option);
 
 		super();

@@ -54,6 +54,9 @@ class MainMenuState extends MusicBeatState
 	
 	var menuJSON:MenuData;
 
+	var kadeMenu:Array<String> = ["story_mode", "freeplay", "donate", "mods", "options"];
+	var vanillaMenu:Array<String> = ["story_mode", "freeplay", "donate", "options"];
+
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 
@@ -164,34 +167,94 @@ class MainMenuState extends MusicBeatState
 		/*if(menuJSON.ui.length > 6) {
 			scale = 6 / menuJSON.ui.length;
 		}*/
-
-		for (i in 0...menuJSON.ui.length)
+		if(ClientPrefs.data.styleEngine == 'Psych')
 		{
-			var offset:Float = 108 - (Math.max(menuJSON.ui.length, 4) - 4) * 80;
-			var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset);
-			menuItem.antialiasing = ClientPrefs.data.antialiasing;
-			menuItem.scale.x = scale;
-			menuItem.scale.y = scale;
-			menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + menuJSON.ui[i]);
-			menuItem.animation.addByPrefix('idle', menuJSON.ui[i] + " basic", 24);
-			menuItem.animation.addByPrefix('selected', menuJSON.ui[i] + " white", 24);
-			menuItem.animation.play('idle');
-			menuItem.ID = i;
-			menuItem.screenCenter(X);
-			menuItems.add(menuItem);
-			var scr:Float = (menuJSON.ui.length - 4) * 0.135;
-			if(menuJSON.ui.length < 6) scr = 0;
-			menuItem.scrollFactor.set(0, scr);
-			//menuItem.setGraphicSize(Std.int(menuItem.width * 0.58));
-			menuItem.updateHitbox();
+			for (i in 0...menuJSON.ui.length)
+			{
+				var offset:Float = 108 - (Math.max(menuJSON.ui.length, 4) - 4) * 80;
+				var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset);
+				menuItem.antialiasing = ClientPrefs.data.antialiasing;
+				menuItem.scale.x = scale;
+				menuItem.scale.y = scale;
+				menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + menuJSON.ui[i]);
+				menuItem.animation.addByPrefix('idle', menuJSON.ui[i] + " basic", 24);
+				menuItem.animation.addByPrefix('selected', menuJSON.ui[i] + " white", 24);
+				menuItem.animation.play('idle');
+				menuItem.ID = i;
+				menuItem.screenCenter(X);
+				menuItems.add(menuItem);
+				var scr:Float = (menuJSON.ui.length - 4) * 0.135;
+				if(menuJSON.ui.length < i) scr = 0;
+				menuItem.scrollFactor.set(0, scr);
+				//menuItem.setGraphicSize(Std.int(menuItem.width * 0.58));
+				menuItem.updateHitbox();
+			}
+		}
+		else if(ClientPrefs.data.styleEngine == 'Kade')
+		{
+			for (i in 0...kadeMenu.length)
+			{
+				var offset:Float = 108 - (Math.max(kadeMenu.length, 4) - 4) * 80;
+				var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset - 40);
+				menuItem.antialiasing = ClientPrefs.data.antialiasing;
+				menuItem.scale.x = scale;
+				menuItem.scale.y = scale;
+				menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + kadeMenu[i]);
+				menuItem.animation.addByPrefix('idle', kadeMenu[i] + " basic", 24);
+				menuItem.animation.addByPrefix('selected', kadeMenu[i] + " white", 24);
+				menuItem.animation.play('idle');
+				menuItem.ID = i;
+				menuItem.screenCenter(X);
+				menuItems.add(menuItem);
+				var scr:Float = (kadeMenu.length - 4) * 0.135;
+				if(kadeMenu.length < 5) scr = 0;
+				menuItem.scrollFactor.set(0, scr);
+				//menuItem.setGraphicSize(Std.int(menuItem.width * 0.58));
+				menuItem.updateHitbox();
+			}
+		}
+		else if(ClientPrefs.data.styleEngine == 'Vanilla')
+		{
+			for (i in 0...vanillaMenu.length)
+			{
+				var offset:Float = 108 - (Math.max(vanillaMenu.length, 4) - 4) * 80;
+				var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset - 40);
+				menuItem.antialiasing = ClientPrefs.data.antialiasing;
+				menuItem.scale.x = scale;
+				menuItem.scale.y = scale;
+				menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + vanillaMenu[i]);
+				menuItem.animation.addByPrefix('idle', vanillaMenu[i] + " basic", 24);
+				menuItem.animation.addByPrefix('selected', vanillaMenu[i] + " white", 24);
+				menuItem.animation.play('idle');
+				menuItem.ID = i;
+				menuItem.screenCenter(X);
+				menuItems.add(menuItem);
+				var scr:Float = (vanillaMenu.length - 4) * 0.135;
+				if(vanillaMenu.length < 5) scr = 0;
+				menuItem.scrollFactor.set(0, scr);
+				//menuItem.setGraphicSize(Std.int(menuItem.width * 0.58));
+				menuItem.updateHitbox();
+			}
 		}
 
 		FlxG.camera.follow(camFollow, null, 0);
 
-		var versionShit:FlxText = new FlxText(menuJSON.peVer[0], menuJSON.peVer[1], 0, "Psych Engine v" + psychEngineVersion, 12);
-		versionShit.scrollFactor.set();
-		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		add(versionShit);
+		if(ClientPrefs.data.styleEngine == 'Psych')
+		{
+			var versionShit:FlxText = new FlxText(menuJSON.peVer[0], menuJSON.peVer[1], 0, "Psych Engine v" + psychEngineVersion, 12);
+			versionShit.scrollFactor.set();
+			versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+			add(versionShit);
+		}
+		else if(ClientPrefs.data.styleEngine == 'Kade')
+		{
+			var versionShit:FlxText = new FlxText(menuJSON.peVer[0], menuJSON.peVer[1], 0, "Kade Engine v" + psychEngineVersion, 12);
+			versionShit.scrollFactor.set();
+			versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+			add(versionShit);
+		}
+		else if(ClientPrefs.data.styleEngine == 'Vanilla')
+			menuJSON.tfeVer[1] = 676;
 
 		var versionShit:FlxText = new FlxText(menuJSON.fnfVer[0], menuJSON.fnfVer[1], 0, "Friday Night Funkin' v" + Application.current.meta.get('version'), 12);
 		versionShit.scrollFactor.set();
@@ -288,20 +351,45 @@ class MainMenuState extends MusicBeatState
 
 			if (controls.ACCEPT)
 			{
-				if (menuJSON.ui[curSelected] == 'donate')
-				{
-					var tim = DateTools.format(Date.now(), '%m-%d');
-					if(tim == '04-01')
+					if (menuJSON.ui[curSelected] == 'donate' && ClientPrefs.data.styleEngine == 'Psych')
 					{
-						CoolUtil.browserLoad('https://www.bilibili.com/video/BV1GJ411x7h7/?share_source=copy_web');
+						var tim = DateTools.format(Date.now(), '%m-%d');
+						if(tim == '04-01')
+						{
+							CoolUtil.browserLoad('https://www.bilibili.com/video/BV1GJ411x7h7/?share_source=copy_web');
+						}
+						else
+						{
+							CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');
+						}
 					}
-					else
+					else if (kadeMenu[curSelected] == 'donate' && ClientPrefs.data.styleEngine == 'Kade')
 					{
-						CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');
+						var tim = DateTools.format(Date.now(), '%m-%d');
+						if(tim == '04-01')
+							{
+							CoolUtil.browserLoad('https://www.bilibili.com/video/BV1GJ411x7h7/?share_source=copy_web');
+						}
+						else
+						{
+							CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');
+						}
 					}
-				}
-				else
-				{
+					else if (vanillaMenu[curSelected] == 'donate' && ClientPrefs.data.styleEngine == 'Vanilla')
+					{
+						var tim = DateTools.format(Date.now(), '%m-%d');
+						if(tim == '04-01')
+						{
+							CoolUtil.browserLoad('https://www.bilibili.com/video/BV1GJ411x7h7/?share_source=copy_web');
+						}
+						else
+						{
+							CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');
+						}
+					}
+			
+			else
+			{
 					selectedSomethin = true;
 					FlxG.sound.play(Paths.sound('confirmMenu'));
 
@@ -321,34 +409,87 @@ class MainMenuState extends MusicBeatState
 						}
 						else
 						{
-							FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
+							if(ClientPrefs.data.styleEngine == 'Psych')
 							{
-								var daChoice:String = menuJSON.ui[curSelected];
-
-								switch (daChoice)
+								FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
 								{
-									case 'story_mode':
-										MusicBeatState.switchState(new StoryMenuState());
-									case 'freeplay':
-										MusicBeatState.switchState(new FreeplayState());
-									#if MODS_ALLOWED
-									case 'mods':
-										MusicBeatState.switchState(new ModsMenuState());
-									#end
-									case 'awards':
-										MusicBeatState.switchState(new AchievementsMenuState());
-									case 'credits':
-										MusicBeatState.switchState(new CreditsState());
-									case 'options':
-										LoadingState.loadAndSwitchState(new OptionsState());
-										OptionsState.onPlayState = false;
-										if (PlayState.SONG != null)
+									var daChoice:String = menuJSON.ui[curSelected];
+
+									switch (daChoice)
+									{
+										case 'story_mode':
+											MusicBeatState.switchState(new StoryMenuState());
+										case 'freeplay':
+											MusicBeatState.switchState(new FreeplayState());
+										#if MODS_ALLOWED
+										case 'mods':
+											MusicBeatState.switchState(new ModsMenuState());
+										#end
+										case 'awards':
+											MusicBeatState.switchState(new AchievementsMenuState());
+										case 'credits':
+											MusicBeatState.switchState(new CreditsState());
+										case 'options':
+											LoadingState.loadAndSwitchState(new OptionsState());
+											OptionsState.onPlayState = false;
+											if (PlayState.SONG != null)
+											{
+												PlayState.SONG.arrowSkin = null;
+												PlayState.SONG.splashSkin = null;
+											}
+									}
+								});
+							}
+							else if(ClientPrefs.data.styleEngine == 'Kade')
+							{
+								FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
+									{
+										var daChoice:String = kadeMenu[curSelected];
+	
+										switch (daChoice)
 										{
-											PlayState.SONG.arrowSkin = null;
-											PlayState.SONG.splashSkin = null;
+											case 'story_mode':
+												MusicBeatState.switchState(new StoryMenuState());
+											case 'freeplay':
+												MusicBeatState.switchState(new FreeplayState());
+											#if MODS_ALLOWED
+											case 'mods':
+												MusicBeatState.switchState(new ModsMenuState());
+											#end
+											case 'options':
+												LoadingState.loadAndSwitchState(new OptionsState());
+												OptionsState.onPlayState = false;
+												if (PlayState.SONG != null)
+												{
+													PlayState.SONG.arrowSkin = null;
+													PlayState.SONG.splashSkin = null;
+												}
 										}
-								}
-							});
+									});
+							}
+							else if(ClientPrefs.data.styleEngine == 'Vanilla')
+							{
+								FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
+									{
+										var daChoice:String = vanillaMenu[curSelected];
+	
+										switch (daChoice)
+										{
+											case 'story_mode':
+												MusicBeatState.switchState(new StoryMenuState());
+											case 'freeplay':
+												MusicBeatState.switchState(new FreeplayState());
+											case 'options':
+												LoadingState.loadAndSwitchState(new OptionsState());
+												OptionsState.onPlayState = false;
+												if (PlayState.SONG != null)
+												{
+													PlayState.SONG.arrowSkin = null;
+													PlayState.SONG.splashSkin = null;
+												}
+										}
+									});
+							}
 						}
 					});
 				}
@@ -399,7 +540,8 @@ class MainMenuState extends MusicBeatState
 				if(menuItems.length > 4) {
 					add = menuItems.length * 8;
 				}
-				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y - add);
+				if(ClientPrefs.data.styleEngine == 'Psych')
+					camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y - add);
 				spr.centerOffsets();
 			}
 		});

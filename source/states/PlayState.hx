@@ -286,7 +286,6 @@ class PlayState extends MusicBeatState
 	public var endCallback:Void->Void = null;
 
 	var healthLow:FlxSprite;
-	var daTiming:String = '';
 
 	override public function create()
 	{
@@ -298,7 +297,7 @@ class PlayState extends MusicBeatState
 		}
 
 		trace('Playback Rate: ' + playbackRate);
-		Paths.clearStoredMemory();
+		//Paths.clearStoredMemory();
 
 		startCallback = startCountdown;
 		endCallback = endSong;
@@ -539,7 +538,7 @@ class PlayState extends MusicBeatState
 		msTxt.visible = true;
 		add(msTxt);
 
-		if(ClientPrefs.data.keStyle)
+		if(ClientPrefs.data.styleEngine == 'Kade')
 		{
 			timeBar = new HealthBar(0, timeTxt.y + (timeTxt.height / 4), 'timeBarKE', function() return songPercent, 0, 1);
 			timeBar.scrollFactor.set();
@@ -577,7 +576,7 @@ class PlayState extends MusicBeatState
 			verTxt.text = SONG.song + ' | To Funkin Engine v0.1.5.2(demo)';
 		add(verTxt);
 
-		if(!ClientPrefs.data.keStyle) verTxt.visible = false;
+		if(ClientPrefs.data.styleEngine != 'Kade') verTxt.visible = false;
 		else verTxt.visible = true;
 
 		strumLineNotes = new FlxTypedGroup<StrumNote>();
@@ -647,7 +646,7 @@ class PlayState extends MusicBeatState
 		reloadHealthBarColors();
 		if(ClientPrefs.data.language == 'English')
 		{
-			if(ClientPrefs.data.keStyle)
+			if(ClientPrefs.data.styleEngine == 'Kade')
 			{
 				scoreTxt = new FlxText(0, healthBar.y + 40, FlxG.width, "", 20);
 				scoreTxt.setFormat(Paths.font("vcr.ttf"), 15, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -668,7 +667,7 @@ class PlayState extends MusicBeatState
 		}
 		else
 		{
-			if(ClientPrefs.data.keStyle)
+			if(ClientPrefs.data.styleEngine == 'Kade')
 				{
 					scoreTxt = new FlxText(0, healthBar.y + 40, FlxG.width, "", 20);
 					scoreTxt.setFormat(Paths.font("IPix.ttf"), 15, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -688,7 +687,7 @@ class PlayState extends MusicBeatState
 				}
 		}
 
-		if(ClientPrefs.data.keStyle) scoreTxt.y = healthBar.y + 60;
+		if(ClientPrefs.data.styleEngine == 'Kade') scoreTxt.y = healthBar.y + 60;
 
 		if(ClientPrefs.data.language == 'English')
 		{
@@ -894,16 +893,24 @@ class PlayState extends MusicBeatState
 	}
 
 	public function reloadHealthBarColors() {
-		if(!ClientPrefs.data.oldVHB) {
-		healthBar.setColors(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]),
-			FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
-		healthBar.updateBar();
-		}
-		else {
-		healthBarOld.createFilledBar(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]),
-			FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
-		healthBarOld.updateBar();
-		}
+		if(ClientPrefs.data.styleEngine == 'Vanilla')
+			{
+				healthBar.setColors(0xFFFF0000, 0xFF00FF00);
+				healthBar.updateBar();
+			}
+			else
+			{
+				if(!ClientPrefs.data.oldVHB) {
+				healthBar.setColors(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]),
+					FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
+				healthBar.updateBar();
+				}
+				else {
+				healthBarOld.createFilledBar(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]),
+					FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
+				healthBarOld.updateBar();
+				}
+			}
 	}
 
 	public function addCharacterToList(newCharacter:String, type:Int) {
@@ -1317,7 +1324,7 @@ class PlayState extends MusicBeatState
 
 	public function updateScore(miss:Bool = false)
 	{
-		if(ClientPrefs.data.scoreZoom && !miss && !cpuControlled && !ClientPrefs.data.keStyle)
+		if(ClientPrefs.data.scoreZoom && !miss && !cpuControlled && ClientPrefs.data.styleEngine != 'Kade')
 		{
 			if(scoreTxtTween != null) {
 				scoreTxtTween.cancel();
@@ -1800,7 +1807,7 @@ class PlayState extends MusicBeatState
 			scoreTxt.color = 0xFF4BFF03;
 			healthLow.visible = false;
 		}
-		else if(health > 1.6 && health > 0.4)
+		else if(health < 1.6 && health > 0.4)
 		{
 			scoreTxt.color = 0xFFFFFFFF;
 			healthLow.visible = false;
@@ -1812,7 +1819,7 @@ class PlayState extends MusicBeatState
 		}
 		if(ClientPrefs.data.language == 'English')
 		{
-			if(!ClientPrefs.data.keStyle)
+			if(ClientPrefs.data.styleEngine != 'Kade')
 			{
 				if(!cpuControlled)
 				{
@@ -1828,7 +1835,17 @@ class PlayState extends MusicBeatState
 					scoreTxt.color = 0xFFFBFF02;
 				}
 			}
-			else
+
+			else if(ClientPrefs.data.styleEngine == 'Vanilla')
+				{
+					if(!cpuControlled)
+					{
+						scoreTxt.text = 'Score:' + songScore;
+						scoreTxt.x += 100;
+					}
+				}
+
+			else if(ClientPrefs.data.styleEngine == 'Kade')
 			{
 				if(!cpuControlled)
 				{
@@ -1848,7 +1865,7 @@ class PlayState extends MusicBeatState
 		}
 		else
 		{
-			if(!ClientPrefs.data.keStyle)
+			if(ClientPrefs.data.styleEngine != 'Kade')
 				{
 					if(!cpuControlled)
 					{
@@ -1864,7 +1881,17 @@ class PlayState extends MusicBeatState
 						scoreTxt.color = 0xFFFBFF02;
 					}
 				}
-				else
+
+				else if(ClientPrefs.data.styleEngine == 'Vanilla')
+					{
+						if(!cpuControlled)
+						{
+							scoreTxt.text = '分数:' + songScore;
+							scoreTxt.x += 100;
+						}
+					}	
+
+				else if(ClientPrefs.data.styleEngine == 'Kade')
 				{
 					if(!cpuControlled)
 					{
@@ -2514,6 +2541,13 @@ class PlayState extends MusicBeatState
 						},
 					ease: FlxEase.quartInOut});
 				}
+			
+			case 'Sub Tilit':
+				var text1:FlxText = new FlxText(STRUM_X + (FlxG.width / 2) - 248, 640, 400, value1, 32);
+				text1.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				text1.cameras = [camHUD];
+				add(text1);
+				text1.text = value1;
 		}
 		
 		stagesFunc(function(stage:BaseStage) stage.eventCalled(eventName, value1, value2, flValue1, flValue2, strumTime));
@@ -2802,7 +2836,7 @@ class PlayState extends MusicBeatState
 		note.rating = daRating.name;
 		score = daRating.score;
 
-		if(daRating.noteSplash && !note.noteSplashData.disabled && !ClientPrefs.data.keStyle)
+		if(daRating.noteSplash && !note.noteSplashData.disabled && ClientPrefs.data.styleEngine != 'Kade')
 			spawnNoteSplashOnNote(note);
 
 		if(!practiceMode && !cpuControlled) {
@@ -2851,19 +2885,6 @@ class PlayState extends MusicBeatState
 		comboSpr.antialiasing = antialias;
 		comboSpr.y += 60;
 		comboSpr.velocity.x += FlxG.random.int(1, 10) * playbackRate;
-
-		var elSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image(daTiming));
-		elSpr.cameras = [camHUD];
-		elSpr.screenCenter();
-		elSpr.x = placement;
-		elSpr.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
-		elSpr.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
-		elSpr.visible = (!ClientPrefs.data.hideHud);
-		elSpr.x += ClientPrefs.data.comboOffset[0];
-		elSpr.y -= ClientPrefs.data.comboOffset[1];
-		elSpr.antialiasing = antialias;
-		elSpr.y += 60;
-		elSpr.velocity.x += FlxG.random.int(1, 10) * playbackRate;
 
 		insert(members.indexOf(strumLineNotes), rating);
 		
@@ -3295,11 +3316,6 @@ class PlayState extends MusicBeatState
 			msTxt.alpha = 1;
 		}
 
-		if (MS > Conductor.safeZoneOffset * 0)
-			daTiming = 'early';
-		if (MS < Conductor.safeZoneOffset * 0)
-			daTiming = 'late';
-
 		if (!note.wasGoodHit)
 		{	
 			if(cpuControlled && (note.ignoreNote || note.hitCausesMiss)) return;
@@ -3398,7 +3414,7 @@ class PlayState extends MusicBeatState
 	}
 
 	public function spawnNoteSplashOnNote(note:Note) {
-		if(note != null && !ClientPrefs.data.keStyle) {
+		if(note != null && ClientPrefs.data.styleEngine != 'Kade') {
 			var strum:StrumNote = playerStrums.members[note.noteData];
 			if(strum != null)
 				spawnNoteSplash(strum.x, strum.y, note.noteData, note);
@@ -3469,6 +3485,12 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
+		if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && ClientPrefs.data.zoomMode == 'Step')
+		{
+			FlxG.camera.zoom += 0.015 * camZoomingMult;
+			camHUD.zoom += 0.03 * camZoomingMult;
+		}
+
 		lastStepHit = curStep;
 		setOnScripts('curStep', curStep);
 		callOnScripts('onStepHit');
@@ -3481,6 +3503,12 @@ class PlayState extends MusicBeatState
 		if(lastBeatHit >= curBeat) {
 			//trace('BEAT HIT: ' + curBeat + ', LAST HIT: ' + lastBeatHit);
 			return;
+		}
+
+		if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && ClientPrefs.data.zoomMode == 'Beat')
+		{
+			FlxG.camera.zoom += 0.015 * camZoomingMult;
+			camHUD.zoom += 0.03 * camZoomingMult;
 		}
 
 		if (generatedMusic)
@@ -3513,7 +3541,7 @@ class PlayState extends MusicBeatState
 			if (generatedMusic && !endingSong && !isCameraOnForcedPos)
 				moveCameraSection();
 
-			if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms)
+			if (camZooming && FlxG.camera.zoom < 1.35 && ClientPrefs.data.camZooms && ClientPrefs.data.zoomMode == 'Section')
 			{
 				FlxG.camera.zoom += 0.015 * camZoomingMult;
 				camHUD.zoom += 0.03 * camZoomingMult;
@@ -3829,7 +3857,7 @@ class PlayState extends MusicBeatState
 		var shits:Int = ratingsData[3].hits;
 
 		ratingFC = 'Clear';
-		if(!ClientPrefs.data.keStyle)
+		if(ClientPrefs.data.styleEngine != 'Kade')
 		{
 			if(songMisses < 1)
 			{

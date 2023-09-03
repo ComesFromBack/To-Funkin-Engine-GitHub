@@ -1,6 +1,7 @@
 package options;
 
 import objects.Character;
+import flixel.graphics.FlxGraphic;
 
 class GraphicsSettingsSubState extends BaseOptionsMenu
 {
@@ -58,6 +59,14 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 			'int');
 		addOption(option);
 
+		var option:Option = new Option('Persistent Cached Data',
+			'If checked, images loaded will stay in memory\nuntil the game is closed, this increases memory usage,\nbut basically makes reloading times instant.',
+			'imagesPersist',
+			'bool');
+		option.onChange = onChangePersistentData; //Persistent Cached Data changes FlxGraphic.defaultPersist
+		addOption(option);
+		super();
+
 		option.minValue = 30;
 		option.maxValue = 320;
 		option.displayFormat = '%v FPS';
@@ -97,5 +106,9 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 	{
 		super.changeSelection(change);
 		boyfriend.visible = (antialiasingOption == curSelected);
+	}
+	function onChangePersistentData()
+	{
+		FlxGraphic.defaultPersist = ClientPrefs.data.imagesPersist;
 	}
 }

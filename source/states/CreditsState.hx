@@ -35,6 +35,7 @@ class CreditsState extends MusicBeatState
 		persistentUpdate = true;
 
 		bg = new FlxSprite().makeGraphic(FlxG.width, FlxG.height);
+		bg.alpha = 0.5;
 		bg.antialiasing = ClientPrefs.data.antialiasing;
 		add(bg);
 		bg.screenCenter();
@@ -53,14 +54,12 @@ class CreditsState extends MusicBeatState
 
 		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
 			['To Funkin Engine Team'],
-			['CFB',		'cfb',		'Programmer',								'https://b23.tv/8eUIxSY',	'1E90FF'],
-			['TG',		'TG',		'Haxe assists',								'https://user.qzone.qq.com/2111876721?source=grouplist',	'FFD700'],
+			['CFB',		'cfb',		'Programmer',								'https://space.bilibili.com/525583987/dynamic?spm_id_from=444.41.my-info.face.click',	'1E90FF'],
+			['TG',		'TG',		'Haxe assists',								'https://space.bilibili.com/508557497/dynamic?spm_id_from=444.41.list.card_avatar.click',	'FFD700'],
 			['Guagua',				'guagua',			'Assist with the To Funkin Engine',							'https://user.qzone.qq.com/2448554167?source=grouplist',		'008000'],
+			['PWP',				'pwp',			'Android Version Support',							'https://github.com/pwp114514',		'FF7300'],
 			[''],
 			['Special thanks'],
-			['notweuz_', 'weuz', 'Main Programmer of OS Engine', 'https://twitter.com/notweuz_', '8633F2'],
-			['nelifs', 'nelifs', 'Second Programmer and Designer of OS Engine', 'https://github.com/nelifs', '1C1C1C'],
-			['Cooljer', 'cooljer', 'Main Artist of OS Engine', 'https://twitter.com/cooljer_', '3360F2'],
 			['blueberry', 'blueberry', 'very cute', 'https://space.bilibili.com/1224078744?spm_id_from=333.999.0.0', '1F90FF'],
 			[''],
 			['Psych Engine Team'],

@@ -73,7 +73,7 @@ class FPS extends TextField
 	var ColorArray:Array<Int> = [
 		0xCC00D3,
 		0xAE00FF,
-		0x9400FD,
+		0xFF9400FD,
 		0x6F17C2,
 		0x0000FF,
 		0x00E1FF,
@@ -105,25 +105,23 @@ class FPS extends TextField
 		{
 			
 			var memoryMegas:String = "??? MB";
-			var memory:Float = 0;
+			var currentlyMemory:Float = 0;
 			var memoryMegasPeak:String = "??? MB";
-			var memoryPeak:Float = 0;
+			var maximumMemory:Float = 0;
 			
 			#if openfl
-			memory = Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 2));
-			if (memory >= 1048576) memoryMegas = Math.abs(FlxMath.roundDecimal(memory / 1048576, 1)) + " TB";
-			else if(memory >= 1024) memoryMegas = Math.abs(FlxMath.roundDecimal(memory / 1024, 2)) + " GB";
-			else memoryMegas = memory + " MB";
+			currentlyMemory = Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 2));
+			if (currentlyMemory >= 1048576) memoryMegas = Math.abs(FlxMath.roundDecimal(currentlyMemory / 1048576, 1)) + " TB";
+			else if(currentlyMemory >= 1024) memoryMegas = Math.abs(FlxMath.roundDecimal(currentlyMemory / 1024, 2)) + " GB";
+			else memoryMegas = currentlyMemory + " MB";
 
+			if (currentlyMemory >= maximumMemory)
+				maximumMemory = currentlyMemory;
+			
 
-			if(memory >= memoryPeak)
-			{
-				memoryPeak = memory;
-			}
-
-			if (memoryPeak >= 1048576) memoryMegasPeak = Math.abs(FlxMath.roundDecimal(memoryPeak / 1048576, 1)) + " TB";
-			else if(memoryPeak >= 1024) memoryMegasPeak = Math.abs(FlxMath.roundDecimal(memoryPeak / 1024, 2)) + " GB";
-			else memoryMegasPeak = memoryPeak + " MB";
+			if (maximumMemory >= 1048576) memoryMegasPeak = Math.abs(FlxMath.roundDecimal(maximumMemory / 1048576, 1)) + " TB";
+			else if(maximumMemory >= 1024) memoryMegasPeak = Math.abs(FlxMath.roundDecimal(maximumMemory / 1024, 2)) + " GB";
+			else memoryMegasPeak = maximumMemory + " MB";
 
 			#end
 
@@ -145,7 +143,7 @@ class FPS extends TextField
 			else if(!ClientPrefs.data.rainbowFPS)
 			{
 				textColor = 0xFFFFFFFF;
-				if (memory > 3000 || currentFPS <= ClientPrefs.data.framerate / 2)
+				if (currentlyMemory > 3000 || currentFPS <= ClientPrefs.data.framerate / 2)
 				{
 					textColor = 0xFFFF0000;
 				}
