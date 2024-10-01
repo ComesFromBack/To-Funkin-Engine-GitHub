@@ -1,30 +1,42 @@
 package;
+import debug.FPSCounter;
 
 import flixel.graphics.FlxGraphic;
-
 import flixel.FlxGame;
 import flixel.FlxState;
+import haxe.io.Path;
 import openfl.Assets;
 import openfl.Lib;
-import openfl.display.FPS;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.display.StageScaleMode;
 import lime.app.Application;
+import backend.WinAPI;
 import states.TitleState;
+import openfl.events.KeyboardEvent;
+import openfl.events.NativeProcessExitEvent;
+
+#if linux
+import lime.graphics.Image;
+#end
 
 //crash handler stuff
 #if CRASH_HANDLER
 import openfl.events.UncaughtErrorEvent;
 import haxe.CallStack;
 import haxe.io.Path;
-import sys.FileSystem;
-import sys.io.File;
-import sys.io.Process;
 #end
 
-class Main extends Sprite
-{
+import backend.Highscore;
+
+#if linux
+@:cppInclude('./external/gamemode_client.h')
+@:cppFileCode('
+	#define GAMEMODE_AUTO
+')
+#end
+
+class Main extends Sprite {
 	var game = {
 		width: 1280, // WINDOW width
 		height: 720, // WINDOW height
@@ -35,36 +47,31 @@ class Main extends Sprite
 		startFullscreen: false // if the game should start at fullscreen mode
 	};
 
-	public static var fpsVar:FPS;
+	public static var fpsVar:FPSCounter;
+	public static var dateNow:String = Date.now().toString().replace(" ", "_");
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
-	public static function main():Void
-	{
+	public static function main():Void {
 		Lib.current.addChild(new Main());
 	}
 
-	public function new()
-	{
+	public function new() {
 		super();
 
-		if (stage != null)
-		{
-			init();
-		}
-		else
-		{
-			addEventListener(Event.ADDED_TO_STAGE, init);
-		}
+		if (stage != null) init();
+		else addEventListener(Event.ADDED_TO_STAGE, init);
+
+		#if VIDEOS_ALLOWED
+		hxvlc.util.Handle.init(#if (hxvlc >= "1.8.0")  ['--no-lua'] #end);
+		#end
 	}
 
-	private function init(?E:Event):Void
-	{
+	private function init(?E:Event):Void {
 		if (hasEventListener(Event.ADDED_TO_STAGE))
-		{
 			removeEventListener(Event.ADDED_TO_STAGE, init);
-		}
 
+		if(CheckProgramNum("To Funkin Engine.exe") > 1) Sys.exit(1);
 		setupGame();
 	}
 
@@ -73,22 +80,28 @@ class Main extends Sprite
 		var stageWidth:Int = Lib.current.stage.stageWidth;
 		var stageHeight:Int = Lib.current.stage.stageHeight;
 
-		if (game.zoom == -1.0)
-		{
+		if (game.zoom == -1.0) {
 			var ratioX:Float = stageWidth / game.width;
 			var ratioY:Float = stageHeight / game.height;
 			game.zoom = Math.min(ratioX, ratioY);
 			game.width = Math.ceil(stageWidth / game.zoom);
 			game.height = Math.ceil(stageHeight / game.zoom);
 		}
-	
+		#if LUA_ALLOWED
+		Mods.pushGlobalMods();
+		#end
+		Mods.loadTopMod();
+		FlxG.save.bind('funkin', CoolUtil.getSavePath());
+		Highscore.load();
+
 		#if LUA_ALLOWED Lua.set_callbacks_function(cpp.Callable.fromStaticFunction(psychlua.CallbackHandler.call)); #end
 		Controls.instance = new Controls();
 		ClientPrefs.loadDefaultKeys();
+		#if ACHIEVEMENTS_ALLOWED Achievements.load(); #end
 		addChild(new FlxGame(game.width, game.height, game.initialState, #if (flixel < "5.0.0") game.zoom, #end game.framerate, game.framerate, game.skipSplash, game.startFullscreen));
 
 		#if !mobile
-		fpsVar = new FPS(10, 3, 0xFFFFFF);
+		fpsVar = new FPSCounter(10, 3, 0xFFFFFF);
 		addChild(fpsVar);
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -97,80 +110,117 @@ class Main extends Sprite
 		}
 		#end
 
-		#if html5
-		FlxG.autoPause = false;
-		FlxG.mouse.visible = false;
+        var any:Array<String> = Arrays.resolutionList[ClientPrefs.data.resolution].split('x');
+        #if desktop
+        if(!ClientPrefs.data.fullscr)
+			FlxG.resizeWindow(Std.parseInt(any[0]), Std.parseInt(any[1]));
+        #end
+        FlxG.resizeGame(Std.parseInt(any[0]), Std.parseInt(any[1]));
+        FlxG.fullscreen = ClientPrefs.data.fullscr;
+		any = null;
+
+		#if linux
+		var icon = Image.fromFile("icon.png");
+		Lib.current.stage.window.setIcon(icon);
 		#end
-		
+
+		FlxG.fixedTimestep = false;
+		FlxG.game.focusLostFramerate = 60;
+		FlxG.keys.preventDefaultKeys = [TAB];		
 		#if CRASH_HANDLER
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
 		#end
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, toggleFullScreen);
+		FlxG.stage.addEventListener(NativeProcessExitEvent.EXIT, onExit);
 
-		#if desktop
-		DiscordClient.start();
-		#end
+		if(dateNow.contains("04-01")) Application.current.window.title = "Friday Night Funky': To Funky Engine";
+		else Application.current.window.title = "Friday Night Funkin': To Funkin Engine";
 
 		// shader coords fix
 		FlxG.signals.gameResized.add(function (w, h) {
 		     if (FlxG.cameras != null) {
 			   for (cam in FlxG.cameras.list) {
-				@:privateAccess
-				if (cam != null && cam._filters != null)
-					resetSpriteCache(cam.flashSprite);
+				if (cam != null && cam.filters != null) resetSpriteCache(cam.flashSprite);
 			   }
-		     }
+			}
 
-		     if (FlxG.game != null)
-			 resetSpriteCache(FlxG.game);
+			if (FlxG.game != null) resetSpriteCache(FlxG.game);
 		});
 	}
 
 	static function resetSpriteCache(sprite:Sprite):Void {
 		@:privateAccess {
-		        sprite.__cacheBitmap = null;
+		    sprite.__cacheBitmap = null;
 			sprite.__cacheBitmapData = null;
 		}
 	}
 
+	function toggleFullScreen(event:KeyboardEvent){ // From https://github.com/beihu235/FNF-NovaFlare-Engine/blob/main/source/Main.hx
+		if(Controls.instance.justReleased('fullscreen'))
+			FlxG.fullscreen = !FlxG.fullscreen;
+	}
+
+	#if (cpp || windows)
+	function onExit(event:NativeProcessExitEvent) {
+	}
+	#end
+
 	// Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
 	// very cool person for real they don't get enough credit for their work
 	#if CRASH_HANDLER
-	function onCrash(e:UncaughtErrorEvent):Void
-	{
+	static function onCrash(e:UncaughtErrorEvent):Void {
 		var errMsg:String = "";
 		var path:String;
 		var callStack:Array<StackItem> = CallStack.exceptionStack(true);
-		var dateNow:String = Date.now().toString();
+		
+		var flixeled:Bool = false;
+		var mained:Bool = false;
 
-		dateNow = dateNow.replace(" ", "_");
 		dateNow = dateNow.replace(":", "'");
 
-		path = "./crash/" + "PsychEngine_" + dateNow + ".txt";
+		path = "./crash/" + "ToFunkinEngine_" + dateNow + ".txt";
 
-		for (stackItem in callStack)
-		{
-			switch (stackItem)
-			{
+		for (stackItem in callStack) {
+			switch (stackItem) {
 				case FilePos(s, file, line, column):
-					errMsg += file + " (line " + line + ")\n";
-				default:
-					Sys.println(stackItem);
+					if(file.startsWith("flixel") && !flixeled) {
+						errMsg += "\n----The error in Flixel code at file----\n\n";
+						flixeled = true;
+					} else {
+						if(!mained) {
+							errMsg += "Mainly error => "+ file + " (At line " + line + ")\n";
+							mained = true;
+						} else errMsg += file + " (At line " + line + ")\n";
+					}
+				default: Sys.println(stackItem);
 			}
 		}
 
-		errMsg += "\nUncaught Error: " + e.error + "\nPlease report this error to the GitHub page: https://github.com/ShadowMario/FNF-PsychEngine\n\n> Crash Handler written by: sqirra-rng";
+		errMsg += "\nGame has Error: " + e.error;
+		errMsg += "\n\nPlease report this error to:\nGameBanana page: https://gamebanana.com/tools/issues/14365\nCreater E-Mail: MinecraftForMePack@outlook.com";
+		errMsg += "\n\nPress \"OK\" button to open error report page. Press \"NO\" button cancel";
 
-		if (!FileSystem.exists("./crash/"))
-			FileSystem.createDirectory("./crash/");
-
+		if (!FileSystem.exists("./crash/")) FileSystem.createDirectory("./crash/");
 		File.saveContent(path, errMsg + "\n");
-
 		Sys.println(errMsg);
-		Sys.println("Crash dump saved in " + Path.normalize(path));
+		Sys.println("Crash log saved in " + Path.normalize(path));
+		Log.OUTPUT(dateNow);
 
-		Application.current.window.alert(errMsg, "Error!");
-		DiscordClient.shutdown();
+		#if (cpp||windows)
+		WinAPI.createErrorWindow(errMsg);
+		#else
+		Application.current.window.alert(errMsg, "Crash!");
 		Sys.exit(1);
+		#end
 	}
+
+	#if (cpp||windows)
+	@:functionCode('
+		return 1;
+	')
+	function CheckProgramNum(Process:String):Int {
+		return 0;
+	}
+	#end
 	#end
 }
