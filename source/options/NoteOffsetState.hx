@@ -1,10 +1,8 @@
 package options;
 
-import flixel.math.FlxPoint;
-
 import backend.StageData;
 import objects.Character;
-import objects.HealthBar;
+import objects.Bar;
 import flixel.addons.display.shapes.FlxShapeCircle;
 
 import states.stages.StageWeek1 as BackgroundStage;
@@ -27,7 +25,7 @@ class NoteOffsetState extends MusicBeatState
 	var barPercent:Float = 0;
 	var delayMin:Int = -500;
 	var delayMax:Int = 500;
-	var timeBar:HealthBar;
+	var timeBar:Bar;
 	var timeTxt:FlxText;
 	var beatText:Alphabet;
 	var beatTween:FlxTween;
@@ -40,18 +38,16 @@ class NoteOffsetState extends MusicBeatState
 	override public function create()
 	{
 		// Cameras
-		camGame = new FlxCamera();
-		camHUD = new FlxCamera();
-		camOther = new FlxCamera();
-		camHUD.bgColor.alpha = 0;
-		camOther.bgColor.alpha = 0;
+		camGame = initPsychCamera();
 
-		FlxG.cameras.reset(camGame);
+		camHUD = new FlxCamera();
+		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
+
+		camOther = new FlxCamera();
+		camOther.bgColor.alpha = 0;
 		FlxG.cameras.add(camOther, false);
 
-		FlxG.cameras.setDefaultDrawTarget(camGame, true);
-		CustomFadeTransition.nextCamera = camOther;
 		FlxG.camera.scroll.set(120, 130);
 
 		persistentUpdate = true;
@@ -115,7 +111,7 @@ class NoteOffsetState extends MusicBeatState
 		repositionCombo();
 
 		// Note delay stuff
-		beatText = new Alphabet(0, 0, 'Beat Hit!', true);
+		beatText = new Alphabet(0, 0, Language.getTextFromID('Offset_Beat_Hit'), true);
 		beatText.setScale(0.6, 0.6);
 		beatText.x += 260;
 		beatText.alpha = 0;
@@ -133,7 +129,7 @@ class NoteOffsetState extends MusicBeatState
 		barPercent = ClientPrefs.data.noteOffset;
 		updateNoteDelay();
 		
-		timeBar = new HealthBar(0, timeTxt.y + (timeTxt.height / 3), 'healthBar', function() return barPercent, delayMin, delayMax);
+		timeBar = new Bar(0, timeTxt.y + (timeTxt.height / 3), 'healthBar', function() return barPercent, delayMin, delayMax);
 		timeBar.scrollFactor.set();
 		timeBar.screenCenter(X);
 		timeBar.visible = false;
@@ -167,7 +163,7 @@ class NoteOffsetState extends MusicBeatState
 		updateMode();
 		_lastControllerMode = true;
 
-		Conductor.changeBPM(128.0);
+		Conductor.bpm = 128.0;
 		FlxG.sound.playMusic(Paths.music('offsetSong'), 1, true);
 
 		super.create();
@@ -405,17 +401,25 @@ class NoteOffsetState extends MusicBeatState
 			if(beatTween != null) beatTween.cancel();
 
 			persistentUpdate = false;
-			CustomFadeTransition.nextCamera = camOther;
-			MusicBeatState.switchState(new options.OptionsState());
+			switch(Arrays.engineList[ClientPrefs.data.styleEngine]) {
+				case "Psych Old" | "Psych New":
+					MusicBeatState.switchState(new options.OptionsState());
+				case "Kade":
+					MusicBeatState.switchState(new options.kade.KadeOptions());
+				case "MicUp":
+					MusicBeatState.switchState(new options.micup.SettingsState());
+				case "Vanilla":
+					// MusicBeatState.switchState(new options.vanilla.VanillaOptions());
+			}
+			
 			if(OptionsState.onPlayState)
 			{
-				if(ClientPrefs.data.pauseMusic != 'None')
-					FlxG.sound.playMusic(Paths.music(Paths.formatToSongPath(ClientPrefs.data.pauseMusic)));
+				if(Arrays.pauseSongList[ClientPrefs.data.pauseMusic] != 'None')
+					FlxG.sound.playMusic(Paths.music(Paths.formatToSongPath(Arrays.pauseSongList[ClientPrefs.data.pauseMusic])));
 				else
 					FlxG.sound.music.volume = 0;
 			}
 			else FlxG.sound.playMusic(Paths.music('freakyMenu'));
-			FlxG.mouse.visible = false;
 		}
 
 		Conductor.songPosition = FlxG.sound.music.time;
@@ -500,9 +504,9 @@ class NoteOffsetState extends MusicBeatState
 		{
 			switch(i)
 			{
-				case 0: dumbTexts.members[i].text = 'Rating Offset:';
+				case 0: dumbTexts.members[i].text = Language.getTextFromID('Offset_RO');
 				case 1: dumbTexts.members[i].text = '[' + ClientPrefs.data.comboOffset[0] + ', ' + ClientPrefs.data.comboOffset[1] + ']';
-				case 2: dumbTexts.members[i].text = 'Numbers Offset:';
+				case 2: dumbTexts.members[i].text = Language.getTextFromID('Offset_NO');
 				case 3: dumbTexts.members[i].text = '[' + ClientPrefs.data.comboOffset[2] + ', ' + ClientPrefs.data.comboOffset[3] + ']';
 			}
 		}
@@ -511,7 +515,7 @@ class NoteOffsetState extends MusicBeatState
 	function updateNoteDelay()
 	{
 		ClientPrefs.data.noteOffset = Math.round(barPercent);
-		timeTxt.text = 'Current offset: ' + Math.floor(barPercent) + ' ms';
+		timeTxt.text = Language.getTextFromID('Offset_CO', 'REP', [Math.floor(barPercent)]);
 	}
 
 	function updateMode()
@@ -535,14 +539,14 @@ class NoteOffsetState extends MusicBeatState
 		var str:String;
 		var str2:String;
 		if(onComboMenu)
-			str = 'Combo Offset';
+			str = Language.getTextFromID('Offset_Combo');
 		else
-			str = 'Note/Beat Delay';
+			str = Language.getTextFromID('Offset_NBD');
 
 		if(!controls.controllerMode)
-			str2 = '(Press Accept to Switch)';
+			str2 = Language.getTextFromID('Offset_Switch', 'R_S', 0, [controls.ACCEPT_S]);
 		else
-			str2 = '(Press Start to Switch)';
+			str2 = Language.getTextFromID('Offset_Switch', 'SPT', 1);
 
 		changeModeText.text = '< ${str.toUpperCase()} ${str2.toUpperCase()} >';
 	}
