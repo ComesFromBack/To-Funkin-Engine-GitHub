@@ -1,15 +1,19 @@
 package flixel.addons.ui;
 
-import lime.system.Clipboard;
-import flash.errors.Error;
-import flash.events.KeyboardEvent;
-import flash.geom.Rectangle;
+import flixel.FlxG;
+import flixel.FlxSprite;
 import flixel.addons.ui.FlxUI.NamedString;
-
+import flixel.input.keyboard.FlxKey;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
-
+import flixel.text.FlxText;
+import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
+import flixel.util.FlxTimer;
+import lime.system.Clipboard;
+import openfl.errors.Error;
+import openfl.events.KeyboardEvent;
+import openfl.geom.Rectangle;
 
 /**
  * FlxInputText v1.11, ported to Haxe
@@ -23,7 +27,6 @@ import flixel.util.FlxDestroyUtil;
  * Copyright (c) 2009 Martín Sebastián Wain
  * License: Creative Commons Attribution 3.0 United States
  * @link http://creativecommons.org/licenses/by/3.0/us/
- * 
  */
 class FlxInputText extends FlxText
 {
@@ -41,9 +44,6 @@ class FlxInputText extends FlxText
 	public static inline var DELETE_ACTION:String = "delete"; // press delete
 	public static inline var ENTER_ACTION:String = "enter"; // press enter
 	public static inline var INPUT_ACTION:String = "input"; // manually edit
-	public static inline var PASTE_ACTION:String = "paste"; // text paste
-	public static inline var COPY_ACTION:String = "copy"; // text copy
-	public static inline var CUT_ACTION:String = "cut"; // text copy
 
 	/**
 	 * This regular expression will filter out (remove) everything that matches.
@@ -225,12 +225,17 @@ class FlxInputText extends FlxText
 		}
 
 		lines = 1;
-		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false, 1);
 
 		if (Text == null)
 		{
 			Text = "";
 		}
+
+		// Register paste events for the HTML5 parent window
+		#if (js && html5)
+		FlxG.stage.window.onTextInput.add(handleClipboardText);
+		#end
 
 		text = Text; // ensure set_text is called to avoid bugs (like not preparing _charBoundaries on sys target, making it impossible to click)
 
@@ -257,6 +262,10 @@ class FlxInputText extends FlxText
 			}
 			_charBoundaries = null;
 		}
+		#end
+
+		#if (js && html5)
+		FlxG.stage.window.onTextInput.remove(handleClipboardText);
 		#end
 
 		super.destroy();
@@ -290,7 +299,7 @@ class FlxInputText extends FlxText
 		if (Sprite != null && Sprite.visible)
 		{
 			Sprite.scrollFactor = scrollFactor;
-			Sprite.cameras = cameras;
+			Sprite._cameras = _cameras;
 			Sprite.draw();
 		}
 	}
@@ -307,7 +316,7 @@ class FlxInputText extends FlxText
 		if (FlxG.mouse.justPressed)
 		{
 			var hadFocus:Bool = hasFocus;
-			if (mouseOverlapping())
+			if (FlxG.mouse.overlaps(this))
 			{
 				caretIndex = getCaretIndex();
 				hasFocus = true;
@@ -323,156 +332,76 @@ class FlxInputText extends FlxText
 		}
 		#end
 	}
-	
-	function mouseOverlapping()
-	{
-		var mousePoint = FlxG.mouse.getScreenPosition(camera);
-		var objPoint = this.getScreenPosition(null, camera);
-		if(mousePoint.x >= objPoint.x && mousePoint.y >= objPoint.y &&
-			mousePoint.x < objPoint.x + this.width && mousePoint.y < objPoint.y + this.height)
-		{
-			return true;
-		}
-		return false;
-	}
 
 	/**
 	 * Handles keypresses generated on the stage.
 	 */
 	private function onKeyDown(e:KeyboardEvent):Void
 	{
-		var key:Int = e.keyCode;
+		final key:FlxKey = e.keyCode;
 
 		if (hasFocus)
 		{
-
-			  //// Crtl/Cmd + C to copy text to the clipboard
-			  // This copies the entire input, because i'm too lazy to do caret selection, and if i did it i whoud probabbly make it a pr in flixel-ui.
-
-			  #if (macos)
-			  if (key == 67 && e.commandKey) {
-			  #else
-			  if (key == 67 && e.ctrlKey) {
-		 	  #end
-				Clipboard.text = text;
-
-				onChange(COPY_ACTION);
-
-				// Stops the function to go further, because it whoud type in a c to the input
-				return;
-			  }
-
-			  //// Crtl/Cmd + V to paste in the clipboard text to the input
-			  #if (macos)
-			  if (key == 86 && e.commandKey) {
-			  #else
-			  if (key == 86 && e.ctrlKey) {
-			  #end
-				var newText:String = filter(Clipboard.text);
-
-				if (newText.length > 0 && (maxLength == 0 || (text.length + newText.length) < maxLength)) {
-					text = insertSubstring(text, newText, caretIndex);
-					caretIndex += newText.length;
-					onChange(INPUT_ACTION);
-					onChange(PASTE_ACTION);
-				}
-
-				// Same as before, but prevents typing out a v
-				return;
-			}
-
-			//// Crtl/Cmd + X to cut the text from the input to the clipboard
-			// Again, this copies the entire input text because there is no caret selection.
-			#if (macos)
-			if (key == 88 && e.commandKey) {
-			#else
-			if (key == 88 && e.ctrlKey) {
-			#end
-				Clipboard.text = text;
-				text = '';
-				caretIndex = 0;
-
-				onChange(INPUT_ACTION);
-				onChange(CUT_ACTION);
-
-				// Same as before, but prevents typing out a x
-				return;
-			}
-
-			// Do nothing for Shift, Ctrl, Esc, and flixel console hotkey
-			if (key == 16 || key == 17 || key == 220 || key == 27)
+			switch (key)
 			{
-				return;
-			}
-			// Left arrow
-			else if (key == 37)
-			{
-				if (caretIndex > 0)
-				{
-					caretIndex--;
-					text = text; // forces scroll update
-				}
-			}
-			// Right arrow
-			else if (key == 39)
-			{
-				if (caretIndex < text.length)
-				{
-					caretIndex++;
-					text = text; // forces scroll update
-				}
-			}
-			// End key
-			else if (key == 35)
-			{
-				caretIndex = text.length;
-				text = text; // forces scroll update
-			}
-			// Home key
-			else if (key == 36)
-			{
-				caretIndex = 0;
-				text = text;
-			}
-			// Backspace
-			else if (key == 8)
-			{
-				if (caretIndex > 0)
-				{
-					caretIndex--;
-					text = text.substring(0, caretIndex) + text.substring(caretIndex + 1);
-					onChange(BACKSPACE_ACTION);
-				}
-			}
-			// Delete
-			else if (key == 46)
-			{
-				if (text.length > 0 && caretIndex < text.length)
-				{
-					text = text.substring(0, caretIndex) + text.substring(caretIndex + 1);
-					onChange(DELETE_ACTION);
-				}
-			}
-			// Enter
-			else if (key == 13)
-			{
-				onChange(ENTER_ACTION);
-			}
-			// Actually add some text
-			else
-			{
-				if (e.charCode == 0) // non-printable characters crash String.fromCharCode
-				{
+				case SHIFT | CONTROL | BACKSLASH | ESCAPE:
 					return;
-				}
-				var newText:String = filter(String.fromCharCode(e.charCode));
+				case LEFT:
+					if (caretIndex > 0)
+					{
+						caretIndex--;
+						text = text; // forces scroll update
+					}
+				case RIGHT:
+					if (caretIndex < text.length)
+					{
+						caretIndex++;
+						text = text; // forces scroll update
+					}
+				case END:
+					caretIndex = text.length;
+					text = text; // forces scroll update
+				case HOME:
+					caretIndex = 0;
+					text = text;
+				case BACKSPACE:
+					if (caretIndex > 0)
+					{
+						caretIndex--;
+						text = text.substring(0, caretIndex) + text.substring(caretIndex + 1);
+						onChange(BACKSPACE_ACTION);
+					}
+				case DELETE:
+					if (text.length > 0 && caretIndex < text.length)
+					{
+						text = text.substring(0, caretIndex) + text.substring(caretIndex + 1);
+						onChange(DELETE_ACTION);
+					}
+				case ENTER:
+					onChange(ENTER_ACTION);
+				case V if (e.ctrlKey):
+					// Reapply focus  when tabbing back into the window and selecting the field
+					#if (js && html5)
+					FlxG.stage.window.textInputEnabled = true;
+					#else
+					var clipboardText:String = Clipboard.text;
+					if (clipboardText != null)
+						pasteClipboardText(clipboardText);
+					#end
+				default:
+					// Actually add some text
+					if (e.charCode == 0) // non-printable characters crash String.fromCharCode
+					{
+						return;
+					}
+					final newText = filter(String.fromCharCode(e.charCode));
 
-				if (newText.length > 0 && (maxLength == 0 || (text.length + newText.length) < maxLength))
-				{
-					text = insertSubstring(text, newText, caretIndex);
-					caretIndex++;
-					onChange(INPUT_ACTION);
-				}
+					if (newText.length > 0 && (maxLength == 0 || (text.length + newText.length) <= maxLength))
+					{
+						text = insertSubstring(text, newText, caretIndex);
+						caretIndex++;
+						onChange(INPUT_ACTION);
+					}
 			}
 		}
 	}
@@ -483,6 +412,23 @@ class FlxInputText extends FlxText
 		{
 			callback(text, action);
 		}
+	}
+
+	#if (html5 && js)
+	function handleClipboardText(clipboardText:String)
+	{
+		@:privateAccess if (Clipboard._text == clipboardText)
+			pasteClipboardText(clipboardText);
+	}
+	#end
+
+	function pasteClipboardText(clipboardText:String)
+	{
+		final newText = filter(clipboardText).substring(0, maxLength > 0 ? (maxLength - text.length) : clipboardText.length);
+
+		text = insertSubstring(text, newText, caretIndex);
+		caretIndex += newText.length;
+		onChange(INPUT_ACTION);
 	}
 
 	/**
@@ -601,11 +547,9 @@ class FlxInputText extends FlxText
 				switch (getAlignStr())
 				{
 					case RIGHT:
-						X = X - textField.width + textField.textWidth
-							;
+						X = X - textField.width + textField.textWidth;
 					case CENTER:
-						X = X - textField.width / 2 + textField.textWidth / 2
-							;
+						X = X - textField.width / 2 + textField.textWidth / 2;
 					default:
 				}
 			}
@@ -882,6 +826,11 @@ class FlxInputText extends FlxText
 				_caretTimer = new FlxTimer().start(0.5, toggleCaret, 0);
 				caret.visible = true;
 				caretIndex = text.length;
+
+				#if mobile
+				// Initialize soft keyboard
+				FlxG.stage.window.textInputEnabled = true;
+				#end
 			}
 		}
 		else
@@ -892,11 +841,22 @@ class FlxInputText extends FlxText
 			{
 				_caretTimer.cancel();
 			}
+
+			#if mobile
+			// Remove soft keyboard
+			FlxG.stage.window.textInputEnabled = false;
+			#end
 		}
 
 		if (newFocus != hasFocus)
 		{
 			calcFrame();
+
+			// Set focus on background parent text input
+			#if (js && html5)
+			var window = FlxG.stage.window;
+			@:privateAccess window.__backend.setTextInputEnabled(newFocus);
+			#end
 		}
 		return hasFocus = newFocus;
 	}
