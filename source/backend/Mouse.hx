@@ -1,0 +1,2 @@
+package backend;
+class Mouse {public static function reloadMouseGraphics(){switch(ClientPrefs.data.mouse){case 0:FlxG.mouse.unload();FlxG.mouse.useSystemCursor=false;case 1:FlxG.mouse.useSystemCursor=true;FlxG.mouse.unload();case 2:var mouse= new FlxSprite();mouse.loadGraphic(Paths.image("Preload/cursor"));FlxG.mouse.useSystemCursor=false;FlxG.mouse.load(mouse.pixels);}}}

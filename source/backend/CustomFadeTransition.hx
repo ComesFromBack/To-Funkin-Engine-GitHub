@@ -1,269 +1,328 @@
 package backend;
 
-import backend.Conductor.BPMChangeEvent;
-import flixel.FlxG;
-import flixel.addons.ui.FlxUIState;
-import flixel.math.FlxRect;
-import flixel.util.FlxTimer;
-import flixel.addons.transition.FlxTransitionableState;
-import flixel.tweens.FlxEase;
-import flixel.text.FlxText;
-import flixel.tweens.FlxTween;
-import flixel.util.FlxColor;
-import flixel.util.FlxGradient;
 import flixel.FlxSubState;
-import flixel.FlxSprite;
-import flixel.FlxCamera;
+import openfl.utils.Assets;
+import flixel.FlxObject;
+import flixel.util.FlxGradient;
 
-import lime.app.Application;
+class Fade {
+	public static var LIST:Array<String> = ["Move", "Fade"];
+	public static var moveIn:Array<Array<Int>> = [];
+    public static var moveOut:Array<Array<Int>> = [];
+
+    private static function getPositionMoving() {
+        if(Arrays.fadeStyleList[ClientPrefs.data.fadeStyle] != "default") {
+			for(i in Mods.mergeAllTextsNamed('images/CustomFadeTransition/${Arrays.fadeStyleList[ClientPrefs.data.fadeStyle]}/fade')) {
+            	if(i.startsWith("MoveIn")) moveIn = toArrayInt(i.split(">")[1]);
+				else if(i.startsWith("MoveOut")) moveOut = toArrayInt(i.split(">")[1]);
+			}
+        }
+    }
+
+	public static function toArrayInt(from:String):Array<Array<Int>> {
+		var ret:Array<Array<Int>> = [];
+		var split = from.split("|");
+		for(i in split) ret.push([Std.parseInt(i.split(",")[0]),Std.parseInt(i.split(",")[1])]);
+		return ret;
+	}
+}
 
 class CustomFadeTransition extends MusicBeatSubstate {
 	public static var finishCallback:Void->Void;
 	private var leTween:FlxTween = null;
 	public static var nextCamera:FlxCamera;
 	var isTransIn:Bool = false;
+	var transBlack:FlxSprite;
+	var transGradient:FlxSprite;
+	var duration:Float;
 	
-	var eleLeft:FlxSprite;
-	var eleRight:FlxSprite;
-	var ele2Left:FlxSprite;
-	var ele2Right:FlxSprite;
-	var tipsBG:FlxSprite;
+	var loadLeft:FlxSprite;
+	var loadRight:FlxSprite;
+	var loadAlpha:FlxSprite;
+	var WaterMark:FlxText;
+	var EventText:FlxText;
 	
-	private var eleLeftTween:FlxTween = null;
-	private var eleLeft2Tween:FlxTween = null;
-
-	private var eleRightTween:FlxTween = null;
-	private var eleRight2Tween:FlxTween = null;
-
-	/*var eleLoadLeft:FlxSprite;
-	var eleLoadRight:FlxSprite;
-
-	var eleLoadLeftTween:FlxTween;
-	var eleLoadRightTween:FlxTween;*/
-
-	var tipsBGTween:FlxTween;
+	var loadLeftTween:FlxTween;
+	var loadRightTween:FlxTween;
+	var loadAlphaTween:FlxTween;
+	var EventTextTween:FlxTween;
 	var loadTextTween:FlxTween;
-	
-	var tipsShit:Array<String> = [
-		'Thank you playing this engine!',
-		'Where is Week8?',
-		'If you have a problem, then you have a problem;)',
-		"*slap*",
-		'Say baldi for me :)',
-		'You are my favorite customer. See ya!',
-		"看我干啥,看谱子啊?",
-		'You his mom pi my melon',
-		'Wowee!',
-		"There can never be an Android version! :(",
-		'Thanks TG!!!',
-		"Why can't load images???",
-		"Tips:With botplay, you'll never get a high score",
-		"Please wait...",
-		'When the impostor is sus',
-		'感谢你游玩这个引擎!',
-		'Week8为什么还没出(恼)',
-		'如果你有问题,那么你有问题;)',
-		"*slam*",
-		'替我向Baldi问好:)',
-		'再见勒宁内!',
-		"15斤30块",
-		'你甜蜜劈我瓜是吧',
-		'听说在04/01点赞助会发生奇妙的事情!',
-		"我永远不可能出安卓版本的:(",
-		'特别感谢TG!!!',
-		"我为毛不能加载图片???",
-		"冷知识:Botplay不能帮你拿高分",
-		"*boom*",
-		'SUS,Aomgus'
-	];
-
-	var isBBtips:Array<String> = [
-		"蓝莓可爱,绑回家撅了",
-		"引擎被蓝莓占领力",
-		"我超,野生蓝莓",
-		"如何区分蓝莓和BF",
-		"蓝莓,我的蓝莓,嘿嘿..."
-	];
 
 	public function new(duration:Float, isTransIn:Bool) {
 		super();
 
 		this.isTransIn = isTransIn;
-		tipsShit.push('Engine made by Comes_FromBack');
+		this.duration = duration;
 
-		/*eleLoadLeft = new FlxSprite(-640, 0).loadGraphic(Paths.image('Elevate_Left'));
-		add(eleLoadLeft);
+		//trace(Fade.positionData);
+		if(Arrays.fadeStyleList[ClientPrefs.data.fadeStyle] != "default") {
+			if(ClientPrefs.data.fademode == 0){
+				loadRight = new FlxSprite(isTransIn ? 0 : 1280, 0).loadGraphic(Paths.image('CustomFadeTransition/${Arrays.fadeStyleList[ClientPrefs.data.fadeStyle]}/MR'));
+				loadRight.scrollFactor.set();
+				loadRight.antialiasing = ClientPrefs.data.antialiasing;		
+				add(loadRight);
+				loadRight.setGraphicSize(FlxG.width, FlxG.height);
+				loadRight.updateHitbox();
+				
+				loadLeft = new FlxSprite(isTransIn ? 0 : -1280, 0).loadGraphic(Paths.image('CustomFadeTransition/${Arrays.fadeStyleList[ClientPrefs.data.fadeStyle]}/ML'));
+				loadLeft.scrollFactor.set();
+				loadLeft.antialiasing = ClientPrefs.data.antialiasing;
+				add(loadLeft);
+				loadLeft.setGraphicSize(FlxG.width, FlxG.height);
+				loadLeft.updateHitbox();
+				
+				WaterMark = new FlxText(isTransIn ? 50 : -1230, 720 - 50 - 50 * 2, 0, '${ClientPrefs.data._VERSION_}', 50);
+				WaterMark.scrollFactor.set();
+				WaterMark.setFormat(Language.fonts(), 50, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				WaterMark.antialiasing = ClientPrefs.data.antialiasing;
+				add(WaterMark);
+				
+				EventText = new FlxText(isTransIn ? 50 : -1230, 720 - 50 - 50, 0, 'Please Wait.....', 50);
+				EventText.scrollFactor.set();
+				EventText.setFormat(Language.fonts(), 50, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				EventText.antialiasing = ClientPrefs.data.antialiasing;
+				add(EventText);
+				
+				if(!isTransIn) {
+					FlxG.sound.play('assets/shared/images/CustomFadeTransition/${Arrays.fadeStyleList[ClientPrefs.data.fadeStyle]}/loading_start.ogg',ClientPrefs.data.soundVolume);
+					if (!ClientPrefs.data.fadeText) {
+						EventText.text = '';
+						WaterMark.text = '';
+					}
 
-		eleLoadRight = new FlxSprite(1280, 0).loadGraphic(Paths.image('Elevate_Right'));
-		add(eleLoadRight);*/
-		
-		eleLeft = new FlxSprite(-665, 0).makeGraphic(640 - 25, FlxG.height, 0xFFBB6A00);
-		eleLeft.scrollFactor.set();
-		add(eleLeft);
-		ele2Left = new FlxSprite(-640, 0).makeGraphic(25, FlxG.height, 0xFF000000);
-		ele2Left.scrollFactor.set();
-		add(ele2Left);
-			
-		eleRight = new FlxSprite(1920, 0).makeGraphic(615, FlxG.height, 0xFFBB6A00);
-		eleRight.scrollFactor.set();
-		add(eleRight);
+					trace('MOVEIN:[ LX: ${Fade.moveIn[0][0]}, LY: ${Fade.moveIn[0][1]}, RX:${Fade.moveIn[1][0]}, RL:${Fade.moveIn[1][1]} ]');
 
-		ele2Right = new FlxSprite(1920, 0).makeGraphic(25, FlxG.height, 0xFF000000);
-		ele2Right.scrollFactor.set();
-		add(ele2Right);
+					loadLeftTween = FlxTween.tween(loadLeft, {x: Fade.moveIn[0][0], y: Fade.moveIn[0][1]}, duration, {
+						onComplete: function(twn:FlxTween) {
+							if(finishCallback != null) {
+								finishCallback();
+							}
+						},
+					ease: FlxEase.expoInOut});
+					
+					loadRightTween = FlxTween.tween(loadRight, {x: Fade.moveIn[1][0], y: Fade.moveIn[1][1]}, duration, {
+						onComplete: function(twn:FlxTween) {
+							if(finishCallback != null) {
+								finishCallback();
+							}
+						},
+					ease: FlxEase.expoInOut});
+					
+					loadTextTween = FlxTween.tween(WaterMark, {x: 50}, duration, {
+						onComplete: function(twn:FlxTween) {
+							if(finishCallback != null) {
+								finishCallback();
+							}
+						},
+					ease: FlxEase.expoInOut});
+					
+					EventTextTween = FlxTween.tween(EventText, {x: 50}, duration, {
+						onComplete: function(twn:FlxTween) {
+							if(finishCallback != null) {
+								finishCallback();
+							}
+						},
+					ease: FlxEase.expoInOut});
+					
+				} else {
+					FlxG.sound.play('assets/shared/images/CustomFadeTransition/${Arrays.fadeStyleList[ClientPrefs.data.fadeStyle]}/loading_done.ogg',ClientPrefs.data.soundVolume);
+					EventText.text = 'Loading Completed!';
+					if (!ClientPrefs.data.fadeText) {
+						EventText.text = '';
+						WaterMark.text = '';
+					}
 
-		if(Application.current.window.title == "Friday Night Funkin': BlueBrrey Engine")
-		{
-			eleLeft.color = 0x5F9BFFFF;
-			eleRight.color = 0x5F9BFFFF;
+					trace('MOVEOUT:[ LX: ${Fade.moveOut[0][0]}, LY: ${Fade.moveOut[0][1]}, RX:${Fade.moveOut[1][0]}, RL:${Fade.moveOut[1][1]} ]');
+
+					loadLeftTween = FlxTween.tween(loadLeft, {x: Fade.moveOut[0][0], y: Fade.moveOut[0][1]}, duration, {
+						onComplete: function(twn:FlxTween) {
+							close();
+						},
+					ease: FlxEase.expoInOut});
+					
+					loadRightTween = FlxTween.tween(loadRight, {x: Fade.moveOut[1][0], y: Fade.moveOut[1][1]}, duration, {
+						onComplete: function(twn:FlxTween) {
+							close();
+						},
+					ease: FlxEase.expoInOut});
+					
+					loadTextTween = FlxTween.tween(WaterMark, {x: -1230}, duration, {
+						onComplete: function(twn:FlxTween) {
+							close();
+						},
+					ease: FlxEase.expoInOut});
+					
+					EventTextTween = FlxTween.tween(EventText, {x: -1230}, duration, {
+						onComplete: function(twn:FlxTween) {
+							close();
+						},
+					ease: FlxEase.expoInOut});
+					
+					
+				}
+			} else {
+				loadAlpha = new FlxSprite(0, 0).loadGraphic(Paths.image('CustomFadeTransition/${Arrays.fadeStyleList[ClientPrefs.data.fadeStyle]}/MA'));
+				loadAlpha.scrollFactor.set();
+				loadAlpha.antialiasing = ClientPrefs.data.antialiasing;		
+				add(loadAlpha);
+				loadAlpha.setGraphicSize(FlxG.width, FlxG.height);
+				loadAlpha.updateHitbox();
+				
+				WaterMark = new FlxText(50, 720 - 50 - 50 * 2, 0, '${ClientPrefs.data._VERSION_}', 30);
+				WaterMark.scrollFactor.set();
+				WaterMark.setFormat(Language.fonts(), 30, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				WaterMark.antialiasing = ClientPrefs.data.antialiasing;
+				#if BETA
+				WaterMark.color = 0xFFFFFF00;
+				#end
+				add(WaterMark);
+				
+				EventText= new FlxText(50, 720 - 50 - 50, 0, 'Please Wait.....', 35);
+				EventText.scrollFactor.set();
+				EventText.setFormat(Language.fonts(), 35, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				EventText.antialiasing = ClientPrefs.data.antialiasing;
+				add(EventText);
+				
+				if(!isTransIn) {
+					FlxG.sound.play('assets/shared/images/CustomFadeTransition/${Arrays.fadeStyleList[ClientPrefs.data.fadeStyle]}/loading_start.ogg',ClientPrefs.data.soundVolume);
+					if (!ClientPrefs.data.fadeText) {
+						EventText.text = '';
+						WaterMark.text = '';
+					}
+					WaterMark.alpha = 0;
+					EventText.alpha = 0;
+					loadAlpha.alpha = 0;
+					loadAlphaTween = FlxTween.tween(loadAlpha, {alpha: 1}, duration, {
+						onComplete: function(twn:FlxTween) {
+							if(finishCallback != null) {
+								finishCallback();
+							}
+						},
+					ease: FlxEase.sineInOut});
+					
+					loadTextTween = FlxTween.tween(WaterMark, {alpha: 1}, duration, {
+						onComplete: function(twn:FlxTween) {
+							if(finishCallback != null) {
+								finishCallback();
+							}
+						},
+					ease: FlxEase.sineInOut});
+					
+					EventTextTween = FlxTween.tween(EventText, {alpha: 1}, duration, {
+						onComplete: function(twn:FlxTween) {
+							if(finishCallback != null) {
+								finishCallback();
+							}
+						},
+					ease: FlxEase.sineInOut});
+					
+				} else {
+					FlxG.sound.play('assets/shared/images/CustomFadeTransition/${Arrays.fadeStyleList[ClientPrefs.data.fadeStyle]}/loading_done.ogg',ClientPrefs.data.soundVolume);
+					EventText.text = 'Loading Completed!';
+					if (!ClientPrefs.data.fadeText) {
+						EventText.text = '';
+						WaterMark.text = '';
+					}
+					loadAlphaTween = FlxTween.tween(loadAlpha, {alpha: 0}, duration, {
+						onComplete: function(twn:FlxTween) {
+							if(finishCallback != null) {
+								close();
+							}
+						},
+					ease: FlxEase.sineInOut});
+					
+					loadTextTween = FlxTween.tween(WaterMark, {alpha: 0}, duration, {
+						onComplete: function(twn:FlxTween) {
+							if(finishCallback != null) {
+								close();
+							}
+						},
+					ease: FlxEase.sineInOut});
+					
+					EventTextTween = FlxTween.tween(EventText, {alpha: 0}, duration, {
+						onComplete: function(twn:FlxTween) {
+							if(finishCallback != null) {
+								close();
+							}
+						},
+					ease: FlxEase.sineInOut});
+				}
+			}
+
+			if(nextCamera != null) {
+				if (loadLeft != null) loadLeft.cameras = [nextCamera];
+				if (loadRight != null) loadRight.cameras = [nextCamera];			
+				if (loadAlpha != null) loadAlpha.cameras = [nextCamera];
+
+				WaterMark.cameras = [nextCamera];
+				EventText.cameras = [nextCamera];
+			}
+			nextCamera = null;
+		}
+	}
+
+	override function create() {
+		if(Arrays.fadeStyleList[ClientPrefs.data.fadeStyle] == "default") {
+			cameras = [FlxG.cameras.list[FlxG.cameras.list.length-1]];
+			var width:Int = Std.int(FlxG.width / Math.max(camera.zoom, 0.001));
+			var height:Int = Std.int(FlxG.height / Math.max(camera.zoom, 0.001));
+			transGradient = FlxGradient.createGradientFlxSprite(1, height, (isTransIn ? [0x0, FlxColor.BLACK] : [FlxColor.BLACK, 0x0]));
+			transGradient.scale.x = width;
+			transGradient.updateHitbox();
+			transGradient.scrollFactor.set();
+			transGradient.screenCenter(X);
+			add(transGradient);
+
+			transBlack = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
+			transBlack.scale.set(width, height + 400);
+			transBlack.updateHitbox();
+			transBlack.scrollFactor.set();
+			transBlack.screenCenter(X);
+			add(transBlack);
+
+			if(isTransIn)
+				transGradient.y = transBlack.y - transBlack.height;
+			else
+				transGradient.y = -transGradient.height;
 		}
 
-		
-		var randomSeed = FlxG.random.int(0, tipsShit.length-1);
-		var randomBB = FlxG.random.int(0, isBBtips.length-1);
-		var textString = tipsShit[randomSeed];
-		
-		if(Application.current.window.title != "Friday Night Funkin': BlueBrrey Engine")
-			textString = tipsShit[randomSeed];
-		else
-			textString = isBBtips[randomBB];
-		//var randomSeedPosY = FlxG.random.int(0 ,695);
-	
-		var tipShit:FlxText = new FlxText(isTransIn ? 50 : -1230, FlxG.height - 25, 0, textString, 25);
-		tipShit.scrollFactor.set();
-		tipShit.setFormat(Paths.font('IPix.ttf'), 25, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		add(tipShit);
+		super.create();
+	}
 
-		if(!isTransIn) {
-			FlxG.sound.play(Paths.sound('elevator_close'));
-			/*eleLoadLeftTween = FlxTween.tween(eleLoadLeft, {x: 0}, duration, {
-				onComplete: function(twn:FlxTween) {
-					if(finishCallback != null) {
-						finishCallback();
-					}
-				},
-			ease: FlxEase.quartInOut});
+	override function update(elapsed:Float) {
+		super.update(elapsed);
 
-			eleLoadRightTween = FlxTween.tween(eleLoadRight, {x: 1280 - 640}, duration, {
-				onComplete: function(twn:FlxTween) {
-					if(finishCallback != null) {
-						finishCallback();
-					}
-				},
-			ease: FlxEase.quartInOut});*/
+		if(Arrays.fadeStyleList[ClientPrefs.data.fadeStyle] == "default") {
+			final height:Float = FlxG.height * Math.max(camera.zoom, 0.001);
+			final targetPos:Float = transGradient.height + 50 * Math.max(camera.zoom, 0.001);
+			if(duration > 0)
+				transGradient.y += (height + targetPos) * elapsed / duration;
+			else
+				transGradient.y = (targetPos) * elapsed;
 
-			eleLeftTween = FlxTween.tween(eleLeft, {x: 0}, duration, {
-				onComplete: function(twn:FlxTween) {
-					if(finishCallback != null) {
-						finishCallback();
-					}
-				},
-			ease: FlxEase.quartInOut});
+			if(isTransIn) transBlack.y = transGradient.y + transGradient.height;
+			else transBlack.y = transGradient.y - transBlack.height;
 
-			eleLeft2Tween = FlxTween.tween(ele2Left, {x: 615}, duration, {
-				onComplete: function(twn:FlxTween) {
-					if(finishCallback != null) {
-						finishCallback();
-					}
-				},
-			ease: FlxEase.quartInOut});
-			
-			eleRightTween = FlxTween.tween(eleRight, {x: 665}, duration, {
-				onComplete: function(twn:FlxTween) {
-					if(finishCallback != null) {
-						finishCallback();
-					}
-				},
-			ease: FlxEase.quartInOut});
-
-			eleRight2Tween = FlxTween.tween(ele2Right, {x: 640}, duration, {
-				onComplete: function(twn:FlxTween) {
-					if(finishCallback != null) {
-						finishCallback();
-					}
-				},
-			ease: FlxEase.quartInOut});
-
-			loadTextTween = FlxTween.tween(tipShit, {x: 0}, duration, {
-				onComplete: function(twn:FlxTween) {
-					if(finishCallback != null) {
-						finishCallback();
-					}
-				},
-			ease: FlxEase.quartInOut});
-		} else {
-			FlxG.sound.play(Paths.sound('elevator_open'));
-			/*eleLoadLeftTween = FlxTween.tween(eleLoadLeft, {x: 1280}, duration, {
-				onComplete: function(twn:FlxTween) {
-					close();
-				},
-			ease: FlxEase.smootherStepIn});
-
-			eleLoadRightTween = FlxTween.tween(eleLoadRight, {x: -640}, duration, {
-				onComplete: function(twn:FlxTween) {
-					if(finishCallback != null) {
-						finishCallback();
-					}
-				},
-			ease: FlxEase.quartInOut});*/
-
-			eleLeftTween = FlxTween.tween(eleLeft, {x: -1920}, duration, {
-				onComplete: function(twn:FlxTween) {
-					close();
-				},
-			ease: FlxEase.smootherStepIn});
-
-			eleLeft2Tween = FlxTween.tween(ele2Left, {x: -1280}, duration, {
-				onComplete: function(twn:FlxTween) {
-					close();
-				},
-			ease: FlxEase.smootherStepIn});
-			
-			eleRightTween = FlxTween.tween(eleRight, {x: 1920}, duration, {
-				onComplete: function(twn:FlxTween) {
-					close();
-				},
-			ease: FlxEase.smootherStepIn});
-
-			eleRight2Tween = FlxTween.tween(eleRight, {x: 1280}, duration, {
-				onComplete: function(twn:FlxTween) {
-					if(finishCallback != null) {
-						close();
-					}
-				},
-			ease: FlxEase.quartInOut});
-			
-			loadTextTween = FlxTween.tween(tipShit, {x: -1230}, duration, {
-				onComplete: function(twn:FlxTween) {
-					close();
-				},
-			ease: FlxEase.smootherStepIn});
-			
-			tipShit.text = 'Done!';
+			if(transGradient.y >= targetPos)
+			{
+				close();
+				if(finishCallback != null) finishCallback();
+				finishCallback = null;
+			}
 		}
-
-		if(nextCamera != null) {
-			eleRight.cameras = [nextCamera];
-			eleLeft.cameras = [nextCamera];
-			ele2Right.cameras = [nextCamera];
-			ele2Left.cameras = [nextCamera];
-			/*eleLoadLeft.cameras = [nextCamera];
-			eleLoadRight.cameras = [nextCamera];*/
-		}
-		nextCamera = null;
 	}
 
 	override function destroy() {
-		if(leTween != null) {
+		if(leTween != null && Arrays.fadeStyleList[ClientPrefs.data.fadeStyle] != "default") {
 			finishCallback();
 			leTween.cancel();
-			eleLeftTween.cancel();
-			eleRightTween.cancel();
-			eleLeft2Tween.cancel();
-			eleRight2Tween.cancel();
+			
+			if (loadLeftTween != null) loadLeftTween.cancel();
+			if (loadRightTween != null) loadRightTween.cancel();
+			if (loadAlphaTween != null) loadAlphaTween.cancel();
+			
 			loadTextTween.cancel();
-			/*eleLoadLeftTween.cancel();
-			eleLoadRightTween.cancel();*/
+			EventTextTween.cancel();
 		}
 		super.destroy();
 	}

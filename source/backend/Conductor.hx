@@ -1,7 +1,6 @@
 package backend;
 
 import backend.Song;
-import backend.Section;
 import objects.Note;
 
 typedef BPMChangeEvent =
@@ -24,10 +23,6 @@ class Conductor
 	public static var safeZoneOffset:Float = 0; // is calculated in create(), is safeFrames in milliseconds
 
 	public static var bpmChangeMap:Array<BPMChangeEvent> = [];
-
-	public function new()
-	{
-	}
 
 	public static function judgeNote(arr:Array<Rating>, diff:Float=0):Rating // die
 	{
@@ -145,12 +140,5 @@ class Conductor
 		stepCrochet = crochet / 4;
 
 		return bpm = newBPM;
-	}
-	public static function changeBPM(newBpm:Float)
-	{
-		bpm = newBpm;
-
-		crochet = calculateCrochet(bpm);
-		stepCrochet = crochet / 4;
 	}
 }

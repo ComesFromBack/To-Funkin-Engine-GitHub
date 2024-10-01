@@ -1,16 +1,18 @@
 package backend;
 
-import flixel.addons.ui.FlxUIState;
-import flixel.addons.transition.FlxTransitionableState;
 import flixel.FlxState;
+import backend.PsychCamera;
+import states.FreeplayState;
+import states.editors.ChartingState;
 
-class MusicBeatState extends FlxUIState
+class MusicBeatState extends FlxState
 {
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
 
 	private var curStep:Int = 0;
 	private var curBeat:Int = 0;
+	private var soundTween:FlxTween;
 
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
@@ -20,20 +22,35 @@ class MusicBeatState extends FlxUIState
 		return Controls.instance;
 	}
 
-	public static var camBeat:FlxCamera;
+	var _psychCameraInitialized:Bool = false;
+
+	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
+	public static function getVariables()
+		return getState().variables;
 
 	override function create() {
-		camBeat = FlxG.camera;
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 		#if MODS_ALLOWED Mods.updatedOnState = false; #end
+
+		if(!_psychCameraInitialized) initPsychCamera();
 
 		super.create();
 
 		if(!skip) {
-			openSubState(new CustomFadeTransition(0.7, true));
+			openSubState(new CustomFadeTransition(0.6, true));
 		}
 		FlxTransitionableState.skipNextTransOut = false;
 		timePassedOnState = 0;
+	}
+
+	public function initPsychCamera():PsychCamera
+	{
+		var camera = new PsychCamera();
+		FlxG.cameras.reset(camera);
+		FlxG.cameras.setDefaultDrawTarget(camera, true);
+		_psychCameraInitialized = true;
+		//trace('initialized psych camera ' + Sys.cpuTime());
+		return camera;
 	}
 
 	public static var timePassedOnState:Float = 0;
@@ -78,6 +95,46 @@ class MusicBeatState extends FlxUIState
 			var beats:Float = getBeatsOnSection();
 			stepsToDo += Math.round(beats * 4);
 			sectionHit();
+		}
+	}
+
+	function tweenFunction(v:Float) { 
+		if(Type.getClassName(Type.getClass(FlxG.state)) != 'states.PlayState') FlxG.sound.music.volume = v;
+		if(FreeplayState.vocals != null) FreeplayState.vocals.volume = v-0.1;
+		if(FreeplayState.opponentVocals != null) FreeplayState.opponentVocals.volume = v-0.1;
+		if(ChartingState.vocals != null && Type.getClassName(Type.getClass(FlxG.state)) == 'states.ChartingState') ChartingState.vocals.volume = v;
+		if(ChartingState.opponentVocals != null && Type.getClassName(Type.getClass(FlxG.state)) == 'states.ChartingState') ChartingState.opponentVocals.volume = v;
+	}
+
+	override function onFocusLost() {
+		if(ClientPrefs.data.foucsMusic) {
+			if(FlxG.sound.music != null && soundTween == null) {
+				soundTween = FlxTween.num(ClientPrefs.data.musicVolume, 0.25, 1.25, {onComplete: function(twn:FlxTween) {
+					soundTween = null;
+				}}, tweenFunction.bind());
+			} else {
+				soundTween.cancel();
+				soundTween = FlxTween.num(FlxG.sound.music.volume, 0.25, 1.25, {onComplete: function(twn:FlxTween) {
+					soundTween = null;
+				}}, tweenFunction.bind());
+			}
+		}
+	}
+
+	override function onFocus() {
+		if(ClientPrefs.data.foucsMusic) {
+			if(FlxG.sound.music != null && soundTween == null) {
+				if (FlxG.sound.music.volume != ClientPrefs.data.musicVolume) {
+					soundTween = FlxTween.num(0.25, ClientPrefs.data.musicVolume, 1.25, {onComplete: function(twn:FlxTween) {
+						soundTween = null;
+					}}, tweenFunction.bind());
+				}
+			} else {
+				soundTween.cancel();
+				soundTween = FlxTween.num(0.25, ClientPrefs.data.musicVolume, 1.25, {onComplete: function(twn:FlxTween) {
+					soundTween = null;
+				}}, tweenFunction.bind());
+			}
 		}
 	}
 

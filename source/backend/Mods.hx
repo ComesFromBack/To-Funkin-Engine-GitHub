@@ -1,12 +1,6 @@
 package backend;
 
-#if sys
-import sys.FileSystem;
-import sys.io.File;
-#else
-import lime.utils.Assets;
-#end
-import tjson.TJSON as Json;
+import haxe.Json;
 
 typedef ModsList = {
 	enabled:Array<String>,
@@ -14,14 +8,10 @@ typedef ModsList = {
 	all:Array<String>
 };
 
-typedef PackList = {
-	name:String
-}
-
 class Mods
 {
 	static public var currentModDirectory:String = '';
-	public static var ignoreModFolders:Array<String> = [
+	public static final ignoreModFolders:Array<String> = [
 		'characters',
 		'custom_events',
 		'custom_notetypes',
@@ -64,7 +54,7 @@ class Mods
 			for (folder in FileSystem.readDirectory(modsFolder))
 			{
 				var path = haxe.io.Path.join([modsFolder, folder]);
-				if (sys.FileSystem.isDirectory(path) && !ignoreModFolders.contains(folder.toLowerCase()) && !list.contains(folder))
+				if (FileSystem.isDirectory(path) && !ignoreModFolders.contains(folder.toLowerCase()) && !list.contains(folder))
 					list.push(folder);
 			}
 		}
@@ -72,9 +62,9 @@ class Mods
 		return list;
 	}
 	
-	inline public static function mergeAllTextsNamed(path:String, defaultDirectory:String = null, allowDuplicates:Bool = false)
+	inline public static function mergeAllTextsNamed(path:String, ?defaultDirectory:String = null, allowDuplicates:Bool = false)
 	{
-		if(defaultDirectory == null) defaultDirectory = Paths.getPreloadPath();
+		if(defaultDirectory == null) defaultDirectory = Paths.getSharedPath();
 		defaultDirectory = defaultDirectory.trim();
 		if(!defaultDirectory.endsWith('/')) defaultDirectory += '/';
 		if(!defaultDirectory.startsWith('assets/')) defaultDirectory = 'assets/$defaultDirectory';
@@ -102,10 +92,15 @@ class Mods
 	inline public static function directoriesWithFile(path:String, fileToFind:String, mods:Bool = true)
 	{
 		var foldersToCheck:Array<String> = [];
-		#if sys
 		if(FileSystem.exists(path + fileToFind))
-		#end
 			foldersToCheck.push(path + fileToFind);
+
+		if(Paths.currentLevel != null && Paths.currentLevel != path)
+		{
+			var pth:String = Paths.getFolderPath(fileToFind, Paths.currentLevel);
+			if(FileSystem.exists(pth))
+				foldersToCheck.push(pth);
+		}
 
 		#if MODS_ALLOWED
 		if(mods)
@@ -114,18 +109,18 @@ class Mods
 			for(mod in Mods.getGlobalMods())
 			{
 				var folder:String = Paths.mods(mod + '/' + fileToFind);
-				if(FileSystem.exists(folder)) foldersToCheck.push(folder);
+				if(FileSystem.exists(folder) && !foldersToCheck.contains(folder)) foldersToCheck.push(folder);
 			}
 
 			// Then "PsychEngine/mods/" main folder
 			var folder:String = Paths.mods(fileToFind);
-			if(FileSystem.exists(folder)) foldersToCheck.push(Paths.mods(fileToFind));
+			if(FileSystem.exists(folder) && !foldersToCheck.contains(folder)) foldersToCheck.push(Paths.mods(fileToFind));
 
 			// And lastly, the loaded mod's folder
 			if(Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
 			{
 				var folder:String = Paths.mods(Mods.currentModDirectory + '/' + fileToFind);
-				if(FileSystem.exists(folder)) foldersToCheck.push(folder);
+				if(FileSystem.exists(folder) && !foldersToCheck.contains(folder)) foldersToCheck.push(folder);
 			}
 		}
 		#end
@@ -138,7 +133,6 @@ class Mods
 		if(folder == null) folder = Mods.currentModDirectory;
 
 		var path = Paths.mods(folder + '/pack.json');
-
 		if(FileSystem.exists(path)) {
 			try {
 				#if sys
@@ -146,8 +140,9 @@ class Mods
 				#else
 				var rawJson:String = Assets.getText(path);
 				#end
-				if(rawJson != null && rawJson.length > 0) return Json.parse(rawJson);
+				if(rawJson != null && rawJson.length > 0) return tjson.TJSON.parse(rawJson);
 			} catch(e:Dynamic) {
+				Log.LogPrint("Mods.hx -> Func=getPack():Json parse has unknown error","ERROR");
 				trace(e);
 			}
 		}
@@ -175,6 +170,7 @@ class Mods
 					list.disabled.push(dat[0]);
 			}
 		} catch(e) {
+			Log.LogPrint("Mods.hx -> Func=parseList():Parse List has Unknown Error, Maybe not has 'modsList.txt' in Game Root Path.","ERROR");
 			trace(e);
 		}
 		#end
@@ -199,6 +195,7 @@ class Mods
 				}
 			}
 		} catch(e) {
+			Log.LogPrint("Mods.hx -> Func=updateModList():Update List has Unknown Error.","ERROR");
 			trace(e);
 		}
 		
@@ -224,7 +221,7 @@ class Mods
 
 		File.saveContent('modsList.txt', fileStr);
 		updatedOnState = true;
-		trace('Saved modsList.txt');
+		//trace('Saved modsList.txt');
 		#end
 	}
 
