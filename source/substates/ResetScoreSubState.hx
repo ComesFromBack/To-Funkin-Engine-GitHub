@@ -3,9 +3,6 @@ package substates;
 import backend.WeekData;
 import backend.Highscore;
 
-import flixel.addons.display.FlxBackdrop;
-import flixel.addons.display.FlxGridOverlay;
-
 import flixel.FlxSubState;
 import objects.HealthIcon;
 
@@ -37,17 +34,13 @@ class ResetScoreSubState extends MusicBeatSubstate
 		}
 		name += ' (' + Difficulty.getString(difficulty) + ')?';
 
-		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, 0xFFBB0000);
+		bg = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		bg.alpha = 0;
+		bg.scrollFactor.set();
 		add(bg);
-		bg.alpha = 0.5;
-	
-		var bgGrid:FlxBackdrop = new FlxBackdrop(FlxGridOverlay.createGrid(80, 80, 160, 160, true, 0x11FFFFFF, 0x0));
-		bgGrid.alpha = 0.5;
-		bgGrid.velocity.set(175, 175);
-		add(bgGrid);
 
 		var tooLong:Float = (name.length > 18) ? 0.8 : 1; //Fucking Winter Horrorland
-		var text:Alphabet = new Alphabet(0, 180, "Reset the score of", true);
+		var text:Alphabet = new Alphabet(0, 180, Language.getTextFromID('Reset_Score'), true);
 		text.screenCenter(X);
 		alphabetArray.push(text);
 		text.alpha = 0;
@@ -68,20 +61,24 @@ class ResetScoreSubState extends MusicBeatSubstate
 			add(icon);
 		}
 
-		yesText = new Alphabet(0, text.y + 150, 'Yes', true);
+		yesText = new Alphabet(0, text.y + 150, Language.getTextFromID('Yes'), true);
 		yesText.screenCenter(X);
 		yesText.x -= 200;
 		add(yesText);
-
-		noText = new Alphabet(0, text.y + 150, 'No', true);
+		noText = new Alphabet(0, text.y + 150, Language.getTextFromID('No'), true);
 		noText.screenCenter(X);
 		noText.x += 200;
 		add(noText);
+		
+		for(letter in yesText.letters) letter.color = FlxColor.RED;
 		updateOptions();
 	}
 
 	override function update(elapsed:Float)
 	{
+		bg.alpha += elapsed * 1.5;
+		if(bg.alpha > 0.6) bg.alpha = 0.6;
+
 		for (i in 0...alphabetArray.length) {
 			var spr = alphabetArray[i];
 			spr.alpha += elapsed * 2.5;
@@ -100,6 +97,7 @@ class ResetScoreSubState extends MusicBeatSubstate
 			if(onYes) {
 				if(week == -1) {
 					Highscore.resetSong(song, difficulty);
+					Highscore.resetRank(song, difficulty);
 				} else {
 					Highscore.resetWeek(WeekData.weeksList[week], difficulty);
 				}
