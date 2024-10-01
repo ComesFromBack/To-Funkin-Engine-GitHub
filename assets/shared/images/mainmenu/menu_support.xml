@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="menu_support.png">
+	<!-- Created with Adobe Animate version 21.0.0.35450 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="support basic0000" x="0" y="0" width="517" height="279"/>
+	<SubTexture name="support basic0001" x="0" y="0" width="517" height="279"/>
+	<SubTexture name="support basic0002" x="517" y="0" width="517" height="279"/>
+	<SubTexture name="support basic0003" x="517" y="0" width="517" height="279"/>
+	<SubTexture name="support basic0004" x="1034" y="0" width="517" height="279"/>
+	<SubTexture name="support basic0005" x="1034" y="0" width="517" height="279"/>
+	<SubTexture name="support white0000" x="0" y="279" width="649" height="269" frameX="0" frameY="-8" frameWidth="649" frameHeight="277"/>
+	<SubTexture name="support white0001" x="0" y="279" width="649" height="269" frameX="0" frameY="-8" frameWidth="649" frameHeight="277"/>
+	<SubTexture name="support white0002" x="649" y="279" width="644" height="273" frameX="0" frameY="-4" frameWidth="649" frameHeight="277"/>
+	<SubTexture name="support white0003" x="649" y="279" width="644" height="273" frameX="0" frameY="-4" frameWidth="649" frameHeight="277"/>
+	<SubTexture name="support white0004" x="1293" y="279" width="641" height="277" frameX="0" frameY="0" frameWidth="649" frameHeight="277"/>
+	<SubTexture name="support white0005" x="1293" y="279" width="641" height="277" frameX="0" frameY="0" frameWidth="649" frameHeight="277"/>
+</TextureAtlas>

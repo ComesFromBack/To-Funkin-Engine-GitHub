@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="menu_optionsMic.png">
+	<!-- Created with Adobe Animate version 21.0.0.35450 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="optionsMic basic0000" x="0" y="0" width="517" height="270"/>
+	<SubTexture name="optionsMic basic0001" x="0" y="0" width="517" height="270"/>
+	<SubTexture name="optionsMic basic0002" x="517" y="0" width="517" height="270"/>
+	<SubTexture name="optionsMic basic0003" x="517" y="0" width="517" height="270"/>
+	<SubTexture name="optionsMic basic0004" x="1034" y="0" width="517" height="270"/>
+	<SubTexture name="optionsMic basic0005" x="1034" y="0" width="517" height="270"/>
+	<SubTexture name="optionsMic white0000" x="0" y="270" width="623" height="260" frameX="0" frameY="-10" frameWidth="628" frameHeight="270"/>
+	<SubTexture name="optionsMic white0001" x="0" y="270" width="623" height="260" frameX="0" frameY="-10" frameWidth="628" frameHeight="270"/>
+	<SubTexture name="optionsMic white0002" x="623" y="270" width="626" height="259" frameX="0" frameY="-11" frameWidth="628" frameHeight="270"/>
+	<SubTexture name="optionsMic white0003" x="623" y="270" width="626" height="259" frameX="0" frameY="-11" frameWidth="628" frameHeight="270"/>
+	<SubTexture name="optionsMic white0004" x="1249" y="270" width="628" height="270"/>
+	<SubTexture name="optionsMic white0005" x="1249" y="270" width="628" height="270"/>
+</TextureAtlas>
