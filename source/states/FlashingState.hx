@@ -4,9 +4,7 @@ import flixel.FlxSubState;
 
 import flixel.effects.FlxFlicker;
 import lime.app.Application;
-import flixel.addons.transition.FlxTransitionableState;
-import flixel.addons.display.FlxBackdrop;
-import flixel.addons.display.FlxGridOverlay;
+import backend.Highscore;
 
 class FlashingState extends MusicBeatState
 {
@@ -17,25 +15,22 @@ class FlashingState extends MusicBeatState
 	{
 		super.create();
 
-		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, 0xFFFFA500);
-		bg.alpha = 0.5;
+		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		add(bg);
-	
-		var bgGrid:FlxBackdrop = new FlxBackdrop(FlxGridOverlay.createGrid(80, 80, 160, 160, true, 0x11FFFFFF, 0x0));
-		bgGrid.alpha = 1;
-		bgGrid.velocity.set(175, 175);
-		add(bgGrid);
 
 		warnText = new FlxText(0, 0, FlxG.width,
-			"Precautions!\n
-			The original engine was [[PSYCH ENGINE]], I just made some modifications to this engine!\n
-			After that, you can change the language in the settings.\n
-			Many thanks to TG and Gua Gua for their help.\n
-			Have fun ;)",
+			"Hey, watch out!\n
+			This Mod contains some flashing lights!\n
+			Press ENTER to disable them now or go to Options Menu.\n
+			Press ESCAPE to ignore this message.\n
+			You've been warned!",
 			32);
 		warnText.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, CENTER);
 		warnText.screenCenter(Y);
 		add(warnText);
+
+		if(Highscore.profileList == [] || FlxG.save.data.profileList == null)
+			Highscore.createProfile("Boyfriend");
 	}
 
 	override function update(elapsed:Float)
@@ -50,16 +45,14 @@ class FlashingState extends MusicBeatState
 					ClientPrefs.data.flashing = false;
 					ClientPrefs.saveSettings();
 					FlxG.sound.play(Paths.sound('confirmMenu'));
-					FlxG.sound.play(Paths.sound('controls'), 2);
 					FlxFlicker.flicker(warnText, 1, 0.1, false, true, function(flk:FlxFlicker) {
-						new FlxTimer().start(5.5, function (tmr:FlxTimer) {
+						new FlxTimer().start(0.5, function (tmr:FlxTimer) {
 							MusicBeatState.switchState(new TitleState());
 						});
 					});
 				} else {
 					FlxG.sound.play(Paths.sound('cancelMenu'));
-					FlxG.sound.play(Paths.sound('controls'), 2);
-					FlxTween.tween(warnText, {alpha: 0}, 5.5, {
+					FlxTween.tween(warnText, {alpha: 0}, 1, {
 						onComplete: function (twn:FlxTween) {
 							MusicBeatState.switchState(new TitleState());
 						}
