@@ -1,0 +1,6 @@
+langs=en_us,zh_cn,pt_br
+## -------- How to add language to list -------- ##
+# Append "langs" with: ,filename #
+
+## ---------- 如何添加语言到设置选项中 ---------- ##
+# 在 "langs" 末端追加上：,*文件名* #

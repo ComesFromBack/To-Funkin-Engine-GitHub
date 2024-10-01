@@ -1,0 +1,90 @@
+# -- 语言默认设置使用 -- #
+LANGUAGE_VERSION +> 语言版本
+    -> 如果语言版本低于或高于当前引擎支持的版本会提示过新或者过旧
+    例：
+        LANGUAGE_VERSION=1
+
+DEFAULT_FONT +> 默认字体
+    -> 会在 ./assets/fonts/{language}/ 文件夹下搜索字体
+    -> 在选择的非默认字体丢失会自动选择默认字体
+    -> 如果默认字体不存在的话游戏会报错并退出
+    例：
+        DEFAULT_FONT=vcr.ttf
+
+DEFAULT_COLOR +> 默认颜色
+    -> 在 OptionsState 会根据此数据更改颜色
+    -> 留空默认为 #FFFFFFFF
+    -> 颜色格式为：#RRGGBBAA
+        @> R -> RED, G -> GREEN, B -> BLUE, A -> ALPHA
+    例：
+        DEFAULT_COLOR=#11451419
+
+LANGUAGE_IMAGE_GROUP +> 语言图像组
+    -> 此设置用于游戏的部分非字体的图片文本
+    -> 会在 ./assets/images/{language}/ 文件夹下搜索合适的图片
+    -> 如果图片不存在会使用默认图片
+    例：
+        LANGUAGE_IMAGE_GROUP=ZH_CN
+
+# ---- 关于语言的一些特殊关键字 ---- #
+    # --- 控制类 --- #
+        /* --- 
+        请注意，如果该控制有两个Keys，则会显示
+        {k1} or {k2}
+        --- */
+        {accept} - 确定
+        {back} - 取消/返回
+        {up} - 上
+        {down} - 下
+        {left} - 左
+        {right} - 右
+        {reset} - 重置/重新开始
+        {pause} - 暂停/继续
+    # --- FPS UI类 --- #
+        {FPS} - 当前FPS
+        {FPS_Setting} - 设置的FPS
+        {MEM} - 当前内存占用
+        {MEMPeak} - 最大内存占用
+        {FT} - 帧时间
+        #!# -- 以下是未使用/目前没有更新的关键字 -- #!#
+            {FPS_Max} - 最大FPS
+            {FPS_Min} - 最小FPS
+            {FPS_Abs} - 平均FPS
+    # --- 特定关键字 --- #
+        故事模式：
+            {week_score} - 周总分
+            {week_rank} - 周平均准确率
+            {week_rating} - 周准确率评分
+        选曲模式：
+            {song_score} - 选中的歌曲最高分
+            {song_rating} - 选中的歌曲最高准确率
+        游戏内：
+            {score} - 获得的分数
+            {ranking} - 准确率（Psych）
+            {accuracy} - 准确率（Kade/Base Kade）
+            {combo} - 当前连击数
+            {misses} - 失误（Psych）
+            {cbs} - 连击中断（Kade/Base Kade）
+            {hit} - 当前总共按中的Note数量
+            {health} - 当前血量
+        暂停菜单：
+            {deaths} - 死亡数
+    # --- 其他/高级关键字 --- #
+        {modname} - 模组名字
+        {error} - 返回的报错
+    # --- 特殊符号 --- #
+        在 list 文件：
+           [ | ] -> 语言分隔符
+            => 在不同的语言之间分割
+                例：en_us,English(US)|简体中文（中国大陆）
+
+           [ , ] -> 语言文件/标题分隔符
+            => 分割语言调用的文件和 Options 里显示的标题
+                例：en_us,English(US)
+        在语言文件：
+           [ , ] -> 二级分割符
+            => 分割此文本的两种状态
+                例：Achievement_Hold=Oversinging Much...?,Hold down a note for 10 seconds.
+                    Achievement_ID=Achievement Title,Achievement Descr
+
+    # ----- Coming Soon ----- #

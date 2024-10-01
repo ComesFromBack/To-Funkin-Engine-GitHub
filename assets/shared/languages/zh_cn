@@ -1,0 +1,94 @@
+## 语言默认设置 (不能删除!!) ##
+LANGUAGE_VERSION=1
+DEFAULT_FONT=vcr.ttf
+DEFAULT_COLOR=#FF0000FF
+#----------------------------#
+
+#FPS计数器
+FPS=每秒帧率: 
+MEM=内存: 
+MEMPeak=最高内存: 
+Frame=每帧时间: 
+
+#主菜单
+Version_Main=To Funkin Engine 
+Version_Main_Debug=To Funkin Engine[调试模式] 
+Version_Psych=Psych Engine v
+Version_Kade=Kade Engine v
+Version_Mic=MU 2.0.5
+Version_FNF=Friday Night Funkin' v
+
+#故事模式
+Week_Score=周分数:
+Week_Rank=评分:
+
+#选曲模式 / 选曲模式音乐播放器
+Freeplay_PB=最好成绩: 
+Freeplay_Tip=按下空格键听歌 / 按下CTRL键打开游戏设置 / 按下{reset}重置歌曲的分数和准确率
+Freeplay_Tip_SP=按下CTRL键打开游戏设置 / 按下{reset}重置歌曲的分数和准确率
+Freeplayer_Playing=正在播放: 
+Frrrplayer_Paused=(已暂停)
+Freeplayer_Space_Playing=按下空格键暂停
+Freeplayer_Space_Pause=按下空格键继续
+Freeplayer_Exit=按下{escape}退出播放
+Freeplayer_Reset_Pause=按下{reset}重置歌曲播放位置
+Freeplayer_Reset_Playing=按下{reset}重播歌曲
+Freeplayer_Spilter= / 
+Freeplay_Tip_No_Voice=按下空格键听歌[不播放人声文件(Voice.ogg)] / 按下CTRL键打开游戏设置 / 按下{reset}重置歌曲的分数和准确率
+
+#成就
+Achievement_Friday=在周五晚上Freaky,在周五...晚上游玩.
+Achievement_Week1_FC=她也叫我父亲,完成第一周Hard难度并且FC.
+Achievement_Week2_FC=没有更多门票,完成第二周Hard难度并且FC.
+Achievement_Week3_FC=叫我Hitman,完成第三周Hard难度并且FC.
+Achievement_Week4_FC=Lady杀手,完成第四周Hard难度并且FC.
+Achievement_Week5_FC=无懈可击的圣诞节,完成第五周Hard难度并且FC.
+Achievement_Week6_FC=高分!!,完成第六周Hard难度并且FC.
+Achievement_Week7_FC=上帝在该死的吹嘘它!,完成第七周Hard难度并且FC.
+Achievement_Weekend1_FC=额...没有什么,无
+Achievement_Losser=多么有趣的灾难!,完成一首歌使准确率低于20%.
+Achievement_Pro=完美主义者,完成一首歌使准确率保持在100%.
+Achievement_Henchmen_Die=道路杀手爱好者,看Henchmen死亡50次.
+Achievement_Hold=过度歌唱太多...?,长按下箭头保持10秒.
+Achievement_No_Idle=超活跃歌手,在没有待机动画的情况下完成一首歌.
+Achievement_Only2Key=只有我们两个,只按两个方向的箭头完成一首歌.
+Achievement_Toaster=吐司机玩家,尝试过在吐司机上运行游戏吗?
+Achievement_Debugger=调试者,从谱子编辑器完成歌曲"Test".
+Achievement_Lunatic=在Lunatic模式打开时,在随机到有"InstakillOnMiss"时完成任意歌曲并取得FC.
+Achievement_New_Year=新年快乐！,新年到了！.
+
+#设置
+Note_Color_Reset=按下{reset}重置选中的箭头配色.
+Note_Color_Select=按住Shift + 按下{reset}重置所有箭头的配色.,按住Left Shoulder按钮 + 按下{reset}重置所有箭头的配色.
+Offset_RO=评分偏移:
+Offset_NO=连击数字偏移:
+Offset_CO=主要偏移: 
+Offset_MS= 毫秒
+Offset_Combo=连击偏移
+Offset_NBD=箭头/节拍延迟
+Offset_Switch=按下{accept}切换,按下Start切换
+Android_Button=按钮 
+Android_X= X:
+Android_Y= Y:
+Android_Arrow_Up=上
+Android_Arrow_Down=下
+Android_Arrow_Left=左
+Android_Arrow_Right=右
+Android_Tip=按下{back}返回到设置菜单
+
+#游玩界面UI
+PlayState_Score=分数: 
+PlayState_Accuracy=准确率: 
+PlayState_Rating=评分: 
+PlayState_ComboBreak=失误: ,连击中断: 
+PlayState_Combo=连击: 
+PlayState_Hit=击中: 
+PlayState_Health=血量: 
+PlayState_Rank_Spilter= | 
+
+#编辑器(未完成，部分废弃)
+Editor_Main_Modloader=< 已加载模组文件夹: {modname} >
+Editor_Main_Modloader_Not_Found=< 没有可加载的模组文件夹 >
+Editor_Charting_Zoom=缩放: 1 / 1
+Editor_Charting_NoteType= ,Alt Animation,Hey!,Hurt Note,GF Sing,No Animation
+#Editor_Charting_Events（暂时废弃（）

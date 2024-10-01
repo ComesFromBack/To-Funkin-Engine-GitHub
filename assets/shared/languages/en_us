@@ -1,0 +1,193 @@
+## Language Default Settings (DON'T DELETE!!) ##
+LANGUAGE_VERSION=1
+DEFAULT_FONT=vcr.ttf
+DEFAULT_COLOR=#00112233
+LANGUAGE_IMAGE_GROUP=EN_US
+#----------------------------------------------#
+
+# FPSCounter
+FPS=FPS: {FPS}
+MEM=Memory: {MEM}
+MEMPeak=Memory Peak: {MEMPeak}
+Frame=Frame Time: {FT}
+
+# MainMenu
+Version_Main=To Funkin Engine 
+Version_Main_Debug=To Funkin Engine[DEBUG MODE] 
+Version_Psych=Psych Engine v
+Version_Kade=Kade Engine v
+Version_Mic=MU 2.0.5
+Version_FNF=Friday Night Funkin' v
+
+# Story Mode
+Week_Score=WEEK SCORE: {0}
+Week_Rank=RANK: {0} ({1}%)
+
+# Freeplay / Freeplay Music Player
+Freeplay_PB=PERSONAL BEST: {0} ({1}%)
+Freeplay_Tip= / Press CTRL to open Gameplay Changers Menu / Press {0} to Reset your Score and Accuracy
+Freeplay_Tip_SP=Press CTRL to open Gameplay Changers Menu / Press {0} to Reset your Score and Accuracy
+Freeplay_Tip_Listen=Press SPACE to listen to Song
+Freeplayer_Playing=PLAYING: {0}
+Freeplayer_Paused=(PAUSED)
+Freeplayer_Space_Playing=Press SPACE to Pause
+Freeplayer_Space_Pause=Press SPACE to Resume
+Freeplayer_Exit= Press {0} to Exit
+Freeplayer_Reset_Pause= Press {0} to Reset SongPosition
+Freeplayer_Reset_Playing= Press {0} to Replay This Song
+Freeplayer_Spilter= /
+Voice_Lost=[Not with voice]
+
+# Achievements
+Achievement_friday_night_play=Freaky on a Friday Night,Play on a Friday... Night.
+Achievement_week1_nomiss=She Calls Me Daddy Too,Beat Week 1 on Hard with no Misses.
+Achievement_week2_nomiss=No More Tricks,Beat Week 2 on Hard with no Misses.
+Achievement_week3_nomiss=Call Me The Hitman,Beat Week 3 on Hard with no Misses.
+Achievement_week4_nomiss=Lady Killer,Beat Week 4 on Hard with no Misses.
+Achievement_week5_nomiss=Missless Christmas,Beat Week 5 on Hard with no Misses.
+Achievement_week6_nomiss=Highscore!!,Beat Week 6 on Hard with no Misses.
+Achievement_week7_nomiss=God Effing Damn It!,Beat Week 7 on Hard with no Misses.
+Achievement_Weekend1_FC=Ugh..Nothing,Null
+Achievement_ur_bad=What a Funkin' Disaster!,Complete a Song with a rating lower than 20%.
+Achievement_ur_good=Perfectionist,Complete a Song with a rating of 100%.
+Achievement_roadkill_enthusiast=Roadkill Enthusiast,Watch the Henchmen die 50 times.
+Achievement_oversinging=Oversinging Much...?,Hold down a note for 10 seconds.
+Achievement_hype=Hyperactive,Finish a Song without going Idle.
+Achievement_two_keys=Just the Two of Us,Finish a Song pressing only two keys.
+Achievement_toastie=Toaster Gamer,Have you tried to run the game on a toaster?
+Achievement_debugger=Debugger,Beat the "Test" Stage from the Chart Editor.
+Achievement_lunatic=When the "Lunatic" mode is turned on,play any song is completed with the standard of "FC" when there is a random is "InstakillOnMiss".
+Achievement_new_year=Happy New Year!,It's new year.
+
+# Options
+Set_Note_Color_Reset=Press {0} to Reset the selected Note Part.
+Set_Note_Color_Select=Hold Shift + Press {0} to fully reset the selected Note.,Hold Left Shoulder Button + Press {0} to fully reset the selected Note.
+Offset_RO=Rating Offset: 
+Offset_NO=Numbers Offset: 
+Offset_CO=Current offset: {0} ms
+Offset_Combo=Combo Offset
+Offset_NBD=Note/Beat Delay
+Offset_Switch=Press {0} to Switch,Press Start to Switch
+Offset_Beat_Hit=Beat Hit!
+
+# PlayState
+PlayState_Score=Score: {0}
+PlayState_Accuracy=Accuracy: {0}%
+PlayState_Rating=Rating: {0}
+PlayState_Misses=Misses: {0}
+PlayState_Combo=(Combos: {0})
+PlayState_ComboBreak=Combo Breaks: {0}
+PlayState_Hit=Hits: {0}
+PlayState_Health=Health: {0}%
+PlayState_Rank_Spilter= |
+PlayState_Rank_Spilter_KE=|
+PlayState_Botplay=Botplay
+PlayState_Replay=REPLAY
+# -- Psych Engine Rating -- #
+PlayState_You Suck!=You Suck!
+PlayState_Shit=Shit
+PlayState_Bad=Bad
+PlayState_Bruh=Bruh
+PlayState_Meh=Meh
+PlayState_Nice=Nice
+PlayState_Good=Good
+PlayState_Great=Great
+PlayState_Sick!=Sick!
+PlayState_Perfect!!=Perfect!!
+PlayState_SFC=SFC
+PlayState_GFC=GFC
+PlayState_FC=FC
+PlayState_SDCB=SDCB
+PlayState_BAKA=BAKA
+PlayState_Clear=Clear
+
+# Mods
+Mod_NotFound=No description provided.
+Mod_Name=Mod name: {0}
+Mod_Has_Error=An error occurred: {0}
+
+Mods_No_Installed=NO MODS INSTALLED\nPRESS BACK TO EXIT OR INSTALL A MOD
+Mods_No_Found=No Mods found.
+Mod_Restart=* Moving or Toggling On/Off this Mod will restart the game.
+Reload_Button=RELOAD
+Enable_All_Button=ENABLE ALL
+Disable_All_Button=DISABLE ALL
+
+# Dialogues
+Dialogues_Skip=Press {0} to Skip
+
+# Pause UI
+Pause_Resume=Resume
+Pause_Restart Song=Restart Song
+Pause_Leave Charting Mode=Leave Charting Mode
+Pause_Skip Time=Skip Time
+Pause_End Song=End Song
+Pause_Change Difficulty=Change Difficulty
+Pause_Toggle Botplay=Toggle Botplay
+Pause_Toggle Practice Mode=Toggle Practice Mode
+Pause_Options=Options
+Pause_Exit to menu=Exit to Menu
+Pause_BACK=BACK
+Pause_Practice=Practice Mode
+Pause_Charting=Charting Mode
+Deaths=BlueBalled: {0}
+
+# Gameplay Changers
+Setting_scrolltype=Scroll Type
+Setting_scrolltype-multiplicative=Multiplicaive
+Setting_scrolltype-constant=Constant
+Setting_scrollspeed=Scroll Speed
+Setting_songspeed=Playback Rate
+Setting_healthgain=Health Gain
+Setting_healthloss=Health Loss
+Setting_instakill=Instakill On Miss
+Setting_practice=Practice
+Setting_botplay=Botplay
+Setting_lunatic=Lunatic
+Setting_Opponent_Play=Opponent Play
+
+# Controls
+KeyGroup_NOTES=NOTES
+KeyGroup_UI=UI
+KeyGroup_VOLMUE=VOLUME
+KeyGroup_DEBUG=DEBUG
+
+Key_note_left=LEFT
+Key_note_down=DOWN
+Key_note_up=UP
+Key_note_right=RIGHT
+Key_ui_left=LEFT
+Key_ui_down=DOWN
+Key_ui_up=UP
+Key_ui_right=RIGHT
+Key_reset=Reset
+Key_accept=Accept
+Key_back=Back
+Key_pause=Pause
+Key_volume_mute=MUTE
+Key_volume_up=UP
+Key_volume_down=DOWN
+Key_debug_1=KEY 1
+Key_debug_2=KEY 2
+
+reset_to_default_keys=Reset to default keys
+Controls_Rebinding=Rebinding {0}
+Controls_Rebinding_Desc=Hold ESC to Cancel\nHold Backspace to Delete
+
+# Reset Score/Achievement
+Reset_Score=Reset the score of
+Reset_Achievement=Reset Achievement: 
+Yes=Yes
+No=No
+
+# Default Difficulties
+Difficulty_Easy=Easy
+Difficulty_Normal=Normal
+Difficulty_Hard=Hard
+
+# Editor(hmm)
+Editor_Main_Modloader=< Loaded Mod Directory: {0} >
+Editor_Main_Modloader_Not_Found=< No Mod Directory Loaded >
+Editor_Charting_Zoom=Zoom: 1 / 1
+Editor_Charting_NoteType= ,Alt Animation,Hey!,Hurt Note,GF Sing,No Animation
+#Editor_Charting_Events=（暂时废弃（）
