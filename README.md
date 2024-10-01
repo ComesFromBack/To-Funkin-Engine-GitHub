@@ -1,8 +1,8 @@
 # Friday Night Funkin' - To Funkin Engine
-Engine mod by [Psych Engine](https://gamebanana.com/mods/301107)
-Kade UI code from: [Kade Engine](https://github.com/KadeDev/Kade-Engine)
-Mic'd UP UI code from: [Mic'd up](https://github.com/Verwex/Funkin-Mic-d-Up-SC)
-Yanilla UI: [Vanilla game](https://github.com/FunkinCrew/Funkin)
+* Engine mod by [Psych Engine](https://gamebanana.com/mods/301107)
+* Kade UI code from: [Kade Engine](https://github.com/KadeDev/Kade-Engine)
+* Mic'd UP UI code from: [Mic'd up](https://github.com/Verwex/Funkin-Mic-d-Up-SC)
+* Vanilla UI: [Vanilla game](https://github.com/FunkinCrew/Funkin)
 
 ## Installation:
 
