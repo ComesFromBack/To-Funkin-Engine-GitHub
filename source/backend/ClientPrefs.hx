@@ -4,6 +4,7 @@ import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.input.keyboard.FlxKey;
 import flixel.util.FlxSave;
 import states.TitleState;
+import mobile.input.MobileInputID;
 
 // Add a variable here and it will get automatically saved
 @:structInit class SaveVariables {
@@ -211,7 +212,7 @@ class ClientPrefs {
 	];
 	public static var defaultKeys:Map<String, Array<FlxKey>> = null;
 	public static var defaultButtons:Map<String, Array<FlxGamepadInputID>> = null;
-	public static var defaultButtons:Map<String, Array<FlxGamepadInputID>> = null;
+	public static var defaultMobileBinds:Map<String, Array<MobileInputID>> = null;
 
 	public static function resetKeys(controller:Null<Bool> = null) // Null = both, False = Keyboard, True = Controller
 	{

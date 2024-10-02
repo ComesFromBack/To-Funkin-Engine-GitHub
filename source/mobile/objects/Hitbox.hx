@@ -3,6 +3,7 @@ package mobile.objects;
 import openfl.display.BitmapData;
 import openfl.display.Shape;
 import flixel.graphics.FlxGraphic;
+import mobile.input.MobileInputID;
 
 /**
  * A zone with 4 hint's (A hitbox).

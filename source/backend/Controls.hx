@@ -4,6 +4,7 @@ import flixel.input.gamepad.FlxGamepadButton;
 import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.input.gamepad.mappings.FlxGamepadMapping;
 import flixel.input.keyboard.FlxKey;
+import mobile.input.MobileInputID;
 
 class Controls
 {
@@ -112,7 +113,7 @@ class Controls
 	
 	// Functions
 	public function getControlString(str:String):String {
-		var savKey:Array<Null<FlxKey>> = (controllerMode ? ClientPrefs.gamepadBinds.get(str) : ClientPrefs.keyBinds.get(str));
+		var savKey:Array<Null<Any>> = (controllerMode ? ClientPrefs.gamepadBinds.get(str) : ClientPrefs.keyBinds.get(str));
 		var ret:String = null;
 		var hasKey:Bool = false;
 		if (savKey[0] != null) {

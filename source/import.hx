@@ -74,7 +74,6 @@ import mobile.objects.IMobileControls;
 import mobile.objects.Hitbox;
 import mobile.objects.TouchPad;
 import mobile.objects.TouchButton;
-import mobile.input.MobileInputID;
 import mobile.backend.MobileData;
 import mobile.backend.StorageUtil;
 import mobile.input.MobileInputManager;

@@ -1,5 +1,7 @@
 package mobile.objects;
 
+import mobile.input.MobileInputID;
+
 /**
  * ...
  * @author: Karim Akra and Lily Ross (mcagabe19)
