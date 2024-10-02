@@ -53,6 +53,11 @@ class Main extends Sprite {
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
 	public static function main():Void {
+		#if cpp
+		cpp.NativeGc.enable(true);
+		#elseif hl
+		hl.Gc.enable(true);
+		#end
 		Lib.current.addChild(new Main());
 	}
 
@@ -61,6 +66,22 @@ class Main extends Sprite {
 
 		if (stage != null) init();
 		else addEventListener(Event.ADDED_TO_STAGE, init);
+
+		#if mobile
+		#if android
+		StorageUtil.requestPermissions();
+		#end
+		Sys.setCwd(StorageUtil.getStorageDirectory());
+		#end
+
+		#if (windows||cpp)
+		@:functionCode("
+			#include <windows.h>
+			#include <winuser.h>
+			setProcessDPIAware() // allows for more crisp visuals
+			DisableProcessWindowsGhosting() // lets you move the window and such if it's not responding
+		")
+		#end
 
 		#if VIDEOS_ALLOWED
 		hxvlc.util.Handle.init(#if (hxvlc >= "1.8.0")  ['--no-lua'] #end);
@@ -125,11 +146,23 @@ class Main extends Sprite {
 		#end
 
 		FlxG.fixedTimestep = false;
-		FlxG.game.focusLostFramerate = 60;
-		FlxG.keys.preventDefaultKeys = [TAB];		
+		FlxG.game.focusLostFramerate = #if mobile 30 #else 60 #end;
+		#if web
+		FlxG.keys.preventDefaultKeys.push(TAB);
+		#else
+		FlxG.keys.preventDefaultKeys = [TAB];
+		#end
+		
 		#if CRASH_HANDLER
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
 		#end
+
+		#if android FlxG.android.preventDefaultKeys = [BACK]; #end
+		#if mobile
+		LimeSystem.allowScreenTimeout = ClientPrefs.data.screensaver; 		
+		FlxG.scaleMode = new MobileScaleMode();
+		#end
+
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, toggleFullScreen);
 		FlxG.stage.addEventListener(NativeProcessExitEvent.EXIT, onExit);
 
@@ -138,10 +171,13 @@ class Main extends Sprite {
 
 		// shader coords fix
 		FlxG.signals.gameResized.add(function (w, h) {
-		     if (FlxG.cameras != null) {
-			   for (cam in FlxG.cameras.list) {
-				if (cam != null && cam.filters != null) resetSpriteCache(cam.flashSprite);
-			   }
+			if(fpsVar != null)
+				fpsVar.positionFPS(10, 3, Math.min(w / FlxG.width, h / FlxG.height));
+
+			if (FlxG.cameras != null) {
+				for (cam in FlxG.cameras.list) {
+					if (cam != null && cam.filters != null) resetSpriteCache(cam.flashSprite);
+			}
 			}
 
 			if (FlxG.game != null) resetSpriteCache(FlxG.game);
