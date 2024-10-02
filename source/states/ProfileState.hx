@@ -12,6 +12,11 @@ class ProfileState extends MusicBeatState {
 	public var warnTimer:FlxTimer;
     public var warnTween:FlxTween;
 
+    var selectedPF:String;
+    var waiting:Bool = false;
+    var waitingForTimer:FlxTimer;
+
+    var side:FlxSprite = new FlxSprite(0).loadGraphic(Paths.image('Mara_Bottom'));
     // public var Normal_Window:Window;
 
     override function create() {
@@ -26,16 +31,23 @@ class ProfileState extends MusicBeatState {
 			textGroup.add(item);
 		}
 
+        side.scrollFactor.x = 0;
+		side.scrollFactor.y = 0;
+		side.antialiasing = true;
+		side.screenCenter();
+
+		side.y = FlxG.height;
+
         var deleteText:FlxText = new FlxText(12, FlxG.height - 24, 0, "Press \"Delete\" key to DELETE selected profile", 12);
         deleteText.scrollFactor.set();
 		deleteText.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-        var resetText:FlxText = new FlxText(12, FlxG.height - 44, 0, "Press "+controls.RESET_S+" key to CLEAR selected profile", 12);
+        var resetText:FlxText = new FlxText(12, deleteText.x - 20, 0, "Press "+controls.RESET_S+" key to CLEAR selected profile", 12);
         resetText.scrollFactor.set();
 		resetText.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-        var renameText:FlxText = new FlxText(12, FlxG.height - 64, 0, "Press Shift + "+controls.RESET_S+" key to Rename selected profile", 12);
+        var renameText:FlxText = new FlxText(12, resetText.x - 20, 0, "Press Shift + "+controls.RESET_S+" key to Rename selected profile", 12);
         renameText.scrollFactor.set();
 		renameText.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-        var newProfileText:FlxText = new FlxText(12, FlxG.height - 84, 0, "Press \"N\" key to Create new profile", 12);
+        var newProfileText:FlxText = new FlxText(12, renameText.x - 20, 0, "Press \"N\" key to Create new profile", 12);
         newProfileText.scrollFactor.set();
 		newProfileText.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 
@@ -48,6 +60,9 @@ class ProfileState extends MusicBeatState {
         add(newProfileText);
         add(textGroup);
         add(newText);
+
+        add(side);
+		FlxTween.tween(side, {y: FlxG.height - side.height}, 0.6, {ease: FlxEase.quartInOut});
 
         changeSelection();
     }
@@ -63,18 +78,94 @@ class ProfileState extends MusicBeatState {
         else if(controls.UI_DOWN_P)
             changeSelection(1);
 
+        for (num => item in textGroup.members)
+		{
+			item.targetY = num - curSelected;
+			var scaledY = FlxMath.remapToRange(item.targetY, 0, 1, 0, 1.3);
+
+			item.y = FlxMath.lerp(item.y, (item.targetY * 0) + (FlxG.height * 0.425), 0.16/(ClientPrefs.data.framerate / 60));
+			item.x = FlxMath.lerp(item.x, (scaledY * FlxG.width) + (FlxG.width * 0.325), 0.16/(ClientPrefs.data.framerate / 60));
+			// item.x += -45/(ClientPrefs.data.framerate / 60);
+		}
+
         if(FlxG.keys.justPressed.DELETE) {
             if(profiles.length > 1)
-                Highscore.removeProfile(profiles[curSelected]);
+                if(!waiting) {
+                    alter("Are you sure?", FlxColor.WHITE);
+                    waiting = true;
+                    selectedPF = profiles[curSelected];
+                    waitingForTimer = new FlxTimer().start(1, function(timer:FlxTimer) {
+                        waiting = false;
+                        alter("Delete wait canceled!", FlxColor.GREEN);
+                        waitingForTimer = null;
+                    });
+                } else {
+                    if(selectedPF != profiles[curSelected]) {
+                        waiting = false;
+                        FlxG.sound.play(Paths.sound("error"), ClientPrefs.data.soundVolume);
+                        return;
+                    }
+                    Highscore.removeProfile(selectedPF);
+                    profiles.remove(selectedPF);
+                    waiting = false;
+                    FlxG.sound.play(Paths.sound('confirmMenu'), ClientPrefs.data.soundVolume);
+                    waitingForTimer.cancel();
+                    alter("Profile "+'"$selectedPF"'+" removed!",FlxColor.GREEN);
+                    selectedPF = null;
+                    reload();
+                }
             else
                 alter("You must has ONE Profile!", FlxColor.RED);
         }
 
-        // if(FlxG.keys.justPressed.N)
+        if(FlxG.keys.justPressed.C) {
+            if(!waiting) {
+                alter("Are you sure?", FlxColor.WHITE);
+                waiting = true;
+                selectedPF = profiles[curSelected];
+                waitingForTimer = new FlxTimer().start(1, function(timer:FlxTimer) {
+                    waiting = false;
+                    alter("Clear wait timer canceled!", FlxColor.GREEN);
+                    waitingForTimer = null;
+                });
+            } else {
+                if(selectedPF != profiles[curSelected]) {
+                    waiting = false;
+                    FlxG.sound.play(Paths.sound("error"), ClientPrefs.data.soundVolume);
+                    return;
+                }
+                Highscore.clearProfileRank(selectedPF);
+                waiting = false;
+                FlxG.sound.play(Paths.sound('confirmMenu'), ClientPrefs.data.soundVolume);
+                waitingForTimer.cancel();
+                alter("Profile "+'"$selectedPF"'+" data cleared!",FlxColor.GREEN);
+                selectedPF = null;
+                reload();
+            }
+        }
+
+        if(FlxG.keys.justPressed.N) {
+            if(!Highscore.existsProfile("girlfriend")) // Just for test, I guess.
+                Highscore.createProfile("girlfriend");
+
+            alter("Profile "+'"girlfriend"'+" created!",FlxColor.GREEN);
+            reload();
+        }
         if(controls.ACCEPT)
-            openSubState(new substates.ProfileRename());
+            // openSubState(new substates.ProfileRename());
 
         super.update(elapsed);
+    }
+
+    function reload() {
+        curSelected = 0;
+        textGroup.clear();
+        for (num => str in profiles) {
+			var item = new Alphabet(90, 320, str, true);
+			item.isMenuItem = true;
+			item.targetY = num;
+			textGroup.add(item);
+		}
     }
 
     function changeSelection(change:Int = 0):Void {
