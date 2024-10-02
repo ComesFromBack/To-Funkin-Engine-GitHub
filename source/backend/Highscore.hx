@@ -38,6 +38,20 @@ class Highscore
 		}
 	}
 
+	public static function writeToProfile(profileName:String, key:String, value:Dynamic) {
+		if (profileRanks.exists(profileName)) {
+			profileRanks.get(profileName).set(key, value);
+			FlxG.save.data.profileRanks = profileRanks;
+			FlxG.save.flush();
+		}
+	}
+
+	public static function existsProfile(profileName:String):Bool {
+		if(profileRanks.exists(profileName))
+			return true;
+		return false;
+	}
+
 	public static function renameProfile(scrProfileName:String, newProfileName:String):Void {
 		if (profileRanks.exists(scrProfileName)) {
 			profileRanks.set(newProfileName, profileRanks.get(scrProfileName));
