@@ -15,11 +15,11 @@ import flixel.util.FlxStringUtil;
 #if (flixel < version("5.7.0"))
 import flixel.ui.FlxButton.NORMAL;
 import flixel.ui.FlxButton.HIGHLIGHT;
-import flixel.ui.FlxButton.PRESSED;
+import flixel.ui.FlxButton.PRESSED as FLXPRESSED;
 #else
 import flixel.ui.FlxButton.FlxButtonState.NORMAL;
 import flixel.ui.FlxButton.FlxButtonState.HIGHLIGHT;
-import flixel.ui.FlxButton.FlxButtonState.PRESSED;
+import flixel.ui.FlxButton.FlxButtonState.PRESSED as FLXPRESSED;
 import flixel.ui.FlxButton.FlxButtonState.DISABLED;
 #end
 /**
@@ -340,7 +340,7 @@ class FlxUIDropDownMenu extends FlxUIGroup implements IFlxUIWidget implements IF
 
 		t.loadGraphicSlice9([FlxUIAssets.IMG_INVIS, FlxUIAssets.IMG_HILIGHT, FlxUIAssets.IMG_HILIGHT], Std.int(header.background.width),
 			Std.int(header.background.height), [[1, 1, 3, 3], [1, 1, 3, 3], [1, 1, 3, 3]], FlxUI9SliceSprite.TILE_NONE);
-		t.labelOffsets[PRESSED].y -= 1; // turn off the 1-pixel depress on click
+		t.labelOffsets[FLXPRESSED].y -= 1; // turn off the 1-pixel depress on click
 
 		t.up_color = FlxColor.BLACK;
 		t.over_color = FlxColor.WHITE;
