@@ -66,7 +66,7 @@ jobs:
           haxelib install hxCodec 2.6.0
           haxelib install hscript-iris 1.1.0
           haxelib install SScript 19.0.618
-          haxelin install hxvlc 1.9.2
+          haxelib install hxvlc 1.9.2
           haxelib git grig.audio https://github.com/osakared/grig.audio.git
           haxelib git SScript https://github.com/ComesFromBack/SScript19.0.618-Backup.git
           haxelib git hxdiscord_rpc https://github.com/MAJigsaw77/hxdiscord_rpc
