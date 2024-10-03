@@ -65,6 +65,7 @@ jobs:
           haxelib install SScript 8.1.6
           haxelib install hscript 2.5.0
           haxelib install hxCodec 2.6.0
+          haxelib install hscript-iris 1.1.0
           haxelib git grig.audio https://github.com/osakared/grig.audio.git
           haxelib git hxdiscord_rpc https://github.com/MAJigsaw77/hxdiscord_rpc
           haxelib git flxanimate https://github.com/beihu235/flxanimate
