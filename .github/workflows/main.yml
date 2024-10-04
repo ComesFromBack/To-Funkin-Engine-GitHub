@@ -49,7 +49,7 @@ jobs:
             export/release/android/obj
           key: cache-android-build
 
-      - name: Install Haxelib
+      - name: Install Haxelib part 1
         run: |
           haxelib setup ~/haxelib
           haxelib install hxcpp > /dev/null
@@ -65,8 +65,15 @@ jobs:
           haxelib install hscript 2.5.0
           haxelib install hxCodec 2.6.0
           haxelib install hscript-iris 1.1.0
-          haxelib git SScript https://github.com/ComesFromBack/SScript19.0.618-Backup.git
+          haxelib install hxvlc 1.9.2
           haxelib git grig.audio https://github.com/osakared/grig.audio.git
+      - name: Install SScript form github
+        run: |
+          haxelib git sscript https://github.com/ComesFromBack/SScript19.0.618-Backup.git
+          mkdir -pv /home/runner/haxelib/sscript/19,0,618/
+          mv /home/runner/haxelib/sscript/git/19,0,618/  /home/runner/haxelib/sscript/19,0,618/
+      - name: Install Haxelib part2
+        run: |
           haxelib git hxdiscord_rpc https://github.com/MAJigsaw77/hxdiscord_rpc
           haxelib git flxanimate https://github.com/beihu235/flxanimate
           haxelib git linc_luajit https://github.com/superpowers04/linc_luajit
