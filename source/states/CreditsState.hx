@@ -19,11 +19,6 @@ class CreditsState extends MusicBeatState
 
 	override function create()
 	{
-		#if DISCORD_ALLOWED
-		// Updating Discord Rich Presence
-		DiscordClient.changePresence("In the Menus", null);
-		#end
-
 		persistentUpdate = true;
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.antialiasing = ClientPrefs.data.antialiasing;
@@ -38,6 +33,8 @@ class CreditsState extends MusicBeatState
 		#end
 
 		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
+			["Freaky Back Team"],
+			["Comes_FromBack",		"cfb",				"Main Programmer of To Funkin Engine", 						"https://space.bilibili.com/525583987", "808080"],
 			["Psych Engine Team"],
 			["Shadow Mario",		"shadowmario",		"Main Programmer and Head of Psych Engine",					"https://ko-fi.com/shadowmario",		"444444"],
 			["Riveren",				"riveren",			"Main Artist/Animator of Psych Engine",						"https://twitter.com/riverennn",		"14967B"],
@@ -128,6 +125,8 @@ class CreditsState extends MusicBeatState
 		bg.color = CoolUtil.colorFromString(creditsStuff[curSelected][4]);
 		intendedColor = bg.color;
 		changeSelection();
+
+		addTouchPad('UP_DOWN', 'A_B');
 		super.create();
 	}
 

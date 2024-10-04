@@ -161,37 +161,39 @@ class WinAPI {
 
     public static function getMemory(Memory:Float, ?BitMode:Bool = false, ?Bits:String = ""):String {
         if(BitMode) {
-            if(Bits == "B") return '$Memory Bit';
-            else if(Bits == "KB") return '${Memory / 1024} KiB';
-            else if(Bits == "MB") return '${FlxMath.roundDecimal(Memory / 1024 / 1024, 2)} MiB';
-            else if(Bits == "GB") return '${FlxMath.roundDecimal(Memory / 1024 / 1024 / 1024,2)} GiB';
-            else if(Bits == "TB") return '${FlxMath.roundDecimal(Memory / 1024 / 1024 / 1024 / 1024,2)} TiB'; // 所以说应该不会有人能让FNF占1TB吧（）
-            else {
-                if(Memory > 1024) return '${Memory / 1024} KiB';
-                else if(Memory > 1024*1024) return '${FlxMath.roundDecimal(Memory / 1024 / 1024,2)} MiB';
-                else if(Memory > 1024*1024*1024) return '${FlxMath.roundDecimal(Memory / 1024 / 1024 / 1024,2)} GiB';
-                else if(Memory > 1024*1024*1024*1024) return '${FlxMath.roundDecimal(Memory / 1024 / 1024 / 1024 / 1024,2)} TiB';
-                else return '$Memory Bit';
+            switch(Bits) {
+                case "B": return '$Memory Byte';
+                case "KB": return '${Memory / 1024} KiB';
+                case "MB": return '${FlxMath.roundDecimal(Memory / 1024 / 1024, 2)} MiB';
+                case "GB": return '${FlxMath.roundDecimal(Memory / 1024 / 1024 / 1024,2)} GiB';
+                case "TB": return '${FlxMath.roundDecimal(Memory / 1024 / 1024 / 1024 / 1024,2)} TiB'; // 所以说应该不会有人能让FNF占1TB吧（）
+                default:
+                    if(Memory > 1024) return '${Memory / 1024} KiB';
+                    else if(Memory > 1024*1024) return '${FlxMath.roundDecimal(Memory / 1024 / 1024,2)} MiB';
+                    else if(Memory > 1024*1024*1024) return '${FlxMath.roundDecimal(Memory / 1024 / 1024 / 1024,2)} GiB';
+                    else if(Memory > 1024*1024*1024*1024) return '${FlxMath.roundDecimal(Memory / 1024 / 1024 / 1024 / 1024,2)} TiB';
+                    else return '$Memory Byte';
             }
         } else {
-            if(Bits == "B") return '$Memory Byte';
-            else if(Bits == "KB") return '${Memory / 1000} KB';
-            else if(Bits == "MB") return '${FlxMath.roundDecimal(Memory / 1000 / 1000,2)} MB';
-            else if(Bits == "GB") return '${FlxMath.roundDecimal(Memory / 1000 / 1000 / 1000,2)} GB';
-            else if(Bits == "TB") return '${FlxMath.roundDecimal(Memory / 1000 / 1000 / 1000 / 1000,2)} TB';
-            else {
-                if(Memory > 1000) return '${Memory / 1000} KB';
-                else if(Memory > 1000*1000) return '${FlxMath.roundDecimal(Memory / 1000 / 1000,2)} MB';
-                else if(Memory > 1000*1000*1000) return '${FlxMath.roundDecimal(Memory / 1000 / 1000 / 1000,2)} GB';
-                else if(Memory > 1000*1000*1000*1000) return '${FlxMath.roundDecimal(Memory / 1000 / 1000 / 1000 / 1000,2)} TB';
-                else return '$Memory Byte';
+            switch(Bits) {
+                case "B": return '$Memory Byte';
+                case "KB": return '${Memory / 1000} KB';
+                case "MB": return '${FlxMath.roundDecimal(Memory / 1000 / 1000, 2)} MB';
+                case "GB": return '${FlxMath.roundDecimal(Memory / 1000 / 1000 / 1000,2)} GB';
+                case "TB": return '${FlxMath.roundDecimal(Memory / 1000 / 1000 / 1000 / 1000,2)} TB'; // 所以说应该不会有人能让FNF占1TB吧（）
+                default:
+                    if(Memory > 1000) return '${Memory / 1000} KB';
+                    else if(Memory > 1000*1000) return '${FlxMath.roundDecimal(Memory / 1000 / 1000,2)} MB';
+                    else if(Memory > 1000*1000*1000) return '${FlxMath.roundDecimal(Memory / 1000 / 1000 / 1000,2)} GB';
+                    else if(Memory > 1000*1000*1000*1000) return '${FlxMath.roundDecimal(Memory / 1000 / 1000 / 1000 / 1000,2)} TB';
+                    else return '$Memory Byte';
             }
         }
     }
 
     @:functionCode('
 	if(MessageBox(NULL,ErrorMessage,"Oh,no.The game crashed!",MB_YESNO|MB_ICONHAND)==IDYES) {
-		system("start https://gamebanana.com/tools/issues/14365");
+		system("start https://github.com/ComesFromBack/To-Funkin-Engine-GitHub/issues");
 		if(needExit) exit(100);
 	} else {
 		if(needExit) exit(100);
@@ -203,27 +205,25 @@ class WinAPI {
     }
 
     @:functionCode('
-        if(bIsRunAgain) {
-            TCHAR szPath[MAX_PATH];
-            GetModuleFileName(NULL, szPath, MAX_PATH); 
-            STARTUPINFO StartInfo;
-            PROCESS_INFORMATION procStruct;
-            memset(&StartInfo, 0, sizeof(STARTUPINFO));
-            StartInfo.cb = sizeof(STARTUPINFO);
-            exit(10);
-            if(!::CreateProcess(
-                (LPCTSTR)szPath,
-                NULL,
-                NULL,
-                NULL,
-                FALSE,
-                NORMAL_PRIORITY_CLASS,
-                NULL,
-                NULL,
-                &StartInfo,
-                &procStruct))
-            return 0;
-        }
+        TCHAR szPath[MAX_PATH];
+        GetModuleFileName(NULL, szPath, MAX_PATH); 
+        STARTUPINFO StartInfo;
+        PROCESS_INFORMATION procStruct;
+        memset(&StartInfo, 0, sizeof(STARTUPINFO));
+        StartInfo.cb = sizeof(STARTUPINFO);
+        if(::CreateProcess(
+            (LPCTSTR)szPath,
+            NULL,
+            NULL,
+            NULL,
+            FALSE,
+            NORMAL_PRIORITY_CLASS,
+            NULL,
+            NULL,
+            &StartInfo,
+            &procStruct))
+        exit(10);
+        return 0;
     ')
     public static function restart(?bIsRunAgain:Bool = true):Int {
         return 0;

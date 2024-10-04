@@ -121,10 +121,18 @@ class AchievementsMenuState extends MusicBeatState
 		add(nameText);
 		
 		_changeSelection();
+
+		addTouchPad('LEFT_FULL', 'B_C');
 		super.create();
 		
 		FlxG.camera.follow(camFollow, null, 0.15);
 		FlxG.camera.scroll.y = -FlxG.height;
+	}
+
+	override function closeSubState() {
+		super.closeSubState();
+                removeTouchPad();
+		addTouchPad('LEFT_FULL', 'B_C');
 	}
 
 	function makeAchievement(achievement:String, data:Achievement, unlocked:Bool, mod:String = null)
@@ -290,6 +298,8 @@ class ResetAchievementSubstate extends MusicBeatSubstate
 		noText.scrollFactor.set();
 		add(noText);
 		updateOptions();
+
+		addTouchPad('LEFT_RIGHT', 'A');
 	}
 
 	override function update(elapsed:Float)

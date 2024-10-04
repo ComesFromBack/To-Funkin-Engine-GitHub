@@ -36,6 +36,16 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		addOption(option);
 		option.onChange = onChangeAutoPause;
 
+		var option:Option = new Option('Engine UI', //Name
+			'idk.', //Description
+			'styleEngine', //Save data variable name
+			INT); //Variable type
+			option.displayFormat = '${Arrays.engineList[ClientPrefs.data.styleEngine]}';
+			option.scrollSpeed = 1;
+			option.minValue = 0;
+			option.maxValue = 4;
+		addOption(option);
+
 		var option:Option = new Option('Disable Reset Button',
 			"If checked, pressing Reset won't do anything.",
 			'noReset',

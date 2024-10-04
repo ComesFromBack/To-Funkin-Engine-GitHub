@@ -101,7 +101,7 @@ class MainMenuState extends MusicBeatState
 
 		persistentUpdate = persistentDraw = true;
 
-		var yScroll:Float = 0.25;
+		var yScroll:Float = (Arrays.engineList[ClientPrefs.data.styleEngine] == "Psych New" ? 0.25 : Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1));
 		
 		bg.antialiasing = ClientPrefs.data.antialiasing;
 		bg.scrollFactor.set(0, yScroll);
@@ -140,11 +140,6 @@ class MainMenuState extends MusicBeatState
 		magenta.visible = false;
 		magenta.color = 0xFFfd719b;
 		add(magenta);
-
-		if(Arrays.engineList[ClientPrefs.data.styleEngine] != "Psych Old") {
-			bg.y -= 30;
-			magenta.y -= 30;
-		}
 
 		if(Arrays.engineList[ClientPrefs.data.styleEngine] == "MicUp") {
 			side = new FlxSprite(0).loadGraphic(Paths.image('mainmenu/Main_Side'));
@@ -458,7 +453,7 @@ class MainMenuState extends MusicBeatState
 									switch(Arrays.engineList[ClientPrefs.data.styleEngine]) {
 										case 'Psych Old'|'Psych New': MusicBeatState.switchState(new OptionsState());
 										case 'Kade': MusicBeatState.switchState(new options.kade.KadeOptions());
-										// case 'Vanilla': MusicBeatState.switchState(new VanillaOption());
+										case 'Vanilla': MusicBeatState.switchState(new options.vanilla.VanillaSettingState());
 									}
 									
 									OptionsState.onPlayState = false;

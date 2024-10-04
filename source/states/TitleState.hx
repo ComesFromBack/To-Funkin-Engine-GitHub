@@ -93,7 +93,7 @@ class TitleState extends MusicBeatState
 				var curVersion:String = MainMenuState.psychEngineVersion.trim();
 				trace('version online: ' + updateVersion + ', your version: ' + curVersion);
 				if(updateVersion != curVersion) {
-					trace('versions arent matching!');
+					trace("versions aren't matching!");
 					mustUpdate = true;
 				}
 			}
@@ -562,7 +562,7 @@ class TitleState extends MusicBeatState
 					else if (Arrays.engineList[ClientPrefs.data.styleEngine] == 'Vanilla')
 						createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
 					else
-						createCoolText(['Psych Engine by'], 40);
+						createCoolText(['To Funkin Engine by '], 40);
 				case 4:
 					switch(Arrays.engineList[ClientPrefs.data.styleEngine]) {
 						case 'MicUp':
@@ -574,8 +574,8 @@ class TitleState extends MusicBeatState
 						case 'Vanilla':
 							addMoreText('present');
 						default:
-							addMoreText('Shadow Mario', 40);
-							addMoreText('Riveren', 40);
+							addMoreText('Freaky Back Team', 45);
+							addMoreText('Comes_FromBack', 40);
 					}
 				case 5:
 					deleteCoolText();

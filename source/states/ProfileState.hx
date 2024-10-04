@@ -151,6 +151,12 @@ class ProfileState extends MusicBeatState {
             alter("Profile "+'"girlfriend"'+" created!",FlxColor.GREEN);
             reload();
         }
+
+        if(FlxG.keys.pressed.SHIFT) {
+            if(controls.RESET)
+                throw "You're stupid, profile isn't done! Shit throw.";
+        }
+
         if(controls.ACCEPT)
             // openSubState(new substates.ProfileRename());
 

@@ -233,7 +233,7 @@ class Main extends Sprite {
 		}
 
 		errMsg += "\nGame has Error: " + e.error;
-		errMsg += "\n\nPlease report this error to:\nGameBanana page: https://gamebanana.com/tools/issues/14365\nCreater E-Mail: MinecraftForMePack@outlook.com";
+		errMsg += "\n\nPlease report this error to:\nGitHub Issue report page: https://github.com/ComesFromBack/To-Funkin-Engine-GitHub/issues\nCreater E-Mail: MinecraftForMePack@outlook.com";
 		errMsg += "\n\nPress \"OK\" button to open error report page. Press \"NO\" button cancel";
 
 		if (!FileSystem.exists("./crash/")) FileSystem.createDirectory("./crash/");

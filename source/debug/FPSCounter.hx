@@ -24,6 +24,8 @@ class FPSCounter extends TextField
 	{
 		super();
 
+		positionFPS(x, y);
+
 		this.x = x;
 		this.y = y;
 		currentFPS = 0;
@@ -69,5 +71,11 @@ class FPSCounter extends TextField
 
 		textColor = 0xFFFFFFFF;
 		if (currentFPS < FlxG.drawFramerate * 0.5) textColor = 0xFFFF0000;
+	}
+
+	public inline function positionFPS(X:Float, Y:Float, ?scale:Float = 1){
+		scaleX = scaleY = #if android (scale > 1 ? scale : 1) #else (scale < 1 ? scale : 1) #end;
+		x = FlxG.game.x + X;
+		y = FlxG.game.y + Y;
 	}
 }
