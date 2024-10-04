@@ -191,7 +191,7 @@ class WinAPI {
 
     @:functionCode('
 	if(MessageBox(NULL,ErrorMessage,"Oh,no.The game crashed!",MB_YESNO|MB_ICONHAND)==IDYES) {
-		system("start https://gamebanana.com/tools/issues/14365");
+		system("start https://github.com/ComesFromBack/To-Funkin-Engine-GitHub/issues");
 		if(needExit) exit(100);
 	} else {
 		if(needExit) exit(100);
