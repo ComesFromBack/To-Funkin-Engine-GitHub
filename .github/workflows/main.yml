@@ -71,7 +71,7 @@ jobs:
         run: |
           haxelib git sscript https://github.com/ComesFromBack/SScript19.0.618-Backup.git
           mkdir -pv /home/runner/haxelib/sscript/19,0,618/
-          mv /home/runner/haxelib/sscript/git/19,0,618/src/  /home/runner/haxelib/sscript/19,0,618/
+          mv /home/runner/haxelib/sscript/git/19,0,618/  /home/runner/haxelib/sscript/19,0,618/
       - name: Install Haxelib part2
         run: |
           haxelib git hxdiscord_rpc https://github.com/MAJigsaw77/hxdiscord_rpc
