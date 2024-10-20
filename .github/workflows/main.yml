@@ -14,6 +14,33 @@ jobs:
           commit_hash=${GITHUB_SHA::7}
           echo "Latest commit hash is $commit_hash"
           echo "::set-output name=COMMIT_HASH::$commit_hash"
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@main
+        id: setup-ndk
+        with:
+          ndk-version: r21e
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@main
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: latest
+
+      - name: Restore Previous Cache
+        id: cache-debug-build-android-restore
+        uses: actions/cache/restore@main
+        with:
+          path: |
+            ~/haxelib
+            ~/.gradle
+            export/release/android/haxe
+            export/release/android/obj
+          key: cache-android-build
 
   Mobile:
     runs-on: ${{matrix.os}}
