@@ -4,6 +4,7 @@ import flixel.FlxState;
 import backend.PsychCamera;
 import states.FreeplayState;
 import states.editors.ChartingState;
+import states.mic.MenuFreeplay;
 
 class MusicBeatState extends FlxState
 {
@@ -22,93 +23,6 @@ class MusicBeatState extends FlxState
 		return Controls.instance;
 	}
 
-	public var touchPad:TouchPad;
-	public var mobileControls:IMobileControls;
-	public var camControls:FlxCamera;
-	public var tpadCam:FlxCamera;
-
-	public function addTouchPad(DPad:String, Action:String)
-	{
-		touchPad = new TouchPad(DPad, Action);
-		add(touchPad);
-	}
-
-	public function removeTouchPad()
-	{
-		if (touchPad != null)
-		{
-			remove(touchPad);
-			touchPad = FlxDestroyUtil.destroy(touchPad);
-		}
-
-		if(tpadCam != null)
-		{
-			FlxG.cameras.remove(tpadCam);
-			tpadCam = FlxDestroyUtil.destroy(tpadCam);
-		}
-	}
-
-	public function addMobileControls(defaultDrawTarget:Bool = false):Void
-	{
-		var extraMode = MobileData.extraActions.get(ClientPrefs.data.extraButtons);
-
-		switch (MobileData.mode)
-		{
-			case 0: // RIGHT_FULL
-				mobileControls = new TouchPad('RIGHT_FULL', 'NONE', extraMode);
-			case 1: // LEFT_FULL
-				mobileControls = new TouchPad('LEFT_FULL', 'NONE', extraMode);
-			case 2: // CUSTOM
-				mobileControls = MobileData.getTouchPadCustom(new TouchPad('RIGHT_FULL', 'NONE', extraMode));
-			case 3: // HITBOX
-				mobileControls = new Hitbox(extraMode);
-		}
-
-		mobileControls.instance = MobileData.setButtonsColors(mobileControls.instance);
-		camControls = new FlxCamera();
-		camControls.bgColor.alpha = 0;
-		FlxG.cameras.add(camControls, defaultDrawTarget);
-
-		mobileControls.instance.cameras = [camControls];
-		mobileControls.instance.visible = false;
-		add(mobileControls.instance);
-	}
-
-	public function removeMobileControls()
-	{
-		if (mobileControls != null)
-		{
-			remove(mobileControls.instance);
-			mobileControls.instance = FlxDestroyUtil.destroy(mobileControls.instance);
-			mobileControls = null;
-		}
-
-		if(camControls != null)
-		{
-			FlxG.cameras.remove(camControls);
-			camControls = FlxDestroyUtil.destroy(camControls);
-		}
-	}
-
-	public function addTouchPadCamera(defaultDrawTarget:Bool = false):Void
-	{
-		if (touchPad != null)
-		{
-			tpadCam = new FlxCamera();
-			tpadCam.bgColor.alpha = 0;
-			FlxG.cameras.add(tpadCam, defaultDrawTarget);
-			touchPad.cameras = [tpadCam];
-		}
-	}
-
-	override function destroy()
-	{
-		removeTouchPad();
-		removeMobileControls();
-		
-		super.destroy();
-	}
-
 	var _psychCameraInitialized:Bool = false;
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
@@ -124,7 +38,7 @@ class MusicBeatState extends FlxState
 		super.create();
 
 		if(!skip) {
-			openSubState(new CustomFadeTransition(0.6, true));
+			openSubState(new CustomFadeTransition(0.5, true));
 		}
 		FlxTransitionableState.skipNextTransOut = false;
 		timePassedOnState = 0;
@@ -189,12 +103,14 @@ class MusicBeatState extends FlxState
 		if(Type.getClassName(Type.getClass(FlxG.state)) != 'states.PlayState') FlxG.sound.music.volume = v;
 		if(FreeplayState.vocals != null) FreeplayState.vocals.volume = v-0.1;
 		if(FreeplayState.opponentVocals != null) FreeplayState.opponentVocals.volume = v-0.1;
-		if(ChartingState.vocals != null && Type.getClassName(Type.getClass(FlxG.state)) == 'states.ChartingState') ChartingState.vocals.volume = v;
-		if(ChartingState.opponentVocals != null && Type.getClassName(Type.getClass(FlxG.state)) == 'states.ChartingState') ChartingState.opponentVocals.volume = v;
+		if(MenuFreeplay.vocals != null) MenuFreeplay.vocals.volume = v-0.1;
+		if(MenuFreeplay.opponentVocals != null) MenuFreeplay.opponentVocals.volume = v-0.1;
+		// if(ChartingState.vocals != null && Type.getClassName(Type.getClass(FlxG.state)) == 'states.ChartingState') ChartingState.vocals.volume = v;
+		// if(ChartingState.opponentVocals != null && Type.getClassName(Type.getClass(FlxG.state)) == 'states.ChartingState') ChartingState.opponentVocals.volume = v;
 	}
 
 	override function onFocusLost() {
-		if(ClientPrefs.data.foucsMusic) {
+		if(ClientPrefs.data.focusLostMusic) {
 			if(FlxG.sound.music != null && soundTween == null) {
 				soundTween = FlxTween.num(ClientPrefs.data.musicVolume, 0.25, 1.25, {onComplete: function(twn:FlxTween) {
 					soundTween = null;
@@ -209,7 +125,7 @@ class MusicBeatState extends FlxState
 	}
 
 	override function onFocus() {
-		if(ClientPrefs.data.foucsMusic) {
+		if(ClientPrefs.data.focusLostMusic) {
 			if(FlxG.sound.music != null && soundTween == null) {
 				if (FlxG.sound.music.volume != ClientPrefs.data.musicVolume) {
 					soundTween = FlxTween.num(0.25, ClientPrefs.data.musicVolume, 1.25, {onComplete: function(twn:FlxTween) {
@@ -286,7 +202,7 @@ class MusicBeatState extends FlxState
 		if(nextState == null)
 			nextState = FlxG.state;
 
-		FlxG.state.openSubState(new CustomFadeTransition(0.6, false));
+		FlxG.state.openSubState(new CustomFadeTransition(0.5, false));
 		if(nextState == FlxG.state)
 			CustomFadeTransition.finishCallback = function() FlxG.resetState();
 		else

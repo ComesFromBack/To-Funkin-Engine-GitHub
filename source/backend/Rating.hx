@@ -23,10 +23,7 @@ class Rating
 		{
 			this.hitWindow = Reflect.field(ClientPrefs.data, window);
 		}
-		catch(e) {
-			Log.LogPrint("Rating.hx -> Create New Object:Not Field object from 'ClientPrefs.data'(ClientPrefs.hx)","ERROR");
-			FlxG.log.error(e);
-		}
+		catch(e) FlxG.log.error(e);
 	}
 
 	public static function loadDefault():Array<Rating>

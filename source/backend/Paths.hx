@@ -18,6 +18,7 @@ import flash.media.Sound;
 
 import haxe.Json;
 
+
 #if MODS_ALLOWED
 import backend.Mods;
 #end
@@ -172,9 +173,7 @@ class Paths
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
 	static public function image(key:String, ?parentFolder:String = null, ?allowGPU:Bool = true):FlxGraphic
 	{
-		key = 'images/$key';
-		if(key.lastIndexOf('.') < 0) key += '.png';
-
+		key = 'images/$key.png';
 		var bitmap:BitmapData = null;
 		if (currentTrackedAssets.exists(key))
 		{
@@ -228,7 +227,7 @@ class Paths
 
 	inline static public function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
 	{
-		var path:String = getPath(key, TEXT, true);
+		var path:String = getPath(key, TEXT, !ignoreMods);
 		#if sys
 		return (FileSystem.exists(path)) ? File.getContent(path) : null;
 		#else
@@ -292,9 +291,29 @@ class Paths
 		}
 		return getPackerAtlas(key, parentFolder);
 	}
+	
+	static public function getMultiAtlas(keys:Array<String>, ?parentFolder:String = null, ?allowGPU:Bool = true):FlxAtlasFrames
+	{
+		
+		var parentFrames:FlxAtlasFrames = Paths.getAtlas(keys[0].trim());
+		if(keys.length > 1)
+		{
+			var original:FlxAtlasFrames = parentFrames;
+			parentFrames = new FlxAtlasFrames(parentFrames.parent);
+			parentFrames.addAtlas(original, true);
+			for (i in 1...keys.length)
+			{
+				var extraFrames:FlxAtlasFrames = Paths.getAtlas(keys[i].trim(), parentFolder, allowGPU);
+				if(extraFrames != null)
+					parentFrames.addAtlas(extraFrames, true);
+			}
+		}
+		return parentFrames;
+	}
 
 	inline static public function getSparrowAtlas(key:String, ?parentFolder:String = null, ?allowGPU:Bool = true):FlxAtlasFrames
 	{
+		if(key.contains('psychic')) trace(key, parentFolder, allowGPU);
 		var imageLoaded:FlxGraphic = image(key, parentFolder, allowGPU);
 		#if MODS_ALLOWED
 		var xmlExists:Bool = false;
@@ -348,7 +367,7 @@ class Paths
 	public static var currentTrackedSounds:Map<String, Sound> = [];
 	public static function returnSound(key:String, ?path:String, ?modsAllowed:Bool = true, ?beepOnNull:Bool = true)
 	{
-		var file:String = getPath(key + '.$SOUND_EXT', SOUND, path, modsAllowed);
+		var file:String = getPath('$key.$SOUND_EXT', SOUND, path, modsAllowed);
 
 		//trace('precaching sound: $file');
 		if(!currentTrackedSounds.exists(file))

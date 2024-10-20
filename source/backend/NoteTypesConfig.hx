@@ -78,10 +78,7 @@ class NoteTypesConfig
 						obj = _propCheckArray(obj, split[i]);
 				}
 				_propCheckArray(obj, split[split.length-1], true, line.value);
-			} catch(e) {
-				Log.LogPrint('NoteTypesConfig.hx -> Func=applyNoteTypeData():Error applying note type data: $e',"ERROR");
-				trace(e);
-			}
+			} catch(e) trace(e);
 		}
 	}
 

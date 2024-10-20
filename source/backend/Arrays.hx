@@ -4,8 +4,8 @@ class Arrays {
     public static var engineList:Array<String> = ['Psych New', 'Psych Old', 'Kade', 'Vanilla', 'MicUp'];
     public static var pauseSongList:Array<String> = ['None', 'Breakfast', 'Breakfast (Pico)', 'Tea Time'];
     public static var timeBarList:Array<String> = ['Time Left', 'Time Elapsed', 'Song Name', 'Disabled'];
-    public static var noteSkinList:Array<String> = Mods.mergeAllTextsNamed('images/noteSkins/list.txt');
-    public static var noteSplashList:Array<String> = Mods.mergeAllTextsNamed('images/noteSplashes/list.txt');
+    public static var noteSkinList:Array<String> = [];
+    public static var noteSplashList:Array<String> = [];
     public static var fadeStyleList:Array<String> = ['default'];
     public static var soundThemeList:Array<String> = FileSystem.readDirectory("./assets/shared/sounds/theme");
     public static var memoryTypeList:Array<String> = ["B", "KB", "MB", "GB", "Auto"];
@@ -20,13 +20,14 @@ class Arrays {
     ];
 
     public static function LoadData() {
+        noteSkinList = Mods.mergeAllTextsNamed('images/noteSkins/list.txt');
+        noteSplashList = Mods.mergeAllTextsNamed('images/noteSplashes/list.txt');
         noteSkinList.insert(0, 'Default');
         noteSplashList.insert(0, 'Psych');
         for(i in FileSystem.readDirectory("./assets/shared/images/CustomFadeTransition/"))
             fadeStyleList.push(i);
-        // soundThemeList.insert(0, '');
     }
 
     public static function getThemeSound(key:String)
-        return Paths.sound('theme/${soundThemeList[ClientPrefs.data.southeme]}/$key');
+        return Paths.sound('theme/${soundThemeList[ClientPrefs.data.soundTheme]}/$key');
 }

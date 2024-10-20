@@ -1,5 +1,7 @@
 package backend;
 
+import openfl.utils.Assets;
+
 import haxe.Json;
 
 typedef ModsList = {
@@ -142,7 +144,6 @@ class Mods
 				#end
 				if(rawJson != null && rawJson.length > 0) return tjson.TJSON.parse(rawJson);
 			} catch(e:Dynamic) {
-				Log.LogPrint("Mods.hx -> Func=getPack():Json parse has unknown error","ERROR");
 				trace(e);
 			}
 		}
@@ -170,7 +171,6 @@ class Mods
 					list.disabled.push(dat[0]);
 			}
 		} catch(e) {
-			Log.LogPrint("Mods.hx -> Func=parseList():Parse List has Unknown Error, Maybe not has 'modsList.txt' in Game Root Path.","ERROR");
 			trace(e);
 		}
 		#end
@@ -195,7 +195,6 @@ class Mods
 				}
 			}
 		} catch(e) {
-			Log.LogPrint("Mods.hx -> Func=updateModList():Update List has Unknown Error.","ERROR");
 			trace(e);
 		}
 		

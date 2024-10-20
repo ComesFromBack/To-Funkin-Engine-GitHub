@@ -221,11 +221,12 @@ class PsychUIInputText extends FlxSpriteGroup
 			return;
 		}
 
-		for(_ in [FlxKey.SHIFT, FlxKey.CONTROL, FlxKey.ESCAPE])
-			if(flxKey == _) return;
+		static final ignored:Array<FlxKey> = [SHIFT, CONTROL, ESCAPE];
+		if(ignored.contains(flxKey)) return;
 
 		var lastAccent = _nextAccent;
-		switch(keyCode) {
+		switch(keyCode)
+		{
 			case KEY_TILDE:
 				_nextAccent = !e.shiftKey ? TILDE : CIRCUMFLEX;
 				if(lastAccent == NONE) return;

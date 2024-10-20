@@ -27,6 +27,7 @@ import openfl.system.System;
 #include <psapi.h>
 #include <Windows.h>
 #include <memory>
+#include <math.h> 
 #include <tlhelp32.h>
 #include <stdlib.h>
 #include <crtdbg.h>
@@ -191,6 +192,7 @@ class WinAPI {
         }
     }
 
+    #if (windows && cpp)
     @:functionCode('
 	if(MessageBox(NULL,ErrorMessage,"Oh,no.The game crashed!",MB_YESNO|MB_ICONHAND)==IDYES) {
 		system("start https://github.com/ComesFromBack/To-Funkin-Engine-GitHub/issues");
@@ -200,10 +202,12 @@ class WinAPI {
 	}
     return 0;
 	')
+    #end
 	public static function createErrorWindow(ErrorMessage:String, ?needExit:Bool = true):Int {
         return 0;
     }
 
+    #if (windows && cpp)
     @:functionCode('
         TCHAR szPath[MAX_PATH];
         GetModuleFileName(NULL, szPath, MAX_PATH); 
@@ -225,7 +229,20 @@ class WinAPI {
         exit(10);
         return 0;
     ')
+    #end
     public static function restart(?bIsRunAgain:Bool = true):Int {
         return 0;
+    }
+
+    #if (windows && cpp)
+    @:functionCode('
+    #include <cstdlib>
+    DEVMODE NewDevMode;
+    EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, &NewDevMode);
+    return NewDevMode.dmDisplayFrequency;
+    ')
+    #end
+    public static function getFrequency():Int {
+        return 60;
     }
 }

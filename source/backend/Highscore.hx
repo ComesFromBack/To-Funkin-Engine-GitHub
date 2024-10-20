@@ -10,7 +10,6 @@ class Highscore
 
 	public static var profileRanks:Map<String, Map<String, Map<String, Dynamic>>> = new Map();
 	public static var profileList:Array<String> = [];
-	// profileName, []
 
 	public static function clearProfileRank(profileName:String, ?clearWeekRank:Bool = false):Void {
 		if (profileRanks.exists(profileName)) {
@@ -77,7 +76,7 @@ class Highscore
 		FlxG.save.flush();
 	}
 
-	/* =================================================================== */
+
 
 	public static function resetSong(song:String, diff:Int = 0):Void
 	{
@@ -166,6 +165,7 @@ class Highscore
 		FlxG.save.data.weekScores = weekScores;
 		FlxG.save.flush();
 	}
+
 	static function setWeekAcc(week:String, acc:Float):Void
 	{
 		// Reminder that I don't need to format this song, it should come formatted!
