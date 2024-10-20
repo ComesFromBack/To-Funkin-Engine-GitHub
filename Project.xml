@@ -27,6 +27,7 @@
 	<define name="TRANSLATIONS_ALLOWED" />
 	<define name="IRIS_DEBUG"/>
 	<define name="StyleUnlock" />
+	<define name="BETA"/>
 	
 	<define name="SHOW_LOADING_SCREEN" />
 	<define name="BASE_GAME_FILES" />
@@ -103,6 +104,7 @@
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
 	<haxelib name="hscript-iris" if="HSCRIPT_ALLOWED" version="1.1.0"/>
 <!-- 	<haxelib name="SScript" if="HSCRIPT_ALLOWED" version="19.0.618"/> -->
+	<haxelib name="hxdiscord_rpc" version="1.2.4" if="DISCORD_ALLOWED"/>
 	<haxelib name="hxvlc" if="VIDEOS_ALLOWED"/>
 	<haxelib name="flxanimate"/>
 
