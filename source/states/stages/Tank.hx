@@ -215,7 +215,7 @@ class Tank extends BaseStage
 		{
 			wellWellWell.play(true);
 			audioPlaying = wellWellWell;
-			PlayState.subtitle.text = "Tankman: Well well well,Whadda we got here?";
+			// PlayState.subtitle.text = "Tankman: Well well well,Whadda we got here?";
 		});
 
 		// Move camera to BF
@@ -223,7 +223,7 @@ class Tank extends BaseStage
 		{
 			camFollow.x += 750;
 			camFollow.y += 100;
-			PlayState.subtitle.text = "";
+			// PlayState.subtitle.text = "";
 		});
 
 		// Beep!
@@ -232,12 +232,12 @@ class Tank extends BaseStage
 			boyfriend.playAnim('singUP', true);
 			boyfriend.specialAnim = true;
 			FlxG.sound.play(Paths.sound('bfBeep'));
-			PlayState.subtitle.text = "Boyfriend: Beep!";
-			PlayState.subtitle.color = 0xFF00EEFF;
+			// PlayState.subtitle.text = "Boyfriend: Beep!";
+			// PlayState.subtitle.color = 0xFF00EEFF;
 		});
 
 		// Clear SubTitle
-		cutsceneHandler.timer(5.25, function() { PlayState.subtitle.text = ""; });
+		// cutsceneHandler.timer(5.25, function() { PlayState.subtitle.text = ""; });
 
 		// Move camera to Tankman
 		cutsceneHandler.timer(6, function()
@@ -249,13 +249,13 @@ class Tank extends BaseStage
 			tankman.anim.play('killYou', true);
 			killYou.play(true);
 			audioPlaying = killYou;
-			PlayState.subtitle.text = "Tankman: We should just kill you but...";
-			PlayState.subtitle.color = 0xFFFFFFFF;
+			// PlayState.subtitle.text = "Tankman: We should just kill you but...";
+			// PlayState.subtitle.color = 0xFFFFFFFF;
 		});
 
-		cutsceneHandler.timer(7.75, function(){ PlayState.subtitle.text = "Tankman: What the hell, it's been a boring day..."; });
-		cutsceneHandler.timer(10, function(){ PlayState.subtitle.text = "Tankman: Let's see what you've got!"; });
-		cutsceneHandler.timer(11.75, function(){ PlayState.subtitle.text = ""; });
+		// cutsceneHandler.timer(7.75, function(){ PlayState.subtitle.text = "Tankman: What the hell, it's been a boring day..."; });
+		// cutsceneHandler.timer(10, function(){ PlayState.subtitle.text = "Tankman: Let's see what you've got!"; });
+		// cutsceneHandler.timer(11.75, function(){ PlayState.subtitle.text = ""; });
 	}
 	function gunsIntro()
 	{
@@ -274,7 +274,7 @@ class Tank extends BaseStage
 
 		cutsceneHandler.onStart = function()
 		{
-			PlayState.subtitle.text = ""; // Clear subtitle
+			// PlayState.subtitle.text = ""; // Clear subtitle
 			tightBars.play(true);
 			audioPlaying = tightBars;
 			FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom * 1.2}, 4, {ease: FlxEase.quadInOut});
@@ -282,18 +282,18 @@ class Tank extends BaseStage
 			FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom * 1.2}, 1, {ease: FlxEase.quadInOut, startDelay: 4.5});
 		};
 
-		cutsceneHandler.timer(0.2, function() { PlayState.subtitle.text = "Tankman: Ha, pretty tight bars for a little dude who's simping over an..."; });
+		// cutsceneHandler.timer(0.2, function() { PlayState.subtitle.text = "Tankman: Ha, pretty tight bars for a little dude who's simping over an..."; });
 
 		cutsceneHandler.timer(4, function()
 		{
-			PlayState.subtitle.text = "Tankman: ugly, boring little teenager that wears her mom's clothes, ha! Hehehehe...";
+			// PlayState.subtitle.text = "Tankman: ugly, boring little teenager that wears her mom's clothes, ha! Hehehehe...";
 			gf.playAnim('sad', true);
 			gf.animation.finishCallback = function(name:String)
 			{
 				gf.playAnim('sad', true);
 			};
 		});
-		cutsceneHandler.timer(10, function() { PlayState.subtitle.text = ""; } ); // Clear again, but why no effect?
+		// cutsceneHandler.timer(10, function() { PlayState.subtitle.text = ""; } ); // Clear again, but why no effect?
 	}
 	var dualWieldAnimPlayed = 0;
 	function stressIntro()

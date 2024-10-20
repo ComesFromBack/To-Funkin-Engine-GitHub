@@ -2,7 +2,6 @@ package states;
 
 import backend.WeekData;
 import backend.Mods;
-import backend.WinAPI;
 
 import flixel.FlxBasic;
 import flixel.graphics.FlxGraphic;
@@ -11,11 +10,11 @@ import haxe.Json;
 
 import flixel.util.FlxSpriteUtil;
 import objects.AttachedSprite;
-import options.kade.ModSettingsExtra;
 import options.ModSettingsSubState;
 
 import openfl.display.BitmapData;
 import lime.utils.Assets;
+import backend.WinAPI;
 
 class ModsMenuState extends MusicBeatState
 {
@@ -28,7 +27,6 @@ class ModsMenuState extends MusicBeatState
 
 	var bgList:FlxSprite;
 	var buttonReload:MenuButton;
-	//var buttonModFolder:MenuButton;
 	var buttonEnableAll:MenuButton;
 	var buttonDisableAll:MenuButton;
 	var buttons:Array<MenuButton> = [];
@@ -62,7 +60,7 @@ class ModsMenuState extends MusicBeatState
 		persistentUpdate = false;
 
 		modsList = Mods.parseList();
-		Mods.currentModDirectory = modsList.all[0] != null ? modsList.all[0] : '';
+		Mods.loadTopMod();
 
 		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence
@@ -130,7 +128,7 @@ class ModsMenuState extends MusicBeatState
 			}
 			updateModDisplayData();
 			checkToggleButtons();
-			FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+			FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 		});
 		buttonEnableAll.bg.color = FlxColor.GREEN;
 		buttonEnableAll.focusChangeCallback = function(focus:Bool) if(!focus) buttonEnableAll.bg.color = FlxColor.GREEN;
@@ -150,7 +148,7 @@ class ModsMenuState extends MusicBeatState
 			}
 			updateModDisplayData();
 			checkToggleButtons();
-			FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+			FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 		});
 		buttonDisableAll.bg.color = 0xFFFF6666;
 		buttonDisableAll.focusChangeCallback = function(focus:Bool) if(!focus) buttonDisableAll.bg.color = 0xFFFF6666;
@@ -242,10 +240,10 @@ class ModsMenuState extends MusicBeatState
 			var curMod:ModItem = modsGroup.members[curSelectedMod];
 			if(curMod != null && curMod.settings != null && curMod.settings.length > 0)
 			{
-				if(Arrays.engineList[ClientPrefs.data.styleEngine] == "Kade")
+				// if(Arrays.engineList[ClientPrefs.data.styleEngine] == "Kade")
 					MusicBeatState.switchState(new ModSettingsSubState(curMod.settings, curMod.folder, curMod.name));
-				else
-					MusicBeatState.switchState(new ModSettingsExtra(curMod.settings, curMod.folder, curMod.name));
+				// else
+					// MusicBeatState.switchState(new ModSettingsExtra(curMod.settings, curMod.folder, curMod.name));
 			}
 		}, 53, 53);
 
@@ -277,7 +275,7 @@ class ModsMenuState extends MusicBeatState
 			if(curMod.mustRestart) waitingToRestart = true;
 			updateModDisplayData();
 			checkToggleButtons();
-			FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+			FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 		}, 53, 53);
 		button.icon.animation.add('icon', [0]);
 		button.icon.animation.play('icon', true);
@@ -334,26 +332,19 @@ class ModsMenuState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		if(controls.BACK && hoveringOnMods)
-		{
+		if(controls.BACK && hoveringOnMods) {
 			saveTxt();
 
-			FlxG.sound.play(Paths.sound('cancelMenu'));
-			if(waitingToRestart)
-			{
-				//MusicBeatState.switchState(new TitleState());
-				// TitleState.initialized = false;
-				// TitleState.closedState = false;
-				// FlxG.sound.music.fadeOut(0.3);
-				// if(FreeplayState.vocals != null)
-				// {
-				// 	FreeplayState.vocals.fadeOut(0.3);
-				// 	FreeplayState.vocals = null;
-				// }
-				// FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);
+			FlxG.sound.play(Arrays.getThemeSound('cancelMenu'), ClientPrefs.data.soundVolume);
+			if(waitingToRestart) {
 				WinAPI.restart();
 			}
-			else MusicBeatState.switchState(new MainMenuState());
+			else {
+				if(Arrays.engineList[ClientPrefs.data.styleEngine] == "MicUp")
+					MusicBeatState.switchState(new states.mic.PlaySelection());
+				else
+					MusicBeatState.switchState(new MainMenuState());
+			}
 
 			persistentUpdate = false;
 			FlxG.autoPause = ClientPrefs.data.autoPause;
@@ -363,6 +354,7 @@ class ModsMenuState extends MusicBeatState
 		if(Math.abs(FlxG.mouse.deltaX) > 10 || Math.abs(FlxG.mouse.deltaY) > 10)
 		{
 			controls.controllerMode = false;
+			if(!FlxG.mouse.visible) FlxG.mouse.visible = true;
 		}
 		
 		if(controls.controllerMode != _lastControllerMode)
@@ -611,7 +603,7 @@ class ModsMenuState extends MusicBeatState
 			bgButtons.alpha = 0.8;
 		}
 
-		FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+		FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 	}
 
 	function getButton()
@@ -676,7 +668,7 @@ class ModsMenuState extends MusicBeatState
 		holdingElapsed = 0;
 		gottaClickAgain = true;
 		updateModDisplayData();
-		FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+		FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 		
 		if(hoveringOnMods)
 		{
@@ -779,7 +771,7 @@ class ModsMenuState extends MusicBeatState
 			var curMod:ModItem = modsGroup.members[curSelectedMod];
 			if(curMod != null) curMod.selectBg.visible = false;
 		}
-		FlxG.sound.play(Paths.sound('scrollMenu'), 0.6);
+		FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 	}
 
 	function checkToggleButtons()
@@ -814,6 +806,8 @@ class ModsMenuState extends MusicBeatState
 
 		var path:String = 'modsList.txt';
 		File.saveContent(path, fileStr);
+		Mods.parseList();
+		Mods.loadTopMod();
 	}
 }
 
@@ -844,11 +838,10 @@ class ModItem extends FlxSpriteGroup
 		var path:String = Paths.mods('$folder/data/settings.json');
 		if(FileSystem.exists(path))
 		{
-			var data:String = File.getContent(path);
 			try
 			{
 				//trace('trying to load settings: $folder');
-				settings = tjson.TJSON.parse(data);
+				settings = tjson.TJSON.parse(File.getContent(path));
 			}
 			catch(e:Dynamic)
 			{

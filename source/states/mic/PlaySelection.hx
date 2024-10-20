@@ -128,7 +128,7 @@ class PlaySelection extends MusicBeatState
 				changeItem(1);
 			}
 
-			if (controls.BACK || (FlxG.mouse.justPressedRight && ClientPrefs.data.mouseCon))
+			if (controls.BACK || (FlxG.mouse.justPressedRight && ClientPrefs.data.mouseControls))
 			{
 				selectedSomethin = true;
 				FlxG.sound.play(Arrays.getThemeSound('cancelMenu'), ClientPrefs.data.soundVolume);
@@ -140,7 +140,7 @@ class PlaySelection extends MusicBeatState
 				MusicBeatState.switchState(new states.MainMenuState());
 			}
 
-			if (controls.ACCEPT || (FlxG.mouse.justPressed && ClientPrefs.data.mouseCon))
+			if (controls.ACCEPT || (FlxG.mouse.justPressed && ClientPrefs.data.mouseControls))
 			{
 				selectedSomethin = true;
 				FlxG.sound.play(Arrays.getThemeSound('confirmMenu'), ClientPrefs.data.soundVolume);
@@ -172,7 +172,8 @@ class PlaySelection extends MusicBeatState
 								case 'freeplay':
 									MusicBeatState.switchState(new states.mic.MenuFreeplay());
 								case 'modifier':
-									MusicBeatState.switchState(new ModsMenuState());
+									// MusicBeatState.switchState(new ModsMenuState());
+									MusicBeatState.switchState(new states.mic.MenuModifiers());
 								case 'marathon':
 									MusicBeatState.switchState(new states.mic.MenuMarathon());
 								case 'survival':

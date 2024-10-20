@@ -122,7 +122,6 @@ class MenuFreeplay extends MusicBeatState
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 
-		CustomFadeTransition.nextCamera = camOther;
 		// Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
 
@@ -387,7 +386,6 @@ class MenuFreeplay extends MusicBeatState
 		super.create();
 		// camGame.zoom = 0.6;
 		FlxTween.tween(camGame, {zoom: 1/*, alpha: 1*/}, 0.5, {ease: FlxEase.quartInOut});
-		CustomFadeTransition.nextCamera = camOther;
 
 		disc.scale.x = 0;
 		FlxTween.tween(disc, {'scale.x': 1, y: 480, x: -25}, 0.5, {ease: FlxEase.quartInOut});
@@ -525,7 +523,7 @@ class MenuFreeplay extends MusicBeatState
 					changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -shiftMult : shiftMult));
 			}
 
-			if (FlxG.mouse.wheel != 0 && ClientPrefs.data.mouseCon)
+			if (FlxG.mouse.wheel != 0 && ClientPrefs.data.mouseControls)
 			{
 				FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 				changeSelection(-shiftMult * FlxG.mouse.wheel, false);
@@ -544,7 +542,7 @@ class MenuFreeplay extends MusicBeatState
 		}
 
 		if ((controls.BACK
-			|| (FlxG.mouse.justPressedRight && ClientPrefs.data.mouseCon))
+			|| (FlxG.mouse.justPressedRight && ClientPrefs.data.mouseControls))
 			&& !inEnter)
 		{
 			if (vocals != null)
@@ -811,7 +809,7 @@ class MenuFreeplay extends MusicBeatState
 			}
 		}
 
-		if ((controls.ACCEPT || (FlxG.mouse.justPressed && ClientPrefs.data.mouseCon))
+		if ((controls.ACCEPT || (FlxG.mouse.justPressed && ClientPrefs.data.mouseControls))
 			&& !inEnter
 			&& !wared)
 		{

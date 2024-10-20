@@ -61,7 +61,6 @@ class MenuMarathon extends MusicBeatState
 		FlxG.cameras.add(camOther, false);
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
-		CustomFadeTransition.nextCamera = camOther;
 		substated = false;
 		PlayState.modeOfPlayState = "Marathon";
 
@@ -173,8 +172,6 @@ class MenuMarathon extends MusicBeatState
 		}
 
 		super.create();
-
-		CustomFadeTransition.nextCamera = camOther;
 	}
 
 	function weekIsLocked(name:String):Bool

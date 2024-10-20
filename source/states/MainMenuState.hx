@@ -17,10 +17,10 @@ enum MainMenuColumn {
 
 class MainMenuState extends MusicBeatState
 {
-	public static var psychEngineVersion:String = '1.0-prerelease'; // This is also used for Discord RPC
+	public static var psychEngineVersion:String = '0.01'; // This is also used for Discord RPC
 	public static var curSelected:Int = 0;
 	public static var curColumn:MainMenuColumn = CENTER;
-	var allowMouse:Bool = ClientPrefs.data.mouseCon; //Turn this off to block mouse movement in menus
+	var allowMouse:Bool = ClientPrefs.data.mouseControls; //Turn this off to block mouse movement in menus
 
 	var menuItems:FlxTypedGroup<FlxSprite>;
 	var leftItem:FlxSprite;
@@ -96,7 +96,7 @@ class MainMenuState extends MusicBeatState
 					'credits'
 				];
 				leftOption = #if ACHIEVEMENTS_ALLOWED 'achievements' #else null #end;
-				rightOption = 'options';
+				rightOption = 'options_new';
 		}
 
 		persistentUpdate = persistentDraw = true;
@@ -108,6 +108,7 @@ class MainMenuState extends MusicBeatState
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.updateHitbox();
 		bg.screenCenter();
+		bg.y -= 25;
 
 		if(Arrays.engineList[ClientPrefs.data.styleEngine] == "MicUp") {
 			bg = new FlxSprite(-89).loadGraphic(Paths.image('mBG_Main'));
@@ -116,8 +117,9 @@ class MainMenuState extends MusicBeatState
 			bg.setGraphicSize(Std.int(bg.width * 1.125));
 			bg.updateHitbox();
 			bg.screenCenter();
-			bg.antialiasing = true;
+			bg.antialiasing = ClientPrefs.data.antialiasing;
 			bg.angle = 179;
+			bg.y -= 10;
 			add(bg);
 
 			gradientBar = FlxGradient.createGradientFlxSprite(Math.round(FlxG.width), 512, [0x00ff0000, 0x55AE59E4, 0xAA19ECFF], 1, 90, true);
@@ -139,12 +141,12 @@ class MainMenuState extends MusicBeatState
 		magenta.screenCenter();
 		magenta.visible = false;
 		magenta.color = 0xFFfd719b;
+		magenta.y -= 25;
 		add(magenta);
 
 		if(Arrays.engineList[ClientPrefs.data.styleEngine] == "MicUp") {
 			side = new FlxSprite(0).loadGraphic(Paths.image('mainmenu/Main_Side'));
-			side.scrollFactor.x = 0;
-			side.scrollFactor.y = 0;
+			side.scrollFactor.x = side.scrollFactor.y = 0;
 			side.x += -20;
 			side.antialiasing = true;
 			add(side);
@@ -259,7 +261,7 @@ class MainMenuState extends MusicBeatState
 	var timeNotMoving:Float = 0;
 	override function update(elapsed:Float)
 	{
-		if (FlxG.sound.music.volume < 0.8 && !ClientPrefs.data.foucsMusic)
+		if (FlxG.sound.music.volume < 0.8 && !ClientPrefs.data.focusLostMusic)
 			FlxG.sound.music.volume = Math.min(FlxG.sound.music.volume + 0.5 * elapsed, 0.8);
 
 		if(Arrays.engineList[ClientPrefs.data.styleEngine] == "Psych Old")
@@ -443,13 +445,13 @@ class MainMenuState extends MusicBeatState
 								#end
 
 								#if ACHIEVEMENTS_ALLOWED
-								case 'achievements':
+								case 'achievements'|'awards':
 									MusicBeatState.switchState(new AchievementsMenuState());
 								#end
 
 								case 'credits':
 									MusicBeatState.switchState(new CreditsState());
-								case 'options':
+								case 'options'|'options_new':
 									switch(Arrays.engineList[ClientPrefs.data.styleEngine]) {
 										case 'Psych Old'|'Psych New': MusicBeatState.switchState(new OptionsState());
 										case 'Kade': MusicBeatState.switchState(new options.kade.KadeOptions());

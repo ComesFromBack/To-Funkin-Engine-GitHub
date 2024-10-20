@@ -4,7 +4,6 @@ import flixel.FlxSubState;
 
 import flixel.effects.FlxFlicker;
 import lime.app.Application;
-import backend.Highscore;
 
 class FlashingState extends MusicBeatState
 {
@@ -25,12 +24,9 @@ class FlashingState extends MusicBeatState
 			Press ESCAPE to ignore this message.\n
 			You've been warned!",
 			32);
-		warnText.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, CENTER);
+		warnText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER);
 		warnText.screenCenter(Y);
 		add(warnText);
-
-		if(Highscore.profileList == [] || FlxG.save.data.profileList == null)
-			Highscore.createProfile("Boyfriend");
 	}
 
 	override function update(elapsed:Float)
@@ -44,14 +40,14 @@ class FlashingState extends MusicBeatState
 				if(!back) {
 					ClientPrefs.data.flashing = false;
 					ClientPrefs.saveSettings();
-					FlxG.sound.play(Paths.sound('confirmMenu'));
+					FlxG.sound.play(Arrays.getThemeSound('confirmMenu'), ClientPrefs.data.soundVolume);
 					FlxFlicker.flicker(warnText, 1, 0.1, false, true, function(flk:FlxFlicker) {
 						new FlxTimer().start(0.5, function (tmr:FlxTimer) {
 							MusicBeatState.switchState(new TitleState());
 						});
 					});
 				} else {
-					FlxG.sound.play(Paths.sound('cancelMenu'));
+					FlxG.sound.play(Arrays.getThemeSound('cancelMenu'), ClientPrefs.data.soundVolume);
 					FlxTween.tween(warnText, {alpha: 0}, 1, {
 						onComplete: function (twn:FlxTween) {
 							MusicBeatState.switchState(new TitleState());
