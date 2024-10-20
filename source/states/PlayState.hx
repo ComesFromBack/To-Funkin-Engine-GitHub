@@ -51,10 +51,6 @@ import psychlua.LuaUtils;
 import psychlua.HScript;
 #end
 
-#if SScript
-import tea.SScript;
-#end
-
 #if HSCRIPT_ALLOWED
 import crowplexus.iris.Iris;
 #end
