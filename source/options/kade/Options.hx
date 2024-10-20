@@ -520,12 +520,12 @@ class AntiAliasing extends Options {
 	public override function press():Bool {
 		ClientPrefs.data.antialiasing = !ClientPrefs.data.antialiasing;
 
-		for (sprite in members) {
-			var sprite:FlxSprite = cast sprite;
-			if(sprite != null && (sprite is FlxSprite) && !(sprite is FlxText)) {
-				sprite.antialiasing = ClientPrefs.data.antialiasing;
-			}
-		}
+		// for (sprite in members) {
+		// 	var sprite:FlxSprite = cast sprite;
+		// 	if(sprite != null && (sprite is FlxSprite) && !(sprite is FlxText)) {
+		// 		sprite.antialiasing = ClientPrefs.data.antialiasing;
+		// 	}
+		// }
 
 		display = updateDisplay();
 		return true;
@@ -1446,7 +1446,7 @@ class MemoeyPrivate extends Options {
 	}
 
 	private override function updateDisplay():String {return 'Memory Private Using: [ ${ClientPrefs.data.MemPrivate ? "ENABLE" : "DISABLE"} ]';}
-}1
+}
 
 class MemoryType extends Options {
 	public function new(desc:String) {

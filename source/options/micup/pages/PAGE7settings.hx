@@ -146,7 +146,7 @@ class PAGE7settings extends MusicBeatSubstate
                 ResultText.text = "System Mouse: "+'${list[ClientPrefs.data.mouseDisplayType]}';
                 ExplainText.text = "Change Mouse Texture.";
             case "Exit Sound":
-                ResultText.text = "Exit Sound: "+'${list[ClientPrefs.data.exitSound]}';
+                ResultText.text = "Exit Sound: "+'${ClientPrefs.data.onExitPlaySound}';
                 ExplainText.text = "Change Exit Sound.";
         }
 
