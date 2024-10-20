@@ -56,36 +56,13 @@ jobs:
           haxelib run lime config ANDROID_SETUP true
 
       - name: Compile (Android)
-        if: startsWith(matrix.os, 'ubuntu')
         run: haxelib run lime build android -final -D officialBuild
 
-      - name: Compile (iOS)
-        if: startsWith(matrix.os, 'macos')
-        run: haxelib run lime build ios -final -nosign -D officialBuild
-
-      - name: Make Ipa And Zip For Release
-        if: startsWith(matrix.os, 'macos')
-        run: |
-          cd export/release/ios/build/*-iphoneos
-          mkdir Payload
-          mv *.app Payload
-          zip -r PsychEngine.ipa Payload
-          zip PsychEngine-iOS.zip PsychEngine.ipa
-
       - name: Upload Artifact (Android)
-        if: startsWith(matrix.os, 'ubuntu')
         uses: actions/upload-artifact@main
         with:
           name: androidBuild
           path: export/release/android/bin/app/build/outputs/apk/release/*.apk
-          if-no-files-found: error
-
-      - name: Upload Artifact (iOS)
-        if: startsWith(matrix.os, 'macos')
-        uses: actions/upload-artifact@main
-        with:
-          name: iOSBuild
-          path: export/release/ios/build/Release-iphoneos/*.zip
           if-no-files-found: error
   Releaser:
     needs: [get-commit-hash, Mobile]
