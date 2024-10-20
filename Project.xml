@@ -102,7 +102,7 @@
 	<!--Psych stuff needed-->
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
 	<haxelib name="hscript-iris" if="HSCRIPT_ALLOWED" version="1.1.0"/>
-	<haxelib name="SScript" if="HSCRIPT_ALLOWED" version="19.0.618"/>
+<!-- 	<haxelib name="SScript" if="HSCRIPT_ALLOWED" version="19.0.618"/> -->
 	<haxelib name="hxvlc" if="VIDEOS_ALLOWED"/>
 	<haxelib name="flxanimate"/>
 
