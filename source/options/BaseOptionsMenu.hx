@@ -30,6 +30,13 @@ class BaseOptionsMenu extends MusicBeatSubstate
 	public function new()
 	{
 		super();
+
+		if(title == null) title = 'Options';
+		if(rpcTitle == null) rpcTitle = 'Options Menu';
+		
+		#if DISCORD_ALLOWED
+		DiscordClient.changePresence(rpcTitle, null);
+		#end
 		
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = 0xFFea71fd;
@@ -215,7 +222,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 											num = 0;
 		
 										curOption.curOption = num;
-										curOption.setValue(curOption.options[num]);
+										curOption.setValue(num);
 										//trace(curOption.options[num]);
 
 									default:
@@ -263,7 +270,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 					leOption.setValue(leOption.defaultValue);
 					if(leOption.type != BOOL)
 					{
-						if(leOption.type == STRING) leOption.curOption = leOption.options.indexOf(leOption.getValue());
+						if(leOption.type == STRING) leOption.curOption = leOption.getValue();
 						updateTextFrom(leOption);
 					}
 				}

@@ -69,7 +69,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(new GameplayOption('Instakill on Miss', 'instakill', BOOL, false));
 		optionsArray.push(new GameplayOption('Practice Mode', 'practice', BOOL, false));
 		optionsArray.push(new GameplayOption('Botplay', 'botplay', BOOL, false));
-		optionsArray.push(new GameplayOption('Opponent Play', 'opponentplay', BOOL, false));
 	}
 
 	public function getOptionByName(name:String)
@@ -153,9 +152,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 
 		if (controls.BACK)
 		{
-			if (states.mic.MenuFreeplay.vocals != null) states.mic.MenuFreeplay.vocals.fadeIn(0.4, 1);
-			if (states.mic.MenuFreeplay.opponentVocals != null) states.mic.MenuFreeplay.opponentVocals.fadeIn(0.4, 1);
-			states.mic.MenuFreeplay.inGameplay = true;
 			close();
 			ClientPrefs.saveSettings();
 			FlxG.sound.play(Paths.sound('cancelMenu'));
@@ -218,7 +214,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 										num = 0;
 
 									curOption.curOption = num;
-									curOption.setValue(curOption.options[num]); //lol
+									curOption.setValue(num); //lol
 									
 									if (curOption.name == "Scroll Type")
 									{
@@ -283,7 +279,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 					if(leOption.type != BOOL)
 					{
 						if(leOption.type == STRING)
-							leOption.curOption = leOption.options.indexOf(leOption.getValue());
+							leOption.curOption = leOption.getValue();
 
 						updateTextFrom(leOption);
 					}
@@ -377,7 +373,7 @@ class GameplayOption
 
 	public function new(name:String, variable:String, type:OptionType, defaultValue:Dynamic = 'null variable value', ?options:Array<String> = null)
 	{
-		_variable = variable;
+		_name = name;
 		this.name = Language.getTextFromID('Setting_$variable');
 		this.variable = variable;
 		this.type = type;
@@ -395,9 +391,7 @@ class GameplayOption
 				case PERCENT:
 					defaultValue = 1;
 				case STRING:
-					defaultValue = '';
-					if(options.length > 0)
-						defaultValue = options[0];
+					defaultValue = 0;
 
 				default:
 			}
@@ -409,7 +403,7 @@ class GameplayOption
 		switch(type)
 		{
 			case STRING:
-				var num:Int = options.indexOf(getValue());
+				var num:Int = getValue();
 				if(num > -1)
 					curOption = num;
 
@@ -441,7 +435,7 @@ class GameplayOption
 	public function setChild(child:Alphabet)
 		this.child = child;
 
-	var _variable:String = null;
+	var _name:String = null;
 	var _text:String = null;
 	private function get_text()
 		return _text;
@@ -451,7 +445,7 @@ class GameplayOption
 		if(child != null)
 		{
 			_text = newValue;
-			child.text = (_variable == "scrolltype" ? Language.getTextFromID('Setting_$_variable-$_text') : _text);
+			child.text = _text;
 			return _text;
 		}
 		return null;

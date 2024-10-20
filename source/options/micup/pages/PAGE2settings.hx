@@ -151,7 +151,7 @@ class PAGE2settings extends MusicBeatSubstate
 				ResultText.text = "Low Quality: "+(ClientPrefs.data.lowQuality ? "ENABLE" : "DISABLE");
 				ExplainText.text = "Disables some background details, decreases loading times and improves performance.";
 			case "Anti-Aliasing":
-				ResultText.text = "Anti-Aliasing: "+(ClientPrefs.data.globalAntialiasing ? "ENABLE" : "DISABLE");
+				ResultText.text = "Anti-Aliasing: "+(ClientPrefs.data.antialiasing ? "ENABLE" : "DISABLE");
 				ExplainText.text = "Disable or enable anti-aliasing, which is used to improve performance at the expense of sharper visuals.";
 			case "Shaders":
 				ResultText.text = "Shaders: "+(ClientPrefs.data.shaders ? "ENABLE" : "DISABLE");
@@ -166,7 +166,7 @@ class PAGE2settings extends MusicBeatSubstate
 				ResultText.text = "Persistent Cached Data: "+(ClientPrefs.data.imagesPersist ? "ENABLE" : "DISABLE");
 				ExplainText.text = "When loading images, the images are cached directly into memory, and the memory is exchanged for read speed.";
 			case "Full Screen":
-				ResultText.text = "Full Screen: "+(ClientPrefs.data.fullscr ? "ENABLE" : "DISABLE");
+				ResultText.text = "Full Screen: "+(ClientPrefs.data.fullScreen ? "ENABLE" : "DISABLE");
 				ExplainText.text = "It's just full screen, or not?";
 			case "Resolution":
 				ResultText.text = 'Resolution: ${Arrays.resolutionList[ClientPrefs.data.resolution]}';
@@ -243,10 +243,10 @@ class PAGE2settings extends MusicBeatSubstate
 				else
 					ClientPrefs.data.lowQuality = true;
 			case "Anti-Aliasing":
-				if(ClientPrefs.data.globalAntialiasing)
-					ClientPrefs.data.globalAntialiasing = false;
+				if(ClientPrefs.data.antialiasing)
+					ClientPrefs.data.antialiasing = false;
 				else
-					ClientPrefs.data.globalAntialiasing = true;
+					ClientPrefs.data.antialiasing = true;
 			case "Shaders":
 				if(ClientPrefs.data.shaders)
 					ClientPrefs.data.shaders = false;
@@ -278,12 +278,12 @@ class PAGE2settings extends MusicBeatSubstate
 				else
 					ClientPrefs.data.imagesPersist = true;
 			case "Full Screen":
-				if(ClientPrefs.data.fullscr)
-					ClientPrefs.data.fullscr = false;
+				if(ClientPrefs.data.fullScreen)
+					ClientPrefs.data.fullScreen = false;
 				else
-					ClientPrefs.data.fullscr = true;
+					ClientPrefs.data.fullScreen = true;
 
-				FlxG.fullscreen = ClientPrefs.data.fullscr;
+				FlxG.fullscreen = ClientPrefs.data.fullScreen;
 			case "Resolution":
 				ClientPrefs.data.resolution += Change;
 
@@ -294,7 +294,7 @@ class PAGE2settings extends MusicBeatSubstate
 
 				var any:Array<String> = Arrays.resolutionList[ClientPrefs.data.resolution].split('x');
 				#if desktop
-				if(!ClientPrefs.data.fullscr)
+				if(!ClientPrefs.data.fullScreen)
 					FlxG.resizeWindow(Std.parseInt(any[0]), Std.parseInt(any[1]));
 				#end
 				FlxG.resizeGame(Std.parseInt(any[0]), Std.parseInt(any[1]));

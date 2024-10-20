@@ -144,13 +144,13 @@ class PAGE6settings extends MusicBeatSubstate
                 ResultText.text = "";
                 ExplainText.text = "Previous Page: Debug \nNext Page: Extra Setting";
             case "Advance Crash":
-                ResultText.text = "Advance Crash: "+'${(ClientPrefs.data.acrash ? "ENABLE" : "DISABLE")}';
+                ResultText.text = "Advance Crash: "+'${(ClientPrefs.data.advancedCrash ? "ENABLE" : "DISABLE")}';
                 ExplainText.text = "Don't using LIME alert, using C++ MessageBox.";
             case "Death Use Inst":
                 ResultText.text = "Death Use Inst: "+'${(ClientPrefs.data.deathUsingInst ? "ENABLE" : "DISABLE")}';
                 ExplainText.text = "On died, don't use GameOver.ogg. Using this song inst lower.";
             case "Preset MS":
-                ResultText.text = "Preset MS: "+'${list[ClientPrefs.data.MSPresetMode]}';
+                ResultText.text = "Preset MS: "+'${list[ClientPrefs.data.presetMs]}';
                 ExplainText.text = ".";
         }
 
@@ -219,16 +219,16 @@ class PAGE6settings extends MusicBeatSubstate
                         openSubState(new PAGE5settings());
                 });
             case "Advance Crash":
-                ClientPrefs.data.acrash = !ClientPrefs.data.acrash;
+                ClientPrefs.data.advancedCrash = !ClientPrefs.data.advancedCrash;
             case "Death Use Inst":
                 ClientPrefs.data.deathUsingInst = !ClientPrefs.data.deathUsingInst;
             case "Preset MS":
-                ClientPrefs.data.MSPresetMode += Change;
+                ClientPrefs.data.presetMs += Change;
 
-                if(ClientPrefs.data.MSPresetMode > list.length-1)
-                    ClientPrefs.data.MSPresetMode = 0;
-                if(ClientPrefs.data.MSPresetMode < 0)
-                    ClientPrefs.data.MSPresetMode = list.length-1;
+                if(ClientPrefs.data.presetMs > list.length-1)
+                    ClientPrefs.data.presetMs = 0;
+                if(ClientPrefs.data.presetMs < 0)
+                    ClientPrefs.data.presetMs = list.length-1;
         }
 
         new FlxTimer().start(0.2, function(tmr:FlxTimer)

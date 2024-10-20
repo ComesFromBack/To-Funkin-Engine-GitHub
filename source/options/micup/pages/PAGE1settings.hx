@@ -190,16 +190,16 @@ class PAGE1settings extends MusicBeatSubstate
 				ResultText.text = "Language: "+Language.list[ClientPrefs.data.language];
 				ExplainText.text = "Change the language.";
 			case "FontsChange":
-				ResultText.text = "Font for Language: "+Language.fonlist[ClientPrefs.data.usingfont];
+				ResultText.text = "Font for Language: "+Language.fonlist[ClientPrefs.data.usingFont];
 				ExplainText.text = "Choose the right font for the language.";
 			case "AllowedChangesFont":
-				ResultText.text = "Allowed Language Change Font: "+(ClientPrefs.data.languagefonts ? "ENABLE" : "DISABLE");
+				ResultText.text = "Allowed Language Change Font: "+(ClientPrefs.data.allowLanguageFonts ? "ENABLE" : "DISABLE");
 				ExplainText.text = "Allow the language to affect the font, otherwise font and text anomalies may occur.";
 			case "HitSoundChange":
-				ResultText.text = "HitSound Using: "+ClientPrefs.data.hitsound;
+				ResultText.text = "HitSound Using: "+ClientPrefs.data.hitSoundChange;
 				ExplainText.text = "Choose the \"HitSound\" sound effect you like.";
 			case "ThemeSoundChange":
-				ResultText.text = "Theme Sound: "+Arrays.soundThemeList[ClientPrefs.data.southeme];
+				ResultText.text = "Theme Sound: "+Arrays.soundThemeList[ClientPrefs.data.soundTheme];
 				ExplainText.text = "Choose your favorite theme sound effects.";
 			case "SoundVolume":
 				ResultText.text = 'Sound Volume: ${ClientPrefs.data.soundVolume*100}%';
@@ -208,7 +208,7 @@ class PAGE1settings extends MusicBeatSubstate
 				ResultText.text = 'Music Volume: ${ClientPrefs.data.musicVolume*100}%';
 				ExplainText.text = "Generally useless (may be useful if you don't want to listen to music(wtf???)).";
 			case "HitVolume":
-				ResultText.text = 'HitSound Volume: ${ClientPrefs.data.hitVolume*100}%';
+				ResultText.text = 'HitSound Volume: ${ClientPrefs.data.hitSoundVolume*100}%';
 				ExplainText.text = "Generally useless (may be useful if you don't want to listen to hit sounds).";
 			case "RatingOffset":
 				ResultText.text = 'Offset: ${ClientPrefs.data.ratingOffset} (MAX: 30)';
@@ -337,26 +337,26 @@ class PAGE1settings extends MusicBeatSubstate
 
 				Language.loadLangSetting();
 			case "FontsChange":
-				ClientPrefs.data.usingfont += Change;
+				ClientPrefs.data.usingFont += Change;
 
-				if(ClientPrefs.data.usingfont > Language.fonlist.length-1)
-					ClientPrefs.data.usingfont = 0;
-				if(ClientPrefs.data.usingfont < 0)
-					ClientPrefs.data.usingfont = Language.fonlist.length - 1;
+				if(ClientPrefs.data.usingFont > Language.fonlist.length-1)
+					ClientPrefs.data.usingFont = 0;
+				if(ClientPrefs.data.usingFont < 0)
+					ClientPrefs.data.usingFont = Language.fonlist.length - 1;
 			case "AllowedChangesFont":
-				if(ClientPrefs.data.languagefonts)
-					ClientPrefs.data.languagefonts = false;
+				if(ClientPrefs.data.allowLanguageFonts)
+					ClientPrefs.data.allowLanguageFonts = false;
 				else
-					ClientPrefs.data.languagefonts = true;
+					ClientPrefs.data.allowLanguageFonts = true;
 			case "HitSoundChange":
-				ClientPrefs.data.hitsound += Change;
+				ClientPrefs.data.hitSoundChange += Change;
 			case "ThemeSoundChange":
-				ClientPrefs.data.southeme += Change;
+				ClientPrefs.data.soundTheme += Change;
 
-				if(ClientPrefs.data.southeme > Arrays.soundThemeList.length-1)
-					ClientPrefs.data.southeme = 0;
-				if(ClientPrefs.data.southeme < 0)
-					ClientPrefs.data.southeme = Arrays.soundThemeList.length - 1;
+				if(ClientPrefs.data.soundTheme > Arrays.soundThemeList.length-1)
+					ClientPrefs.data.soundTheme = 0;
+				if(ClientPrefs.data.soundTheme < 0)
+					ClientPrefs.data.soundTheme = Arrays.soundThemeList.length - 1;
 			case "SoundVolume":
 				ClientPrefs.data.soundVolume += Change/100;
 
@@ -372,12 +372,12 @@ class PAGE1settings extends MusicBeatSubstate
 				if(ClientPrefs.data.musicVolume < 0)
 					ClientPrefs.data.musicVolume = 0;
 			case "HitVolume":
-				ClientPrefs.data.hitVolume += Change/100;
+				ClientPrefs.data.hitSoundVolume += Change/100;
 
-				if(ClientPrefs.data.hitVolume > 1)
-					ClientPrefs.data.hitVolume = 1;
-				if(ClientPrefs.data.hitVolume < 0)
-					ClientPrefs.data.hitVolume = 0;
+				if(ClientPrefs.data.hitSoundVolume > 1)
+					ClientPrefs.data.hitSoundVolume = 1;
+				if(ClientPrefs.data.hitSoundVolume < 0)
+					ClientPrefs.data.hitSoundVolume = 0;
 			case "RatingOffset":
 				ClientPrefs.data.ratingOffset += Change;
 

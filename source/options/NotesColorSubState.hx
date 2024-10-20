@@ -13,7 +13,7 @@ import objects.Note;
 import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
 
-class NotesSubState extends MusicBeatSubstate
+class NotesColorSubState extends MusicBeatSubstate
 {
 	var onModeColumn:Bool = true;
 	var curSelectedMode:Int = 0;
@@ -54,6 +54,7 @@ class NotesSubState extends MusicBeatSubstate
 		DiscordClient.changePresence("Note Colors Menu", null);
 		#end
 		
+		onPixel = PlayState.isPixelStage;
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = 0xFFEA71FD;
 		bg.screenCenter();
@@ -184,21 +185,11 @@ class NotesSubState extends MusicBeatSubstate
 
 	override function update(elapsed:Float) {
 		if (controls.BACK) {
-			FlxG.sound.play(Paths.sound('cancelMenu'));
-			switch(Arrays.engineList[ClientPrefs.data.styleEngine]) {
-				case "Psych Old" | "Psych New":
-					MusicBeatState.switchState(new options.OptionsState());
-				case "Kade":
-					MusicBeatState.switchState(new options.kade.KadeOptions());
-				case "MicUp":
-					MusicBeatState.switchState(new options.micup.SettingsState());
-				case "Vanilla":
-					MusicBeatState.switchState(new options.vanilla.VanillaSettingState());
-			}
-
+			FlxG.sound.play(Arrays.getThemeSound('cancelMenu'), ClientPrefs.data.soundVolume);
 			if(Arrays.engineList[ClientPrefs.data.styleEngine] == "MicUp")
-				MusicBeatState.reset
-			close();
+				MusicBeatState.resetState();
+			else
+				close();
 			return;
 		}
 

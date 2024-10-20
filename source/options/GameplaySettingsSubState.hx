@@ -39,11 +39,8 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 		var option:Option = new Option('Engine UI', //Name
 			'idk.', //Description
 			'styleEngine', //Save data variable name
-			INT); //Variable type
-			option.displayFormat = '${Arrays.engineList[ClientPrefs.data.styleEngine]}';
-			option.scrollSpeed = 1;
-			option.minValue = 0;
-			option.maxValue = 4;
+			STRING,
+			Arrays.engineList); //Variable type
 		addOption(option);
 
 		var option:Option = new Option('Disable Reset Button',
@@ -54,7 +51,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 
 		var option:Option = new Option('Hitsound Volume',
 			'Funny notes does \"Tick!\" when you hit them.',
-			'hitVolume',
+			'hitSoundVolume',
 			PERCENT);
 		addOption(option);
 		option.scrollSpeed = 1.6;
@@ -124,7 +121,7 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 	}
 
 	function onChangeHitsoundVolume()
-		FlxG.sound.play(Paths.sound('hitsound'), ClientPrefs.data.hitVolume);
+		FlxG.sound.play(Paths.sound('hitsound'), ClientPrefs.data.hitSoundVolume);
 
 	function onChangeAutoPause()
 		FlxG.autoPause = ClientPrefs.data.autoPause;

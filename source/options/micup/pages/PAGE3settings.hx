@@ -5,8 +5,14 @@ import flixel.FlxSubState;
 import flixel.FlxObject;
 import backend.StageData;
 
+import objects.Note;
+import objects.StrumNote;
+import objects.NoteSplash;
+
 class PAGE3settings extends MusicBeatSubstate
 {
+    var notes:FlxTypedGroup<StrumNote>;
+	var splashes:FlxTypedGroup<NoteSplash>;
 
     var menuItems:FlxTypedGroup<FlxSprite>;
     var optionShit:Array<String> = [
@@ -43,6 +49,42 @@ class PAGE3settings extends MusicBeatSubstate
 
     public function new()
     {
+        notes = new FlxTypedGroup<StrumNote>();
+		splashes = new FlxTypedGroup<NoteSplash>();
+		for (i in 0...Note.colArray.length) {
+			var note:StrumNote = new StrumNote(100 + (560 / Note.colArray.length) * i, 200, i, 0);
+			note.centerOffsets();
+			note.centerOrigin();
+			note.playAnim('static');
+            note.alpha = 0;
+			notes.add(note);
+			
+			var splash:NoteSplash = new NoteSplash();
+			splash.noteData = i;
+			splash.setPosition(note.x + 400, note.y+50);
+			splash.loadSplash();
+			splash.visible = false;
+			splash.alpha = ClientPrefs.data.splashAlpha;
+			splash.animation.finishCallback = function(name:String) splash.visible = false;
+			splashes.add(splash);
+			
+			Note.initializeGlobalRGBShader(i % Note.colArray.length);
+			splash.rgbShader.copyValues(Note.globalRgbShaders[i % Note.colArray.length]);
+		}
+
+		// options
+		var noteSkins:Array<String> = Mods.mergeAllTextsNamed('images/noteSkins/list.txt');
+		if(noteSkins.length > 0) {
+			if(!noteSkins.contains(Arrays.noteSkinList[ClientPrefs.data.noteSkin]))
+				ClientPrefs.data.noteSkin = ClientPrefs.defaultData.noteSkin;
+		}
+		
+		var noteSplashes:Array<String> = Mods.mergeAllTextsNamed('images/noteSplashes/list.txt');
+		if(noteSplashes.length > 0) {
+			if(!noteSplashes.contains(Arrays.noteSplashList[ClientPrefs.data.splashSkin]))
+				ClientPrefs.data.splashSkin = ClientPrefs.defaultData.splashSkin;
+		}
+
         super();
 
         persistentDraw = persistentUpdate = true;
@@ -89,6 +131,8 @@ class PAGE3settings extends MusicBeatSubstate
 
         FlxG.camera.follow(camFollow, null, camLerp);
 
+        add(notes);
+		add(splashes);
     }
 
     function createResults():Void
@@ -138,17 +182,21 @@ class PAGE3settings extends MusicBeatSubstate
                 FlxTween.tween(ResultText, { alpha: 0}, 0.15, { ease: FlxEase.expoIn });
                 FlxTween.tween(ExplainText, { alpha: 0}, 0.15, { ease: FlxEase.expoIn });
 
-                if (!SettingsState.onPlayState) {
-					new FlxTimer().start(0.4, function(tmr:FlxTimer) {
-						FlxG.switchState(new states.MainMenuState());
-					});
-				} else {
-					new FlxTimer().start(0.4, function(tmr:FlxTimer) {
-						StageData.loadDirectory(PlayState.SONG);
-						LoadingState.loadAndSwitchState(new PlayState());
-						FlxG.sound.music.volume = 0;
-					});
-				}
+                if(!options.micup.SettingsState.needRestart) {
+                    if (!SettingsState.onPlayState) {
+                        new FlxTimer().start(0.4, function(tmr:FlxTimer) {
+                            FlxG.switchState(new states.MainMenuState());
+                        });
+                    } else {
+                        new FlxTimer().start(0.4, function(tmr:FlxTimer) {
+                            StageData.loadDirectory(PlayState.SONG);
+                            LoadingState.loadAndSwitchState(new PlayState());
+                            FlxG.sound.music.volume = 0;
+                        });
+                    }
+                } else {
+                    backend.WinAPI.restart();
+                }
             }
         }
 
@@ -166,10 +214,10 @@ class PAGE3settings extends MusicBeatSubstate
                 ResultText.text = 'HUD Visible: ${(ClientPrefs.data.hideHud ? "DISABLE" : "ENABLE")}';
 				ExplainText.text = "Whether or not to display the HUD.";
             case "Combo Display":
-                ResultText.text = 'Display Combo Sprite: ${(ClientPrefs.data.comboDisplay ? "ENABLE" : "DISABLE")}';
+                ResultText.text = 'Display Combo Sprite: ${(ClientPrefs.data.comboSprVisible ? "ENABLE" : "DISABLE")}';
                 ExplainText.text = "Whether or not to display the word Combo when the combo is greater than 10.";
             case "MS Display":
-                ResultText.text = 'Show MS on Hit Notes: ${(ClientPrefs.data.msDisplay ? "ENABLE" : "DISABLE")}';
+                ResultText.text = 'Show MS on Hit Notes: ${(ClientPrefs.data.msVisible ? "ENABLE" : "DISABLE")}';
                 ExplainText.text = "Whether the word ms is displayed every time you hit a note.";
             case "Time Bar":
                 ResultText.text = 'Time Bar display on: ${Arrays.timeBarList[ClientPrefs.data.timeBarType]}';
@@ -202,10 +250,10 @@ class PAGE3settings extends MusicBeatSubstate
                 ResultText.text = 'Combo Stack: ${(ClientPrefs.data.comboStacking ? "ENABLE" : "DISABLE")}';
                 ExplainText.text = "Stack Combo display.";
             case "Camera Zoom Mult":
-                ResultText.text = 'Camera Zooming Mult: ${ClientPrefs.data.camZoomingMult}x';
+                ResultText.text = 'Camera Zooming Mult: ${ClientPrefs.data.camZoomingMulti}x';
                 ExplainText.text = "Change Camera Zoom Mult.";
             case "Early Late Display":
-                ResultText.text = 'Early/Late Display: ${(ClientPrefs.data.eld ? "ENABLE" : "DISABLE")}';
+                ResultText.text = 'Early/Late Display: ${(ClientPrefs.data.earlyLateVisible ? "ENABLE" : "DISABLE")}';
                 ExplainText.text = "On you hit note too early or late visible.";
         }
 
@@ -238,6 +286,13 @@ class PAGE3settings extends MusicBeatSubstate
     
             spr.updateHitbox();
         });
+
+        switch (optionShit[curSelected]) {
+            case "Note Skin"|"Note Splashes Skin"|"Note Splashes Alpha":
+                startNoteTween(1);
+            default:
+                startNoteTween(0);
+        }
 
         if(playingSong) {
             FlxG.sound.music.stop();
@@ -282,6 +337,8 @@ class PAGE3settings extends MusicBeatSubstate
                         ClientPrefs.data.noteSkin = 0;
                     if(ClientPrefs.data.noteSkin < 0)
                         ClientPrefs.data.noteSkin = Arrays.noteSkinList.length - 1;
+
+                    onChangeNoteSkin();
                 case "Note Splashes Skin":
                     ClientPrefs.data.splashSkin += Change;
 
@@ -289,21 +346,23 @@ class PAGE3settings extends MusicBeatSubstate
                         ClientPrefs.data.splashSkin = 0;
                     if(ClientPrefs.data.splashSkin < 0)
                         ClientPrefs.data.splashSkin = Arrays.noteSplashList.length - 1;
+
+                    onChangeSplashSkin();
                 case "Hide HUD":
                     if(ClientPrefs.data.hideHud)
                         ClientPrefs.data.hideHud = false;
                     else
                         ClientPrefs.data.hideHud = true;
                 case "Combo Display":
-                    if(ClientPrefs.data.comboDisplay)
-                        ClientPrefs.data.comboDisplay = false;
+                    if(ClientPrefs.data.comboSprVisible)
+                        ClientPrefs.data.comboSprVisible = false;
                     else
-                        ClientPrefs.data.comboDisplay = true;
+                        ClientPrefs.data.comboSprVisible = true;
                 case "MS Display":
-                    if(ClientPrefs.data.msDisplay)
-                        ClientPrefs.data.msDisplay = false;
+                    if(ClientPrefs.data.msVisible)
+                        ClientPrefs.data.msVisible = false;
                     else
-                        ClientPrefs.data.msDisplay = true;
+                        ClientPrefs.data.msVisible = true;
                 case "Time Bar":
                     ClientPrefs.data.timeBarType += Change;
 
@@ -328,6 +387,8 @@ class PAGE3settings extends MusicBeatSubstate
                         ClientPrefs.data.styleEngine = 0;
                     if(ClientPrefs.data.styleEngine < 0)
                         ClientPrefs.data.styleEngine = Arrays.engineList.length - 1;
+
+                    options.micup.SettingsState.needRestart = true;
                 case "Score Zoom":
                     if(ClientPrefs.data.scoreZoom)
                         ClientPrefs.data.scoreZoom = false;
@@ -373,17 +434,17 @@ class PAGE3settings extends MusicBeatSubstate
                     else
                         ClientPrefs.data.comboStacking = true;
                 case "Camera Zoom Mult":
-                    ClientPrefs.data.camZoomingMult += Change/10;
+                    ClientPrefs.data.camZoomingMulti += Change/10;
 
-                    if(ClientPrefs.data.camZoomingMult > 3)
-                        ClientPrefs.data.camZoomingMult = 3;
-                    if(ClientPrefs.data.camZoomingMult < 0.5)
-                        ClientPrefs.data.camZoomingMult = 0.5;
+                    if(ClientPrefs.data.camZoomingMulti > 3)
+                        ClientPrefs.data.camZoomingMulti = 3;
+                    if(ClientPrefs.data.camZoomingMulti < 0.5)
+                        ClientPrefs.data.camZoomingMulti = 0.5;
                 case "Early Late Display":
-                    if(ClientPrefs.data.eld)
-                        ClientPrefs.data.eld = false;
+                    if(ClientPrefs.data.earlyLateVisible)
+                        ClientPrefs.data.earlyLateVisible = false;
                     else
-                        ClientPrefs.data.eld = true;
+                        ClientPrefs.data.earlyLateVisible = true;
         }
 
         new FlxTimer().start(0.2, function(tmr:FlxTimer) {
@@ -391,6 +452,59 @@ class PAGE3settings extends MusicBeatSubstate
         });
 	}
 
+    function startNoteTween(?toAlpha:Float = 1) {
+        if(toAlpha > 1) toAlpha = 1;
+        if(toAlpha < 0) toAlpha = 0;
+
+        for (note in notes.members) {
+			FlxTween.cancelTweensOf(note);
+			FlxTween.tween(note, {alpha: toAlpha}, 0.3, {ease: FlxEase.expoInOut});
+		}
+    }
+
+    function onChangeNoteSkin() {
+		notes.forEachAlive(function(note:StrumNote) {
+			changeNoteSkin(note);
+			note.centerOffsets();
+			note.centerOrigin();
+		});
+	}
+
+	function changeNoteSkin(note:StrumNote) {
+		var skin:String = Note.defaultNoteSkin;
+		var customSkin:String = skin + Note.getNoteSkinPostfix();
+		if(Paths.fileExists('images/$customSkin.png', IMAGE)) skin = customSkin;
+
+		note.texture = skin; //Load texture and anims
+		note.reloadNote();
+		note.playAnim('static');
+	}
+
+	function onChangeSplashSkin()
+	{
+		for (splash in splashes)
+			splash.loadSplash();
+
+		playNoteSplashes();
+	}
+
+	public function playNoteSplashes() {
+		for (splash in splashes) {
+			var anim:String = splash.playDefaultAnim();
+			splash.visible = true;
+			splash.alpha = ClientPrefs.data.splashAlpha;
+			
+			var conf = splash.config.animations.get(anim);
+			var offsets:Array<Float> = [0, 0];
+
+			if (conf != null) offsets = conf.offsets;
+
+			if (offsets != null) {
+				splash.centerOffsets();
+				splash.offset.set(offsets[0], offsets[1]);
+			}
+		}
+	}
 
     override function openSubState(SubState:FlxSubState)
     {

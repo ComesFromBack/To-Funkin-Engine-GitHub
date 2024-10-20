@@ -10,7 +10,8 @@ class PAGE7settings extends MusicBeatSubstate
     var menuItems:FlxTypedGroup<FlxSprite>;
     var optionShit:Array<String> = [
         'Page',
-        'System Mouse'
+        'System Mouse',
+        'Exit Sound'
     ];
 
     private var grpSongs:FlxTypedGroup<Alphabet>;
@@ -142,8 +143,11 @@ class PAGE7settings extends MusicBeatSubstate
                 ResultText.text = "";
                 ExplainText.text = "Previous Page: Experimental \nNext Page: Other Setting";
             case "System Mouse":
-                ResultText.text = "System Mouse: "+'${list[ClientPrefs.data.mouse]}';
+                ResultText.text = "System Mouse: "+'${list[ClientPrefs.data.mouseDisplayType]}';
                 ExplainText.text = "Change Mouse Texture.";
+            case "Exit Sound":
+                ResultText.text = "Exit Sound: "+'${list[ClientPrefs.data.exitSound]}';
+                ExplainText.text = "Change Exit Sound.";
         }
 
         menuItems.forEach(function(spr:FlxSprite) {
@@ -211,12 +215,14 @@ class PAGE7settings extends MusicBeatSubstate
                         openSubState(new PAGE6settings());
                 });
             case "System Mouse":
-                ClientPrefs.data.mouse += Change;
+                ClientPrefs.data.mouseDisplayType += Change;
 
-                if(ClientPrefs.data.mouse > list.length-1)
-                    ClientPrefs.data.mouse = 0;
-                if(ClientPrefs.data.mouse < 0)
-                    ClientPrefs.data.mouse = list.length-1;
+                if(ClientPrefs.data.mouseDisplayType > list.length-1)
+                    ClientPrefs.data.mouseDisplayType = 0;
+                if(ClientPrefs.data.mouseDisplayType < 0)
+                    ClientPrefs.data.mouseDisplayType = list.length-1;
+            case "Exit Sound":
+                ClientPrefs.data.onExitPlaySound = !ClientPrefs.data.onExitPlaySound;
         }
 
         new FlxTimer().start(0.2, function(tmr:FlxTimer)

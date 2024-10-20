@@ -23,7 +23,7 @@ class OptionsState extends MusicBeatState
 		switch(label)
 		{
 			case 'Note Colors':
-				openSubState(new options.NotesSubState());
+				openSubState(new options.NotesColorSubState());
 			case 'Controls':
 				openSubState(new options.ControlsSubState());
 			case 'Graphics':
@@ -44,6 +44,22 @@ class OptionsState extends MusicBeatState
 
 	override function create()
 	{
+		#if DISCORD_ALLOWED
+		DiscordClient.changePresence("Options Menu", null);
+		#end
+
+		if(Arrays.engineList[ClientPrefs.data.styleEngine] == "Psych Old") {
+			options = [
+				'Note_Colors',
+				'Controls',
+				'Adjust_Delay_and_Combo',
+				'Graphics',
+				'Visuals_Old',
+				'Gameplay'
+				#if TRANSLATIONS_ALLOWED , 'Language' #end
+			];
+		}
+
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.antialiasing = ClientPrefs.data.antialiasing;
 		bg.color = 0xFFea71fd;
@@ -57,7 +73,7 @@ class OptionsState extends MusicBeatState
 
 		for (num => option in options)
 		{
-			var optionText:Alphabet = new Alphabet(0, 0, Language.getTextFromID('options_$option'), true);
+			var optionText:Alphabet = new Alphabet(0, 0, Language.getTextFromID('Options_$option'), true);
 			optionText.screenCenter();
 			optionText.y += (92 * (num - (options.length / 2))) + 45;
 			grpOptions.add(optionText);

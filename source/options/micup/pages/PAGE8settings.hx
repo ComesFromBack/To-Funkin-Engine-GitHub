@@ -209,6 +209,7 @@ class PAGE8settings extends MusicBeatSubstate
                 {
                     navi.kill();
                     menuItems.kill();
+                    close();
                     openSubState(new options.ControlsSubState());
                 });
             case "NoteColor":
@@ -227,7 +228,8 @@ class PAGE8settings extends MusicBeatSubstate
                 {
                     navi.kill();
                     menuItems.kill();
-                    openSubState(new options.NotesSubState());
+                    close();
+                    openSubState(new options.NotesColorSubState());
                 });
             case "Offset":
                 selectedSomethin = true;

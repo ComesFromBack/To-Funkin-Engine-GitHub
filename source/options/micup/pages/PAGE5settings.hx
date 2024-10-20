@@ -17,15 +17,14 @@ class PAGE5settings extends MusicBeatSubstate
 	var curSelected:Int = 0;
 	var camFollow:FlxObject;
 
-	var ResultText:FlxText = new FlxText(20, 69, FlxG.width, "", 48);
-	var ExplainText:FlxText = new FlxText(20, 69, FlxG.width / 2, "", 48);
+	var ResultText:FlxText = new FlxText(20,69,FlxG.width,"",48);
+	var ExplainText:FlxText = new FlxText(20,69,FlxG.width/2,"",48);
 
 	var camLerp:Float = 0.32;
 
 	var navi:FlxSprite;
 
-	public function new()
-	{
+	public function new() {
 		super();
 
 		persistentDraw = persistentUpdate = true;
@@ -34,12 +33,10 @@ class PAGE5settings extends MusicBeatSubstate
 		menuItems = new FlxTypedGroup<FlxSprite>();
 		add(menuItems);
 
-		var tex = Paths.getSparrowAtlas('Options_Buttons');
-
 		for (i in 0...optionShit.length)
 		{
 			var menuItem:FlxSprite = new FlxSprite(950, 30 + (i * 160));
-			menuItem.frames = tex;
+			menuItem.frames = Paths.getSparrowAtlas('Options_Buttons');
 			menuItem.animation.addByPrefix('idle', "5k idle", 24, true);
 			menuItem.animation.addByPrefix('select', "5k select", 24, true);
 			menuItem.animation.play('idle');
@@ -73,33 +70,27 @@ class PAGE5settings extends MusicBeatSubstate
 		FlxG.camera.follow(camFollow, null, camLerp);
 	}
 
-	function createResults():Void
-	{
+	function createResults():Void {
 		add(ResultText);
-		ResultText.scrollFactor.x = 0;
-		ResultText.scrollFactor.y = 0;
+		ResultText.scrollFactor.x = ResultText.scrollFactor.y = ResultText.alpha = 0;
 		ResultText.setFormat("VCR OSD Mono", 36, FlxColor.WHITE, CENTER);
 		ResultText.alignment = LEFT;
         ResultText.x = 20;
         ResultText.y = 580;
 		ResultText.setBorderStyle(OUTLINE, 0xFF000000, 5, 1);
-		ResultText.alpha = 0;
 		FlxTween.tween(ResultText, {alpha: 1}, 0.15, {ease: FlxEase.expoInOut});
 
 		add(ExplainText);
-		ExplainText.scrollFactor.x = 0;
-		ExplainText.scrollFactor.y = 0;
+		ExplainText.scrollFactor.x = ExplainText.alpha = ExplainText.scrollFactor.y = 0;
 		ExplainText.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, CENTER);
 		ExplainText.alignment = LEFT;
 		ExplainText.x = 20;
 		ExplainText.y = 624;
 		ExplainText.setBorderStyle(OUTLINE, 0xFF000000, 5, 1);
-		ExplainText.alpha = 0;
 		FlxTween.tween(ExplainText, {alpha: 1}, 0.15, {ease: FlxEase.expoInOut});
 	}
 
-	override function update(elapsed:Float)
-	{
+	override function update(elapsed:Float) {
 		super.update(elapsed);
 
 		if (!selectedSomethin) {
@@ -116,10 +107,10 @@ class PAGE5settings extends MusicBeatSubstate
                     spr.animation.play('idle');
                     FlxTween.tween(spr, { x: -1000}, 0.15, { ease: FlxEase.expoIn });
                 });
-                
-                FlxTween.tween(FlxG.camera, { zoom: 7}, 0.5, { ease: FlxEase.expoInOut, startDelay: 0.2 });
-                FlxTween.tween(ResultText, { alpha: 0}, 0.15, { ease: FlxEase.expoIn });
-                FlxTween.tween(ExplainText, { alpha: 0}, 0.15, { ease: FlxEase.expoIn });
+
+                FlxTween.tween(FlxG.camera,{zoom: 7}, 0.5, {ease:FlxEase.expoInOut,startDelay:0.2});
+                FlxTween.tween(ResultText,{alpha: 0}, 0.15, {ease:FlxEase.expoIn});
+                FlxTween.tween(ExplainText,{alpha: 0}, 0.15, {ease:FlxEase.expoIn});
 
                 if (!SettingsState.onPlayState) {
 					new FlxTimer().start(0.4, function(tmr:FlxTimer) {
@@ -140,7 +131,7 @@ class PAGE5settings extends MusicBeatSubstate
 				ResultText.text = "";
 				ExplainText.text = "Previous Page: Advanced \nNext Page: Experimental";
 			case "LuaEx":
-				ResultText.text = "Lua Extends: "+'${(ClientPrefs.debug.luaExtend ? "ENABLE" : "DISABLE")}';
+				ResultText.text = "Lua Extends: "+'${(ClientPrefs.addons.luaExtend ? "ENABLE" : "DISABLE")}';
 				ExplainText.text = "More testing function and future.";
 		}
 
@@ -157,8 +148,7 @@ class PAGE5settings extends MusicBeatSubstate
 		});
 	}
 
-	function changeItem(huh:Int = 0)
-	{
+	function changeItem(huh:Int = 0) {
 		FlxG.sound.play(Paths.sound('scrollMenu'), ClientPrefs.data.soundVolume);
 
 		curSelected += huh;
@@ -178,18 +168,15 @@ class PAGE5settings extends MusicBeatSubstate
 		});
 	}
 
-	function changePress(Change:Int = 0)
-	{
+	function changePress(Change:Int = 0) {
 		FlxG.sound.play(Paths.sound('scrollMenu'), ClientPrefs.data.soundVolume);
 
-		switch (optionShit[curSelected])
-		{
+		switch (optionShit[curSelected]) {
 			case 'Page':
 				SettingsState.page += Change;
 				selectedSomethin = true;
 
-				menuItems.forEach(function(spr:FlxSprite)
-				{
+				menuItems.forEach(function(spr:FlxSprite) {
 					spr.animation.play('idle');
 					FlxTween.tween(spr, {x: -1000}, 0.15, {ease: FlxEase.expoIn});
 				});
@@ -197,8 +184,7 @@ class PAGE5settings extends MusicBeatSubstate
 				FlxTween.tween(ResultText, {alpha: 0}, 0.15, {ease: FlxEase.expoIn});
 				FlxTween.tween(ExplainText, {alpha: 0}, 0.15, {ease: FlxEase.expoIn});
 
-				new FlxTimer().start(0.2, function(tmr:FlxTimer)
-				{
+				new FlxTimer().start(0.2, function(tmr:FlxTimer) {
 					navi.kill();
 					menuItems.kill();
 					if (Change == 1)
@@ -207,7 +193,7 @@ class PAGE5settings extends MusicBeatSubstate
 						openSubState(new PAGE4settings());
 				});
 			case "LuaEx":
-				ClientPrefs.debug.luaExtend = !ClientPrefs.debug.luaExtend;
+				ClientPrefs.addons.luaExtend = !ClientPrefs.addons.luaExtend;
 		}
 
 		new FlxTimer().start(0.2, function(tmr:FlxTimer)

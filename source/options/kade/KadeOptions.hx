@@ -1,6 +1,5 @@
 package options.kade;
 
-import haxe.display.JsonModuleTypes.JsonEnumFields;
 import states.MainMenuState;
 import backend.StageData;
 import backend.WinAPI;
@@ -184,13 +183,13 @@ class KadeOptions extends MusicBeatState {
 				new AdvanCrash("Advanced crashes are displayed"),
 				new DUI("On Death Using You playing song's inst slow version(Don't need has slow version)"),
 				new PresetMS("Change the preset mode of MS verdict (support for custom files)")
-				
 				#else
 				new Placeholders("Placeholders")
 				#end
 			]),
 			new OptionCata(640, 40+64, "Extra Setting", [
-				new SM("Whether to use the system default mouse")
+				new SM("Whether to use the system default mouse"),
+				new FlyingSound("Play Sound on Exit From 'Title'.")
 			]),
 			new OptionCata(935, 40+64, "Other Settings", [
 				new Contorls("Enter the \"Controls\" settings interface"),
@@ -330,11 +329,11 @@ class KadeOptions extends MusicBeatState {
 	    up_hold = false;
 		down_hold = false;
 		if (FlxG.keys.justPressed.TAB && FlxG.keys.justPressed.B) {
-			if(!ClientPrefs.debug.debugMode) {
-				ClientPrefs.debug.debugMode = true;
+			if(!ClientPrefs.addons.debugMode) {
+				ClientPrefs.addons.debugMode = true;
 				FlxG.camera.flash(0xFF00FF00, 0.4, null, true);
 			} else { 
-				ClientPrefs.debug.debugMode = false;
+				ClientPrefs.addons.debugMode = false;
 				FlxG.camera.flash(0xFFFF0000, 0.4, null, true);
 			}
 			FlxG.sound.play(Arrays.getThemeSound('confirmMenu'), ClientPrefs.data.soundVolume);
@@ -441,7 +440,7 @@ class KadeOptions extends MusicBeatState {
 							var select:String = selectedOption.getOpenState();
 							switch(select) {
 								case 'Contorls': openSubState(new ControlsSubState());
-								case 'NoteColor': openSubState(new NotesSubState());
+								case 'NoteColor': openSubState(new NotesColorSubState());
 								case 'Offset': MusicBeatState.switchState(new NoteOffsetState());
 							}
 						}

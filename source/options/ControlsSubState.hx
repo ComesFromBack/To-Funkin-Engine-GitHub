@@ -41,8 +41,7 @@ class ControlsSubState extends MusicBeatSubstate
 		[false],
 		[false, 'DEBUG'],
 		[false, 'Key 1', 'debug_1', 'Debug Key #1'],
-		[false, 'Key 2', 'debug_2', 'Debug Key #2'],
-		[false, 'Fullscreen', 'fullscreen', 'FullScreen Key']
+		[false, 'Key 2', 'debug_2', 'Debug Key #2']
 	];
 	var curOptions:Array<Int>;
 	var curOptionsValid:Array<Int>;
@@ -64,6 +63,10 @@ class ControlsSubState extends MusicBeatSubstate
 	public function new()
 	{
 		super();
+
+		#if DISCORD_ALLOWED
+		DiscordClient.changePresence("Controls Menu", null);
+		#end
 
 		options.push([true]);
 		options.push([true]);
@@ -136,21 +139,22 @@ class ControlsSubState extends MusicBeatSubstate
 
 					var str:String = option[1];
 					var keyStr:String = option[2];
-					if(isDefaultKey) str = Language.getTextFromID(str);
-					var text:Alphabet = new Alphabet(200, 300, !isDisplayKey ? Language.getTextFromID('Key_$keyStr') : Language.getTextFromID('KeyGroup_$str'), !isDisplayKey);
+					var text:Alphabet = new Alphabet(475, 300, !isDisplayKey ? Language.getTextFromID('Key_$keyStr') : Language.getTextFromID('KeyGroup_$str'), !isDisplayKey);
 					text.isMenuItem = true;
 					text.changeX = false;
 					text.distancePerItem.y = 60;
 					text.targetY = myID;
-					if(isDisplayKey)
-						grpDisplay.add(text);
-					else {
+					text.ID = myID;
+					lastID = myID;
+
+					if(!isDisplayKey)
+					{
+						text.alignment = RIGHT;
 						grpOptions.add(text);
 						curOptions.push(i);
 						curOptionsValid.push(myID);
 					}
-					text.ID = myID;
-					lastID = myID;
+					else grpDisplay.add(text);
 
 					if(isCentered) addCenteredText(text, option, myID);
 					else addKeyText(text, option, myID);
@@ -166,6 +170,7 @@ class ControlsSubState extends MusicBeatSubstate
 
 	function addCenteredText(text:Alphabet, option:Array<Dynamic>, id:Int)
 	{
+		text.alignment = LEFT;
 		text.screenCenter(X);
 		text.y -= 55;
 		text.startPosition.y -= 55;
@@ -182,15 +187,13 @@ class ControlsSubState extends MusicBeatSubstate
 
 		for (n in 0...2)
 		{
-			var textX:Float = 350 + n * 300;
-
 			var key:String = null;
 			if(onKeyboardMode)
 				key = InputFormatter.getKeyName((keys[n] != null) ? keys[n] : NONE);
 			else
 				key = InputFormatter.getGamepadName((gmpds[n] != null) ? gmpds[n] : NONE);
 
-			var attach:Alphabet = new Alphabet(textX + 210, 248, key, false);
+			var attach:Alphabet = new Alphabet(560 + n * 300, 248, key, false);
 			attach.isMenuItem = true;
 			attach.changeX = false;
 			attach.distancePerItem.y = 60;
@@ -210,7 +213,7 @@ class ControlsSubState extends MusicBeatSubstate
 			black.alphaMult = 0.4;
 			black.sprTracker = text;
 			black.yAdd = -6;
-			black.xAdd = textX;
+			black.xAdd = 75 + n * 300;
 			grpBlacks.add(black);
 		}
 	}
@@ -278,17 +281,10 @@ class ControlsSubState extends MusicBeatSubstate
 		{
 			if(FlxG.keys.justPressed.ESCAPE || FlxG.gamepads.anyJustPressed(B))
 			{
-				switch(Arrays.engineList[ClientPrefs.data.styleEngine]) {
-					case "Psych Old" | "Psych New":
-						MusicBeatState.switchState(new options.OptionsState());
-					case "Kade":
-						MusicBeatState.switchState(new options.kade.KadeOptions());
-					case "MicUp":
-						MusicBeatState.switchState(new options.micup.SettingsState());
-					case "Vanilla":
-						// MusicBeatState.switchState(new options.vanilla.VanillaOptions());
-				}
-				close();
+				if(Arrays.engineList[ClientPrefs.data.styleEngine] == "MicUp")
+					MusicBeatState.resetState();
+				else
+					close();
 				return;
 			}
 			if(FlxG.keys.justPressed.CONTROL || FlxG.gamepads.anyJustPressed(LEFT_SHOULDER) || FlxG.gamepads.anyJustPressed(RIGHT_SHOULDER)) swapMode();

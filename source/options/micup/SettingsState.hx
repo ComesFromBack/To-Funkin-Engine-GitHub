@@ -8,6 +8,11 @@ import flixel.addons.display.FlxBackdrop;
 import options.micup.pages.*;
 import flixel.util.FlxAxes;
 
+import objects.Note;
+import objects.StrumNote;
+import objects.NoteSplash;
+import objects.Alphabet;
+
 class SettingsState extends MusicBeatState
 {
 	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Options_Checker'), FlxAxes.XY, 0.2, 0.2);
@@ -15,6 +20,7 @@ class SettingsState extends MusicBeatState
 
 	public static var page:Int = 0;
 	public static var onPlayState:Bool = false;
+	public static var needRestart:Bool = false;
 
 	var menuItems:FlxTypedGroup<FlxSprite>;
 	var pageArray:Array<String> = [
@@ -28,6 +34,8 @@ class SettingsState extends MusicBeatState
 		'Other Setting'
 	];
 	var pageText:FlxText = new FlxText(20, 69, FlxG.width, "", 48);
+	var restartText:FlxText = new FlxText(20, 119, FlxG.width, "", 48);
+	var noteY:Float = 90;
 
 	override public function create():Void
 	{
@@ -68,11 +76,9 @@ class SettingsState extends MusicBeatState
 		menuItems = new FlxTypedGroup<FlxSprite>();
 		add(menuItems);
 
-		var tex = Paths.getSparrowAtlas('Options_Page');
-
 		for (i in 0...pageArray.length) {
 			var menuItem:FlxSprite = new FlxSprite(10 + (i * 70), 50);
-			menuItem.frames = tex;
+			menuItem.frames = Paths.getSparrowAtlas('Options_Page');
 			menuItem.animation.addByPrefix('idle', "PI_idle", 24, true);
 			menuItem.animation.addByPrefix('select', "PI_select", 24, true);
 			menuItem.animation.play('idle');
@@ -83,12 +89,18 @@ class SettingsState extends MusicBeatState
 		}
 
 		add(pageText);
-		pageText.scrollFactor.x = 0;
-		pageText.scrollFactor.y = 0;
+		pageText.scrollFactor.x = pageText.scrollFactor.y = 0;
 		pageText.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT);
 		pageText.x = 10;
 		pageText.y = 65;
 		pageText.setBorderStyle(OUTLINE, 0xFF000000, 2, 1);
+
+		add(restartText);
+		restartText.scrollFactor.x = restartText.scrollFactor.y = 0;
+		restartText.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, LEFT);
+		restartText.x = 10;
+		restartText.y = pageText.y+50;
+		restartText.setBorderStyle(OUTLINE, 0xFF000000, 2, 1);
 
 		FlxG.camera.zoom = 3;
 		FlxTween.tween(FlxG.camera, {zoom: 1}, 1.5, {ease: FlxEase.expoInOut});
@@ -114,15 +126,18 @@ class SettingsState extends MusicBeatState
 		}
 	}
 
-	override function update(elapsed:Float)
-	{
-		checker.x -= 0.21 / (ClientPrefs.data.framerate / 60);
+	override function update(elapsed:Float) {
+		checker.x -= 0.51 / (ClientPrefs.data.framerate / 60);
 		checker.y -= 0.51 / (ClientPrefs.data.framerate / 60);
 
 		if (page < 0) page = 7;
 		if (page > 7) page = 0;
 
 		super.update(elapsed);
+
+		if(needRestart) {
+			restartText.text = "Changed some need to restart game,exit to restart.";
+		}
 
 		menuItems.forEach(function(spr:FlxSprite) {
 			spr.animation.play('idle');

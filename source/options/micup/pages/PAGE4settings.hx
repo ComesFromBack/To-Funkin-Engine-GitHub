@@ -155,10 +155,10 @@ class PAGE4settings extends MusicBeatSubstate
 				ResultText.text = "";
 				ExplainText.text = "Previous Page: Visuals & UI \nNext Page: Debug";
 			case "Focus Music":
-				ResultText.text = "Focus Volume: "+'${(ClientPrefs.data.foucsMusic ? "ENABLE" : "DISABLE")}';
+				ResultText.text = "Focus Volume: "+'${(ClientPrefs.data.focusLostMusic ? "ENABLE" : "DISABLE")}';
 				ExplainText.text = "Lower the volume when the window is not in focus.";
 			case "Fade Mode":
-				ResultText.text = "Fade Mode: "+'${backend.CustomFadeTransition.Fade.LIST[ClientPrefs.data.fademode]}';
+				ResultText.text = "Fade Mode: "+'${backend.CustomFadeTransition.Fade.LIST[ClientPrefs.data.fadeMode]}';
 				ExplainText.text = "Change CFT Fade Mode.";
 			case "Fade Style":
 				ResultText.text = "Fade Style: "+'${Arrays.fadeStyleList[ClientPrefs.data.fadeStyle]}';
@@ -167,7 +167,7 @@ class PAGE4settings extends MusicBeatSubstate
 				ResultText.text = "Show Text: "+'${(ClientPrefs.data.fadeText ? "ENABLE" : "DISABLE")}';
 				ExplainText.text = "Show Loading Text in CFT!";
 			case "Memory Private":
-				ResultText.text = "Get Private: "+'${(ClientPrefs.data.MemPirvate ? "ENABLE" : "DISABLE")}';
+				ResultText.text = "Get Private: "+'${(ClientPrefs.data.MemPrivate ? "ENABLE" : "DISABLE")}';
 				ExplainText.text = "Trun on game will Get 'Pirvate Using' Memoey(True Memory Using).";
 			case "MemoryIB":
 				ResultText.text = "Memory ?IB: "+'${(ClientPrefs.data.iBType ? "ENABLE" : "DISABLE")}';
@@ -179,10 +179,10 @@ class PAGE4settings extends MusicBeatSubstate
 				ResultText.text = "Selected to Play: "+'${(ClientPrefs.data.selectSongPlay ? "ENABLE" : "DISABLE")}';
 				ExplainText.text = "Play Selected Song in Freepley.";
 			case "Preload Base Data":
-				ResultText.text = "Preload Base Data: "+'${(ClientPrefs.data.prebase ? "ENABLE" : "DISABLE")}';
+				ResultText.text = "Preload Base Data: "+'${(ClientPrefs.data.loadBaseRes ? "ENABLE" : "DISABLE")}';
 				ExplainText.text = "Load Base Texture in TitleState.";
 			case "Mouse Controls":
-				ResultText.text = "Mouse Controls: "+'${(ClientPrefs.data.mouseCon ? "ENABLE" : "DISABLE")}';
+				ResultText.text = "Mouse Controls: "+'${(ClientPrefs.data.mouseControls ? "ENABLE" : "DISABLE")}';
 				ExplainText.text = "Usage Mouse in Action.";
 			case "Clear":
 				ResultText.text = "Clear Data";
@@ -306,19 +306,19 @@ class PAGE4settings extends MusicBeatSubstate
 					navi.kill();
 					menuItems.kill();
 					if (Change == 1)
-						openSubState(new PAGE1settings());
+						openSubState(new PAGE5settings());
 					else
 						openSubState(new PAGE3settings());
 				});
 			case "Focus Music":
-				ClientPrefs.data.foucsMusic = !ClientPrefs.data.foucsMusic;
+				ClientPrefs.data.focusLostMusic = !ClientPrefs.data.focusLostMusic;
 			case "Fade Mode":
-				ClientPrefs.data.fademode += Change;
+				ClientPrefs.data.fadeMode += Change;
 
-				if(ClientPrefs.data.fademode > backend.CustomFadeTransition.Fade.LIST.length-1)
-					ClientPrefs.data.fademode = 0;
-				if(ClientPrefs.data.fademode < 0)
-					ClientPrefs.data.fademode = backend.CustomFadeTransition.Fade.LIST.length-1;
+				if(ClientPrefs.data.fadeMode > backend.CustomFadeTransition.Fade.LIST.length-1)
+					ClientPrefs.data.fadeMode = 0;
+				if(ClientPrefs.data.fadeMode < 0)
+					ClientPrefs.data.fadeMode = backend.CustomFadeTransition.Fade.LIST.length-1;
 			case "Fade Style":
 				ClientPrefs.data.fadeStyle += Change;
 
@@ -329,7 +329,7 @@ class PAGE4settings extends MusicBeatSubstate
 			case "Show Text":
 				ClientPrefs.data.fadeText = !ClientPrefs.data.fadeText;
 			case "Memory Private":
-				ClientPrefs.data.MemPirvate = !ClientPrefs.data.MemPirvate;
+				ClientPrefs.data.MemPrivate = !ClientPrefs.data.MemPrivate;
 			case "MemoryIB":
 				ClientPrefs.data.iBType = !ClientPrefs.data.iBType;
 			case "Memory Type":
@@ -342,9 +342,9 @@ class PAGE4settings extends MusicBeatSubstate
 			case "Select Play":
 				ClientPrefs.data.selectSongPlay = !ClientPrefs.data.selectSongPlay;
 			case "Preload Base Data":
-				ClientPrefs.data.prebase = !ClientPrefs.data.prebase;
+				ClientPrefs.data.loadBaseRes = !ClientPrefs.data.loadBaseRes;
 			case "Mouse Controls":
-				ClientPrefs.data.mouseCon = !ClientPrefs.data.mouseCon;
+				ClientPrefs.data.mouseControls = !ClientPrefs.data.mouseControls;
 		}
 
 		new FlxTimer().start(0.2, function(tmr:FlxTimer)
