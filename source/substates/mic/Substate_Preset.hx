@@ -115,7 +115,6 @@ class Substate_Preset extends MusicBeatSubstate
                         });
                     case 'save':
                         goingBack = true;
-                        substates.mic.Substate_PresetSave.coming = "Modifiers";
                             
                         FlxTween.tween(blackBarThingie, { 'scale.y': 1500}, 0.5, { ease: FlxEase.expoIn});
     

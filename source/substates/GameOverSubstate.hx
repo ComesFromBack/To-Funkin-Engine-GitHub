@@ -84,7 +84,7 @@ class GameOverSubstate extends MusicBeatSubstate
 		
 		PlayState.instance.setOnScripts('inGameOver', true);
 		PlayState.instance.callOnScripts('onGameOverStart', []);
-		FlxG.sound.music.loadEmbedded(Paths.music(loopSoundName));
+		Paths.music(loopSoundName);
 
 		if(characterName == 'pico-dead')
 		{
@@ -158,6 +158,7 @@ class GameOverSubstate extends MusicBeatSubstate
 			}
 			else if (controls.BACK)
 			{
+				#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
 				FlxG.camera.visible = false;
 				FlxG.sound.music.stop();
 				PlayState.deathCounter = 0;
@@ -165,20 +166,10 @@ class GameOverSubstate extends MusicBeatSubstate
 				PlayState.chartingMode = false;
 	
 				Mods.loadTopMod();
-				switch(PlayState.modeOfPlayState) {
-					case "Story Mode":
-						if(Arrays.engineList[ClientPrefs.data.styleEngine] == "MicUp")
-							MusicBeatState.switchState(new states.mic.StoryMenu());
-						else
-							MusicBeatState.switchState(new StoryMenuState());
-					case "Free Play":
-						if(Arrays.engineList[ClientPrefs.data.styleEngine] == "MicUp")
-							MusicBeatState.switchState(new states.mic.MenuFreeplay());
-						else
-							MusicBeatState.switchState(new FreeplayState());
-					case "Marathon":
-						MusicBeatState.switchState(new states.mic.MenuMarathon());
-				}
+				if (PlayState.isStoryMode)
+					MusicBeatState.switchState(new StoryMenuState());
+				else
+					MusicBeatState.switchState(new FreeplayState());
 	
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 				PlayState.instance.callOnScripts('onGameOverConfirm', [false]);
@@ -196,17 +187,16 @@ class GameOverSubstate extends MusicBeatSubstate
 						FlxG.sound.play(Paths.sound('jeffGameover/jeffGameover-' + FlxG.random.int(1, 25, exclude)), 1, false, null, true, function() {
 							if(!isEnding)
 							{
-								FlxG.sound.music.fadeIn(0.2, 1, 4);
+								FlxG.sound.music.fadeIn(0.2, ClientPrefs.data.musicVolume, 4);
 							}
 						});
 
 					default:
-						coolStartDeath();
+						coolStartDeath(ClientPrefs.data.musicVolume);
 				}
 			}
 			
-			if (FlxG.sound.music.playing)
-			{
+			if (FlxG.sound.music.playing) {
 				Conductor.songPosition = FlxG.sound.music.time;
 			}
 		}
@@ -214,10 +204,8 @@ class GameOverSubstate extends MusicBeatSubstate
 	}
 
 	var isEnding:Bool = false;
-	function coolStartDeath(?volume:Float = 1):Void
-	{
-		FlxG.sound.music.play(true);
-		FlxG.sound.music.volume = volume;
+	function coolStartDeath(?volume:Float = 1):Void {
+		FlxG.sound.playMusic(Paths.music(loopSoundName), volume);
 	}
 
 	function endBullshit():Void
