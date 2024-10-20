@@ -10,6 +10,8 @@ import objects.StrumNote;
 
 import flixel.math.FlxRect;
 
+using StringTools;
+
 typedef EventNote = {
 	strumTime:Float,
 	event:String,
@@ -134,8 +136,8 @@ class Note extends FlxSprite
 	public var hitsoundForce:Bool = false;
 	public var hitsoundVolume(get, default):Float = 1.0;
 	function get_hitsoundVolume():Float {
-		if(ClientPrefs.data.hitVolume > 0)
-			return ClientPrefs.data.hitVolume;
+		if(ClientPrefs.data.hitSoundVolume > 0)
+			return ClientPrefs.data.hitSoundVolume;
 		return hitsoundForce ? hitsoundVolume : 0.0;
 	}
 	public var hitsound:String = 'hitsound';
@@ -475,9 +477,9 @@ class Note extends FlxSprite
 		{
 			canBeHit = false;
 
-			if (strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult))
+			if (!wasGoodHit && strumTime <= Conductor.songPosition)
 			{
-				if((isSustainNote && prevNote.wasGoodHit) || strumTime <= Conductor.songPosition)
+				if(!isSustainNote || (prevNote.wasGoodHit && !ignoreNote))
 					wasGoodHit = true;
 			}
 		}
@@ -533,8 +535,7 @@ class Note extends FlxSprite
 	public function clipToStrumNote(myStrum:StrumNote)
 	{
 		var center:Float = myStrum.y + offsetY + Note.swagWidth / 2;
-		if(isSustainNote && (mustPress || !ignoreNote) &&
-			(!mustPress || (wasGoodHit || (prevNote.wasGoodHit && !canBeHit))))
+		if((mustPress || !ignoreNote) && (wasGoodHit || (prevNote.wasGoodHit && !canBeHit)))
 		{
 			var swagRect:FlxRect = clipRect;
 			if(swagRect == null) swagRect = new FlxRect(0, 0, frameWidth, frameHeight);

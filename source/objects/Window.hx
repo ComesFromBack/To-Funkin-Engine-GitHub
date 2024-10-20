@@ -69,7 +69,7 @@ class Window extends FlxSpriteGroup {
         TOP = new FlxSprite().makeGraphic(500, 20, 0x90E6FF);
         TITLE = new FlxText(0, 0, 0, "Window Title");
         WINDOW_BG = new FlxSprite().makeGraphic(TOP.width, 320);
-        EXIT_BUTTON = new CLICKBOX("", 0, 20, true);
+        EXIT_BUTTON = new CLICKBOX("", TOP.width-20, 20, true);
 
         add(TOP);
         add(EXIT_BUTTON);
