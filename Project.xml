@@ -20,13 +20,14 @@
 	
 	<!-- ______________________ ENGINE CUSTOMIZATION ______________________ -->
 
-	<define name="MODS_ALLOWED" if="desktop || mobile" />
-	<define name="HSCRIPT_ALLOWED" if="desktop || mobile" />  <!-- ScriptsAPI is allowed on mobile -->
+	<define name="MODS_ALLOWED" if="desktop || mobile || android" />
+	<define name="HSCRIPT_ALLOWED" if="desktop || mobile || android" />  <!-- ScriptsAPI is allowed on mobile -->
 	<define name="LUA_ALLOWED" if="cpp" />
 	<define name="ACHIEVEMENTS_ALLOWED" />
 	<define name="TRANSLATIONS_ALLOWED" />
 	<define name="IRIS_DEBUG"/>
 	<define name="StyleUnlock" />
+	<define name="BETA"/>
 	
 	<define name="SHOW_LOADING_SCREEN" />
 	<define name="BASE_GAME_FILES" />
@@ -60,7 +61,7 @@
 	<!-- __________________________ Game Assets & Etc. __________________________ -->
 	
 	<!-- Turn on Crash Handler -->
-	<define name="CRASH_HANDLER" if="desktop release" />
+	<define name="CRASH_HANDLER" if="desktop || android" />
 
 	<!-- Assets -->
 	<assets path="assets/fonts" />
@@ -102,9 +103,22 @@
 	<!--Psych stuff needed-->
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
 	<haxelib name="hscript-iris" if="HSCRIPT_ALLOWED" version="1.1.0"/>
-	<haxelib name="SScript" if="HSCRIPT_ALLOWED" version="19.0.618"/>
+<!-- 	<haxelib name="SScript" if="HSCRIPT_ALLOWED" version="19.0.618"/> -->
+	<haxelib name="hxdiscord_rpc" version="1.2.4" if="DISCORD_ALLOWED"/>
 	<haxelib name="hxvlc" if="VIDEOS_ALLOWED"/>
 	<haxelib name="flxanimate"/>
+
+	<haxelib name="androiddialogs" if="android" />
+	<haxelib name="devicelanguage" if="android" />
+    	<haxelib name="extension-orientation" if="mobile" />
+	<!--In case you want to use the ui package-->
+	<haxelib name="flixel-ui" />
+	<haxelib name="extension-androidtools" if="android"/>
+	<haxelib name="faxe" if='switch'/>
+
+	<!-- Mobile and Android Specific-->
+	<haxelib name="extension-androidtools" if="android" />
+	<haxelib name="extension-orientation" if="mobile" />
 
 	<!-- Enables a terminal log prompt on debug builds -->
 	<haxelib name="hxcpp-debug-server" if="debug"/>
@@ -168,6 +182,11 @@
 	<!--Macro fixes-->
 	<haxeflag name="--macro" value="allowPackage('flash')" />
 	<haxeflag name="--macro" value="include('my.pack')" />
+
+	<config:android permission="android.permission.READ_EXTERNAL_STORAGE" if="android"/>
+	<config:android permission="android.permission.WRITE_EXTERNAL_STORAGE" if="android"/>
+	<config:android gradle-version="7.5.1" />
+	<config:android gradle-plugin="7.3.1" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 

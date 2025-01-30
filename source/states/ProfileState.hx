@@ -41,13 +41,13 @@ class ProfileState extends MusicBeatState {
         var deleteText:FlxText = new FlxText(12, FlxG.height - 24, 0, "Press \"Delete\" key to DELETE selected profile", 12);
         deleteText.scrollFactor.set();
 		deleteText.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-        var resetText:FlxText = new FlxText(12, deleteText.x - 20, 0, "Press "+controls.RESET_S+" key to CLEAR selected profile", 12);
+        var resetText:FlxText = new FlxText(12, deleteText.y - 20, 0, "Press "+controls.RESET_S+" key to CLEAR selected profile", 12);
         resetText.scrollFactor.set();
 		resetText.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-        var renameText:FlxText = new FlxText(12, resetText.x - 20, 0, "Press Shift + "+controls.RESET_S+" key to Rename selected profile", 12);
+        var renameText:FlxText = new FlxText(12, resetText.y - 20, 0, "Press Shift + "+controls.RESET_S+" key to Rename selected profile", 12);
         renameText.scrollFactor.set();
 		renameText.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-        var newProfileText:FlxText = new FlxText(12, renameText.x - 20, 0, "Press \"N\" key to Create new profile", 12);
+        var newProfileText:FlxText = new FlxText(12, renameText.y - 20, 0, "Press \"N\" key to Create new profile", 12);
         newProfileText.scrollFactor.set();
 		newProfileText.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 
@@ -154,7 +154,7 @@ class ProfileState extends MusicBeatState {
 
         if(FlxG.keys.pressed.SHIFT) {
             if(controls.RESET)
-                throw "You're stupid, profile isn't done! Shit throw.";
+                throw "You're stupid, profile isn't done! B**ch.";
         }
 
         if(controls.ACCEPT)
