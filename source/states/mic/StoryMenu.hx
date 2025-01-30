@@ -22,22 +22,22 @@ import substates.ResetScoreSubState;
 class StoryMenu extends MusicBeatState
 {
 	var scoreText:FlxText;
-	var curWeekData:Array<Dynamic> = [];
 	public static var curDifficulty:Int = 2;
 	private static var lastDifficultyName:String = '';
 	public static var weekCompleted:Map<String, Bool> = new Map<String, Bool>();
 
 	var txtWeekTitle:FlxText;
 
-	var curWeek:Int = 0;
+	private static var curWeek:Int = 0;
 	var loadedWeeks:Array<WeekData> = [];
+	var curWeekArray:Array<Dynamic> = [];
 	var rakes:String = 'Null';
 
 	var txtTracklist:FlxText;
 	var grpWeekText:FlxTypedGroup<MenuItem>;
 	var sprDifficulty:FlxSprite;
 
-	var bg:FlxSprite = new FlxSprite(-89).loadGraphic(Paths.image('wBG_Main'));
+	var bg:FlxSprite = new FlxSprite(-89).loadGraphic(Paths.image('menuDesat'));
 	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Week_Checker'), FlxAxes.XY, 0.2, 0.2);
 	var gradientBar:FlxSprite = new FlxSprite(0, 0).makeGraphic(FlxG.width, 300, 0xFFAA00AA);
 	var side:FlxSprite = new FlxSprite(0).loadGraphic(Paths.image('Week_Top'));
@@ -57,10 +57,12 @@ class StoryMenu extends MusicBeatState
 		lime.app.Application.current.window.title = lime.app.Application.current.meta.get('name');
 
 		ranks = new FlxTypedGroup<FlxSprite>();
+
 		PlayState.modeOfPlayState = "Story Mode";
 		WeekData.reloadWeekFiles(true);
 
-		if(WeekData.weeksList.length < 1) {
+		if(WeekData.weeksList.length < 1)
+		{
 			FlxTransitionableState.skipNextTransIn = true;
 			persistentUpdate = false;
 			MusicBeatState.switchState(new states.ErrorState("NO WEEKS ADDED FOR STORY MODE\n\nPress ACCEPT to go to the Week Editor Menu.\nPress BACK to return to Main Menu.",
@@ -69,19 +71,11 @@ class StoryMenu extends MusicBeatState
 			return;
 		}
 
-		if (FlxG.sound.music != null) {
-			if (!FlxG.sound.music.playing)
-			{
-				FlxG.sound.playMusic(Paths.music('freakyMenu'), ClientPrefs.data.musicVolume);
-				Conductor.bpm = 102;
-			}
-		}
-
 		if(curWeek >= WeekData.weeksList.length) curWeek = 0;
 		persistentUpdate = persistentDraw = true;
 
-		bg.scrollFactor.x = 0;
-		bg.scrollFactor.y = 0;
+		bg.color = 0xFFEE9209;
+		bg.scrollFactor.x = bg.scrollFactor.y = 0;
 		bg.setGraphicSize(Std.int(bg.width * 1.1));
 		bg.updateHitbox();
 		bg.screenCenter();
@@ -100,18 +94,18 @@ class StoryMenu extends MusicBeatState
 		add(grpWeekText);
 
 		var itemTargetY:Float = 0;
-		for (i in 0...WeekData.weeksList.length)
+		for (num => item in WeekData.weeksList)
 		{
-			var weekFile:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
-			var isLocked:Bool = weekIsLocked(WeekData.weeksList[i]);
+			var weekFile:WeekData = WeekData.weeksLoaded.get(item);
+			var isLocked:Bool = weekIsLocked(item);
 			if(!isLocked || !weekFile.hiddenUntilUnlocked)
 			{
 				loadedWeeks.push(weekFile);
 				WeekData.setDirectoryFromWeek(weekFile);
-				var weekThing:MenuItem = new MenuItem(0, 40, WeekData.weeksList[i]);
-				weekThing.y += ((weekThing.height + 20) * i);
+				var weekThing:MenuItem = new MenuItem(0, 40, item);
+				weekThing.y += ((weekThing.height + 20) * num);
 				weekThing.alpha = (isLocked ? 0.5 : 1);
-				weekThing.ID = i;
+				weekThing.ID = num;
 				weekThing.targetY = itemTargetY;
 				itemTargetY += Math.max(weekThing.height, 110) + 10;
 				grpWeekText.add(weekThing);
@@ -209,6 +203,8 @@ class StoryMenu extends MusicBeatState
 		{
 			selectable = true;
 		});
+
+		checker.scroll.set(-0.12,-0.34);
 	}
 
 	var selectable:Bool = false;
@@ -461,12 +457,12 @@ class StoryMenu extends MusicBeatState
 	{
 		ranks.clear();
 
-		curWeekData = loadedWeeks[curWeek].songs;
+		curWeekArray = loadedWeeks[curWeek].songs;
 
-		for (i in 0...curWeekData.length)
+		for (i in 0...curWeekArray.length)
 		{
 			var rank:FlxSprite = new FlxSprite(958, 100);
-			rank.loadGraphic(Paths.image('rankings/' + rankTable[Highscore.getRank(curWeekData[i], curDifficulty)]));
+			rank.loadGraphic(Paths.image('rankings/' + rankTable[Highscore.getRank(curWeekArray[i], curDifficulty)]));
 			rank.ID = i;
 			rank.scale.x = rank.scale.y = 80 / rank.height;
 			rank.updateHitbox();

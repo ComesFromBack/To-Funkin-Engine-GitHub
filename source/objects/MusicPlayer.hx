@@ -10,8 +10,7 @@ import states.FreeplayState;
  * Music player used for Freeplay
  */
 @:access(states.FreeplayState)
-class MusicPlayer extends FlxGroup 
-{
+class MusicPlayer extends FlxGroup {
 	public var instance:FreeplayState;
 	public var controls:Controls;
 
@@ -91,10 +90,15 @@ class MusicPlayer extends FlxGroup
 		}
 
 		var songName:String = instance.songs[FreeplayState.curSelected].songName;
-		if (playing && !wasPlaying)
+		if (playing && !wasPlaying) {
 			songTxt.text = Language.getTextFromID('Freeplayer_Playing', 'REP', [songName]);
-		else
+			if(Arrays.engineList[ClientPrefs.data.styleEngine] != "Vanilla")
+				instance.bottomText.text = '${Language.getTextFromID("Freeplayer_Space_Playing")}${Language.getTextFromID("Freeplayer_Spilter")}${Language.getTextFromID("Freeplayer_Exit","REP",[controls.BACK_S])}${Language.getTextFromID("Freeplayer_Spilter")}${Language.getTextFromID("Freeplayer_Reset_Playing","REP",[controls.RESET_S])}';
+		} else {
 			songTxt.text = '${Language.getTextFromID('Freeplayer_Playing', 'REP', [songName])} ${Language.getTextFromID('Freeplayer_Paused')}';
+			if(Arrays.engineList[ClientPrefs.data.styleEngine] != "Vanilla")
+				instance.bottomText.text = '${Language.getTextFromID("Freeplayer_Space_Pause")}${Language.getTextFromID("Freeplayer_Spilter")}${Language.getTextFromID("Freeplayer_Exit","REP",[controls.BACK_S])}${Language.getTextFromID("Freeplayer_Spilter")}${Language.getTextFromID("Freeplayer_Reset_Pause","REP",[controls.RESET_S])}';
+		}
 
 		//if(FlxG.keys.justPressed.K) trace('Time: ${FreeplayState.vocals.time}, Playing: ${FreeplayState.vocals.playing}');
 
@@ -246,7 +250,7 @@ class MusicPlayer extends FlxGroup
 		FlxG.autoPause = (!playingMusic && ClientPrefs.data.autoPause);
 		active = visible = playingMusic;
 
-		instance.scoreBG.visible = instance.diffText.visible = instance.rateText.visible = instance.scoreText.visible = !playingMusic; //Hide Freeplay texts and boxes if playingMusic is true
+		instance.scoreBG.visible = instance.diffText.visible = instance.scoreText.visible = !playingMusic; //Hide Freeplay texts and boxes if playingMusic is true
 		songTxt.visible = timeTxt.visible = songBG.visible = playbackTxt.visible = playbackBG.visible = progressBar.visible = playingMusic; //Show Music Player texts and boxes if playingMusic is true
 
 		for (i in playbackSymbols)
@@ -259,7 +263,6 @@ class MusicPlayer extends FlxGroup
 
 		if (playingMusic)
 		{
-			instance.bottomText.text = '${Language.getTextFromID("Freeplayer_Space_Playing")}${Language.getTextFromID("Freeplayer_Spilter")}${Language.getTextFromID("Freeplayer_Exit","REP",[controls.BACK_S])}${Language.getTextFromID("Freeplayer_Spilter")}${Language.getTextFromID("Freeplayer_Reset_Playing","REP",[controls.RESET_S])}';
 			positionSong();
 			
 			progressBar.setRange(0, FlxG.sound.music.length);
@@ -270,13 +273,14 @@ class MusicPlayer extends FlxGroup
 		}
 		else
 		{
-			instance.bottomText.text = '${Language.getTextFromID("Freeplayer_Space_Pause")}${Language.getTextFromID("Freeplayer_Spilter")}${Language.getTextFromID("Freeplayer_Exit","REP",[controls.BACK_S])}${Language.getTextFromID("Freeplayer_Spilter")}${Language.getTextFromID("Freeplayer_Reset_Pause","REP",[controls.RESET_S])}';
 			progressBar.setRange(0, Math.POSITIVE_INFINITY);
 			progressBar.setParent(null, "");
 			progressBar.numDivisions = 0;
 
-			instance.bottomText.text = instance.bottomString;
-			instance.positionHighscore();
+			if(Arrays.engineList[ClientPrefs.data.styleEngine] != "Vanilla") {
+				instance.bottomText.text = instance.bottomString;
+				instance.positionHighscore();
+			}
 		}
 		progressBar.updateBar();
 	}

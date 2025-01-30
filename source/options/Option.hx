@@ -24,7 +24,7 @@ class Option
 	public var type:OptionType = BOOL;
 
 	public var scrollSpeed:Float = 50; //Only works on int/float, defines how fast it scrolls per second while holding left/right
-	private var variable:String = null; //Variable from ClientPrefs.hx
+	public var variable(default, null):String = null; //Variable from ClientPrefs.hx
 	public var defaultValue:Dynamic = null;
 
 	public var curOption:Int = 0; //Don't change this
@@ -67,10 +67,8 @@ class Option
 				scrollSpeed = 0.5;
 				decimals = 2;
 			case STRING:
-				if(options.length > 0)
-					defaultValue = options[0];
-				if(defaultValue == null)
-					defaultValue = '';
+				if(defaultValue == null || options.length > 0)
+					defaultValue = 0;
 
 			case KEYBIND:
 				defaultValue = '';
@@ -86,7 +84,7 @@ class Option
 			switch(type)
 			{
 				case STRING:
-					var num:Int = options.indexOf(getValue());
+					var num:Int = getValue();
 					if(num > -1) curOption = num;
 
 				default:
@@ -132,7 +130,10 @@ class Option
 		if(child != null)
 		{
 			_text = newValue;
-			child.text = Language.getTextFromID('Setting_$_translationKey-${getValue()}', _text);
+			if(type == STRING)
+				child.text = options[getValue()];
+			else
+				child.text = getValue();
 			return _text;
 		}
 		return null;

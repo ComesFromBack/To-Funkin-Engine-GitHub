@@ -16,6 +16,10 @@ class ModSettingsSubState extends BaseOptionsMenu
 	{
 		this.folder = folder;
 
+		title = '';
+		//title = name;
+		rpcTitle = 'Mod Settings ($name)'; //for Discord Rich Presence
+
 		if(FlxG.save.data.modSettings == null) FlxG.save.data.modSettings = new Map<String, Dynamic>();
 		else
 		{
@@ -113,7 +117,7 @@ class ModSettingsSubState extends BaseOptionsMenu
 	
 					switch(newOption.type)
 					{
-						case STRING:
+						case INT:
 							var num:Int = newOption.options.indexOf(myValue);
 							if(num > -1) newOption.curOption = num;
 
@@ -153,14 +157,12 @@ class ModSettingsSubState extends BaseOptionsMenu
 		{
 			case 'bool':
 				return BOOL;
-			case 'int', 'integer':
-				return INT;
 			case 'float', 'fl':
 				return FLOAT;
 			case 'percent':
 				return PERCENT;
 			case 'string', 'str':
-				return STRING;
+				return INT;
 			case 'keybind', 'key':
 				return KEYBIND;
 		}

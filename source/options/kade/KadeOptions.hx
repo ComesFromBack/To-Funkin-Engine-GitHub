@@ -1,12 +1,9 @@
 package options.kade;
 
-import haxe.display.JsonModuleTypes.JsonEnumFields;
 import states.MainMenuState;
 import backend.StageData;
 import backend.WinAPI;
 import options.*;
-import states.FreeplayState;
-import states.TitleState;
 import flixel.input.gamepad.FlxGamepad;
 import options.kade.Options;
 
@@ -73,6 +70,7 @@ class KadeOptions extends MusicBeatState {
 	public var needrestart:Bool = false;
 
 	override function create() {
+
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuBG'));
 		bg.alpha = 0;
 		bg.scrollFactor.set();
@@ -113,86 +111,98 @@ class KadeOptions extends MusicBeatState {
 			new OptionCata(50, 40, "Gameplay", [
 				new Downscroll("Change the top and bottom positions of the decision line"),
 				new Middlescroll("Change the middle position of the decision line"),
-				new SasO("Change the hit pattern of the long note"),
-				new Voices("Whether to play Voice when playing songs in Freeplay"),
 				new OpponentNotes("Hide or show your opponent's judgment line"),
 				new GhostTapping("When pressed empty, it will not reduce Health and increase Misses"),
-				new AutoPause("When the body window loses focus, it does not pause"),
-				new DisableResetButton("Is it possible to use the \"R\" key while playing?"),
+				new SasO("Change the hit pattern of the long note"),
+				new Voices("Whether to play Voice when playing songs in Freeplay"),
+				new AllowedChangesFont("Allow the language to affect the font, otherwise font and text anomalies may occur"),
+
 				new LanguageChange("Change the language"),
 				new FontsChange("Choose the right font for the language"),
-				new AllowedChangesFont("Allow the language to affect the font, otherwise font and text anomalies may occur"),
 				new HitsoundChange("Choose the \"HitSound\" sound effect you like"),
 				new ThemesoundChange("Choose your favorite theme sound effects"),
-				new SoundVolume("Generally useless (may be useful if you don't want to listen to sound effects)"),
-				new MusicVolume("Generally useless (may be useful if you don't want to listen to music(wtf???))"),
+
 				new HitVolume("Generally useless (may be useful if you don't want to listen to hit sounds)"),
-				new RatingOffset("Changes how late/early you have to hit for a \"Sick!\"Higher values mean you have to hit later."),
-				new SickOffset("Changes the amount of time you have for hitting a \"Sick!\" in milliseconds."),
-				new GoodOffset("Changes the amount of time you have for hitting a \"Good!\" in milliseconds."),
-				new BadOffset("Changes the amount of time you have for hitting a \"Bad\" in milliseconds."),
-				new SafeFrames("Changes how many frames you have for hitting a note earlier or late.")
+				new MusicVolume("Generally useless (may be useful if you don't want to listen to music.)"),
+				new SoundVolume("Generally useless (may be useful if you don't want to listen to sound effects.)")
 			]),
 			new OptionCata(345, 40, "Graphics", [
 				new LowQuality("Disables some background details, decreases loading times and improves performance."),
 				new AntiAliasing("Disable or enable anti-aliasing, which is used to improve performance at the expense of sharper visuals."),
-				new Shaders("Disable or enable shaders, but trust me, it's best to disable them if you're using a core or integrated display"),
+				new Shaders("Disable or enable shaders, but trust me, it's best to disable them if you're using a core or integrated display."),
 				new GPUCache("Enable or disable graphics card caching, and don't turn it on if your graphics card is too scummy"),
 				new FPSCap("Change FPS (You don't KNOW???)"),
-				new PersistentCachedData("When loading images, the images are cached directly into memory, and the memory is exchanged for read speed"),
 				new FullScreen("It's just full screen, or not?"),
-				new Resolution("Just change the resolution...en, yeah")
+				new Resolution("Just change the resolution...en, yeah"),
+				new PersistentCachedData("When loading images, the images are cached directly into memory, and the memory is exchanged for read speed"),
+				new PreBase("Load Base Texture in Title."),
+				new FPSCount("Display FPSCounter")
 			]),
-			new OptionCata(640, 40, "Visuals & UI", [
-				new NoteSkin("Change notes skin."),
-				new NoteSplashesSkin("Change note splashes skin"),
-				new HideHUD("Whether or not to display the HUD"),
-				new ComboDisplay("Whether or not to display the word Combo when the combo is greater than 10"),
-				new MSDisplay("Whether the word ms is displayed every time you hit a note"),
-				new TimeBar("Change the display mode of TimeBar"),
-				new FlashingLights("Warning! Do not open the in patients with photosensitive epilepsy!!!!"),
-				new CameraZooms("Whether to enable camera zoom"),
-				new EngineStyle("Change the global engine style"),
-				new ScoreZoom("Change the Score text zooming everytime you hit a note."),
-				new HealthBarOpacity("How much transparent should the health bar and icons be."),
-				new FPSCount("Display FPSCounter"),
-				new PauseSong("Select a Music of Pause"),
-				new CheckUpdates("Check Game Update"),
-				new ComboStack("Stack Combo display"),
-				new CamZomMul("Change Camera Zoom Mult"),
-				new ELDisplay("Early/Late Display"),
-			]),
-			new OptionCata(935, 40, "Advanced", [
-				new FoucsMusic("Lower the volume when the window is not in focus"),
-				new FadeMode("Change Fade Mode"),
-				new FadeStyle("Change Fade Theme in display"),
-				new ShowText("Show Loading Text in CFT!"),
+			new OptionCata(640, 40, "System", [
 				new MemoeyPrivate("Trun on game will Get 'Pirvate Using' Memoey(True Memory Using)"),
 				new MemoeyIB("Trun on Memory using ?iB(1024), Trun off Memory using ?B(1000)"),
 				new MemoryType("Memory Display Type"),
-				new SelectPlay("Play Select Song in Freepley"),
-				new PreBase("Load Base Texture in TITLESTATE"),
+
 				new MouseCONT("Usage Mouse in Action"),
+				new SM("Whether to use the system default mouse"),
+				new AutoPause("When the body window loses focus, it does not pause"),
+				new DisableResetButton('Is it possible to use the "${controls.RESET_S}" key while playing?'),
+
+				new StartingAnimation("Start Tween on Game Starting"),
+				new CheckUpdates("Check Game Update"),
+				new AdvanCrash("Advanced crashes are displayed"),
+				new FoucsMusic("Lower the volume when the window is not in focus"),
+
 				new ED("CLEAR ALL PLAYER DATA (If you know what you're doing!!)"),
 				new DeleteGame("Please don't use this,If you really use this")
 			]),
-			new OptionCata(50, 40+64, "Debug", [
-				new LuaEx("Lua Script Extension (Testing!)")
+			new OptionCata(935, 40, "Scripts", [
+				new LuaEx("Lua Script Extension")
 			]),
-			new OptionCata(345, 40+64, "Experimental", [
-				#if BETA
-				new AdvanCrash("Advanced crashes are displayed"),
+			new OptionCata(50, 40+64, "Customize", [
+				new EngineStyle("Change the global engine style"),
+
+				new NoteSkin("Change notes skin."),
+				new NoteSplashesSkin("Change note splashes skin"),
+				new HideHUD("Whether or not to display the HUD"),
+
+				new ComboStack("Stack Combo display"),
+
+				new FlashingLights("Warning! Do not open the in patients with photosensitive epilepsy!!!!"),
+
+				new CameraZooms("Whether to enable camera zoom"),
+				new ScoreZoom("Change the Score text zooming everytime you hit a note."),
+				new HealthBarOpacity("How much transparent should the health bar and icons be."),
+
 				new DUI("On Death Using You playing song's inst slow version(Don't need has slow version)"),
-				new PresetMS("Change the preset mode of MS verdict (support for custom files)")
-				
-				#else
-				new Placeholders("Placeholders")
-				#end
+				new PauseSong("Select a Music of Pause"),
+				new FlyingSound("Play Sound on Exit From 'Title'."),
+				new SelectPlay("Play Select Song in Freepley"),
+
+				new FadeMode("Change Fade Mode"),
+				new FadeStyle("Change Fade Theme in display"),
+				new ShowText("Show Loading Text in CFT!"),
+
+				new ComboDisplay("Whether or not to display the word Combo when the combo is greater than 10"),
+				new MSDisplay("Whether the word ms is displayed every time you hit a note"),
+				new ELDisplay("Early/Late Display"),
+
+				new TimeBar("Change the display mode of TimeBar")
 			]),
-			new OptionCata(640, 40+64, "Extra Setting", [
-				new SM("Whether to use the system default mouse")
+			new OptionCata(345, 40+64, "Rating", [
+				new SickOffset("Changes the amount of time you have for hitting a \"Sick!\" in milliseconds."),
+				new GoodOffset("Changes the amount of time you have for hitting a \"Good!\" in milliseconds."),
+				new BadOffset("Changes the amount of time you have for hitting a \"Bad\" in milliseconds."),
+				new RatingOffset("Changes how late/early you have to hit for a \"Sick!\"Higher values mean you have to hit later."),
+				new SafeFrames("Changes how many frames you have for hitting a note earlier or late."),
+				new PresetMS("Change the preset mode of MS verdict")
 			]),
-			new OptionCata(935, 40+64, "Other Settings", [
+			new OptionCata(640, 40+64, "Kade Only", [
+				new PlayKEMenuMusic("Play Kade Engine FreakyMenu.ogg"),
+				new ShowKESongText("Show KE Text 'Song Name | KE x.x.x'"),
+				new UseKEOldHealthColor("Use Old HealthBar Color on Kade Style")
+			]),
+			new OptionCata(935, 40+64, "More Settings", [
 				new Contorls("Enter the \"Controls\" settings interface"),
 				new NoteColor("Enter the \"NoteColor\" settings interface"),
 				new Offset("Enter the \"Offset Change\" settings interface")
@@ -330,11 +340,11 @@ class KadeOptions extends MusicBeatState {
 	    up_hold = false;
 		down_hold = false;
 		if (FlxG.keys.justPressed.TAB && FlxG.keys.justPressed.B) {
-			if(!ClientPrefs.debug.debugMode) {
-				ClientPrefs.debug.debugMode = true;
+			if(!ClientPrefs.addons.debugMode) {
+				ClientPrefs.addons.debugMode = true;
 				FlxG.camera.flash(0xFF00FF00, 0.4, null, true);
 			} else { 
-				ClientPrefs.debug.debugMode = false;
+				ClientPrefs.addons.debugMode = false;
 				FlxG.camera.flash(0xFFFF0000, 0.4, null, true);
 			}
 			FlxG.sound.play(Arrays.getThemeSound('confirmMenu'), ClientPrefs.data.soundVolume);
@@ -441,14 +451,14 @@ class KadeOptions extends MusicBeatState {
 							var select:String = selectedOption.getOpenState();
 							switch(select) {
 								case 'Contorls': openSubState(new ControlsSubState());
-								case 'NoteColor': openSubState(new NotesSubState());
+								case 'NoteColor': openSubState(new NotesColorSubState());
 								case 'Offset': MusicBeatState.switchState(new NoteOffsetState());
 							}
 						}
 						if (selectedOptionIndex == prev) {
 							object.text = selectedOption.getValue();
 						}
-					} else {FlxG.sound.play(Paths.sound('error'), ClientPrefs.data.soundVolume);}
+					} else FlxG.sound.play(Paths.sound('error'), ClientPrefs.data.soundVolume);
 				}
 
 				if (down || down_hold) {
@@ -489,7 +499,7 @@ class KadeOptions extends MusicBeatState {
 
 					if (selectedOptionIndex < 0) {
 						selectedOptionIndex = options[selectedCatIndex].options.length - 1;
-                        if (options[selectedCatIndex].options.length > 10)
+						if (options[selectedCatIndex].options.length > 10)
 						for (i in 0...selectedCat.options.length) {
 							var opt = selectedCat.optionObjects.members[i];
 							opt.y = selectedCat.positionFix + 54 + (46 * (i - (selectedCat.options.length - 10))); 
@@ -498,13 +508,13 @@ class KadeOptions extends MusicBeatState {
 					}
 
 					if (selectedOptionIndex != 0 
-    					&& options[selectedCatIndex].options.length > 10
-    					&& (selectedOptionIndex >= 5 || UPmoveFix)
-    					&& selectedOptionIndex <= options[selectedCatIndex].options.length - 1 - 5){
+						&& options[selectedCatIndex].options.length > 10
+						&& (selectedOptionIndex >= 5 || UPmoveFix)
+						&& selectedOptionIndex <= options[selectedCatIndex].options.length - 1 - 5){
 							for (i in selectedCat.optionObjects.members) i.y += 46;
 						}
-                        
-                    moveCheak();
+						
+					moveCheak();
 					selectOption(options[selectedCatIndex].options[selectedOptionIndex]);
 				}
 
@@ -514,25 +524,27 @@ class KadeOptions extends MusicBeatState {
 						var object = selectedCat.optionObjects.members[selectedOptionIndex];
 						selectedOption.right();
 						object.text = selectedOption.getValue();
-					} else {if (!right_hold) FlxG.sound.play(Paths.sound('error'), ClientPrefs.data.soundVolume);}
-					if(selectedOption.getRestart()) {
-						tipText.text = "You do the option Need Restart Game, Press "+controls.BACK_S+" key to Restart!";
-						tipText.visible = true;
-						needrestart = true;
-					}
+
+						if(selectedOption.getRestart()) {
+							tipText.text = "You do the option Need Restart Game, Press "+controls.BACK_S+" key to Restart!";
+							tipText.visible = true;
+							needrestart = true;
+						}
+					} else FlxG.sound.play(Paths.sound('error'), ClientPrefs.data.soundVolume);
 				} else if (left || left_hold) {
 					if(selectedOption.onEnable()) {
 						if (!left_hold) FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 						var object = selectedCat.optionObjects.members[selectedOptionIndex];
 						selectedOption.left();
 						object.text = selectedOption.getValue();
-					} else {if (!left_hold) FlxG.sound.play(Paths.sound('error'), ClientPrefs.data.soundVolume);}
-					if(selectedOption.getRestart()) {
-						tipText.text = "You do the option Need Restart Game, Press "+controls.BACK_S+" key to Restart!";
-						tipText.visible = true;
-						needrestart = true;
-					}
+						if(selectedOption.getRestart()) {
+							tipText.text = "You do the option Need Restart Game, Press "+controls.BACK_S+" key to Restart!";
+							tipText.visible = true;
+							needrestart = true;
+						}
+					} else FlxG.sound.play(Paths.sound('error'), ClientPrefs.data.soundVolume);
 				}
+
 				if (back) {
 					FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 

@@ -4,9 +4,9 @@ import flixel.effects.FlxFlicker;
 
 class VanillaSettingState extends MusicBeatState {
     var options:Array<String> = [
-		'Note Colors',
+		'Note_Colors',
 		'Controls',
-		'Adjust Delay and Combo',
+		'Adjust_Delay_and_Combo',
 		'Graphics',
 		'Visuals',
 		'Gameplay'
@@ -17,21 +17,23 @@ class VanillaSettingState extends MusicBeatState {
 	private static var curSelected:Int = 0;
 	public static var menuBG:FlxSprite;
 	public static var onPlayState:Bool = false;
+	public static var needRestart:Bool = false;
+	var allowMouse:Bool = ClientPrefs.data.mouseControls;
 
     function openSelectedSubstate(label:String) {
 		switch(label)
 		{
-			case 'Note Colors':
-				openSubState(new options.NotesSubState());
+			case 'Note_Colors':
+				openSubState(new options.NotesColorSubState());
 			case 'Controls':
 				openSubState(new options.ControlsSubState());
 			case 'Graphics':
 				openSubState(new options.GraphicsSettingsSubState());
-			case 'Visuals':
+			case 'Visuals'|'Visuals_Old':
 				openSubState(new options.VisualsSettingsSubState());
 			case 'Gameplay':
 				openSubState(new options.GameplaySettingsSubState());
-			case 'Adjust Delay and Combo':
+			case 'Adjust_Delay_and_Combo':
 				MusicBeatState.switchState(new options.NoteOffsetState());
 			case 'Language':
 				openSubState(new options.LanguageSubState());
@@ -52,7 +54,7 @@ class VanillaSettingState extends MusicBeatState {
 
 		for (num => option in options)
 		{
-			var optionText:Alphabet = new Alphabet(0, 0, Language.getTextFromID('options_$option'), true);
+			var optionText:Alphabet = new Alphabet(0, 0, Language.getTextFromID('Options_$option'), true);
 			optionText.screenCenter();
 			optionText.y += (92 * (num - (options.length / 2))) + 45;
 			grpOptions.add(optionText);
@@ -71,9 +73,37 @@ class VanillaSettingState extends MusicBeatState {
 		if (controls.UI_DOWN_P)
 			changeSelection(1);
 
+		var allowMouse:Bool = allowMouse;
+		var timeNotMoving:Float = 0;
+		if (allowMouse && ((FlxG.mouse.deltaScreenX != 0 && FlxG.mouse.deltaScreenY != 0) || FlxG.mouse.justPressed)) {
+			allowMouse = false;
+			FlxG.mouse.visible = true;
+			timeNotMoving = 0;
+
+			var selectedItem:Alphabet = null;
+			var dist:Float = -1;
+			var distItem:Int = -1;
+			for (i in 0...options.length) {
+				var memb:Alphabet = grpOptions.members[i];
+				if(FlxG.mouse.overlaps(memb)) {
+					var distance:Float = Math.sqrt(Math.pow(memb.getGraphicMidpoint().x - FlxG.mouse.screenX, 2) + Math.pow(memb.getGraphicMidpoint().y - FlxG.mouse.screenY, 2));
+					if (dist < 0 || distance < dist) {
+						dist = distance;
+						distItem = i;
+						allowMouse = true;
+					}
+				}
+			}
+
+			if(distItem != -1 && selectedItem != grpOptions.members[distItem]) {
+				curSelected = distItem;
+				changeSelection();
+			}
+		} else timeNotMoving += elapsed;
+
 		if (controls.BACK)
 		{
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			FlxG.sound.play(Arrays.getThemeSound('cancelMenu'), ClientPrefs.data.soundVolume);
 			if(onPlayState)
 			{
 				backend.StageData.loadDirectory(PlayState.SONG);
@@ -82,8 +112,9 @@ class VanillaSettingState extends MusicBeatState {
 			}
 			else MusicBeatState.switchState(new states.MainMenuState());
 		}
-		else if (controls.ACCEPT) {
-            FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, false, false, function(flick:FlxFlicker) {
+		else if (controls.ACCEPT || (FlxG.mouse.justPressed && allowMouse)) {
+			FlxG.sound.play(Arrays.getThemeSound('confirmMenu'), ClientPrefs.data.soundVolume);
+            FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker) {
                 openSelectedSubstate(options[curSelected]);
             });
         }
@@ -97,6 +128,6 @@ class VanillaSettingState extends MusicBeatState {
 			item.targetY = num - curSelected;
 			item.alpha = (item.targetY == 0 ? 1 : 0.6);
 		}
-		FlxG.sound.play(Paths.sound('scrollMenu'));
+		FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 	}
 }

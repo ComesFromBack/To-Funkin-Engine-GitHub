@@ -9,7 +9,7 @@ import substates.objects.HitGraph;
 import backend.Rating;
 import states.PlayState;
 import flixel.FlxSubState;
-import backend.DiffCounder;
+import backend.CoolUtil.DiffUtil as DiffCounder;
 
 class ResultsScreen extends FlxSubState
 {
@@ -198,7 +198,7 @@ class ResultsScreen extends FlxSubState
 
 	override function update(elapsed:Float)
 	{
-		if (music != null && !ClientPrefs.data.foucsMusic)
+		if (music != null && !ClientPrefs.data.focusLostMusic)
 			if (music.volume < 0.5)
 				music.volume += 0.01 * elapsed;
 
@@ -229,9 +229,6 @@ class ResultsScreen extends FlxSubState
 				Mods.loadTopMod();
 
 				cancelMusicFadeTween();
-				if (FlxTransitionableState.skipNextTransIn) {
-					CustomFadeTransition.nextCamera = null;
-				}
 				
 				switchTimer = new FlxTimer().start(0.51, function(tmr:FlxTimer) {
 					MusicBeatState.switchState(new states.StoryMenuState());
@@ -243,9 +240,6 @@ class ResultsScreen extends FlxSubState
 				Mods.loadTopMod();
 
 				cancelMusicFadeTween();
-				if (FlxTransitionableState.skipNextTransIn) {
-					CustomFadeTransition.nextCamera = null;
-				}
 				switchTimer = new FlxTimer().start(0.51, function(tmr:FlxTimer) {
 					MusicBeatState.switchState(new states.FreeplayState());
 					tmr.destroy();
@@ -253,11 +247,6 @@ class ResultsScreen extends FlxSubState
 				
 			}
 		} else if (FlxG.keys.justPressed.F1 && !PlayState.loadRep) {
-			
-		}
-
-		if (FlxG.keys.justPressed.F1 && !PlayState.loadRep)
-		{
 			PlayState.rep = null;
 
 			PlayState.loadRep = true;

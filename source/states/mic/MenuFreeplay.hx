@@ -86,11 +86,11 @@ class MenuFreeplay extends MusicBeatState
 		["P","0"],
 		["X","0"],
 		["X-","0"],
-		["SS+","0"],
-		["SS","0"],
+		["SS+","-40"],
+		["SS","-30"],
 		["SS-","-37"],
 		["S+","0"],
-		["S","0"],
+		["S","-30"],
 		["S-","-27"],
 		["A+","0"],
 		["A","-36"],
@@ -122,7 +122,6 @@ class MenuFreeplay extends MusicBeatState
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 
-		CustomFadeTransition.nextCamera = camOther;
 		// Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
 
@@ -385,9 +384,8 @@ class MenuFreeplay extends MusicBeatState
 
 		updateTexts();
 		super.create();
-		// camGame.zoom = 0.6;
+		camGame.zoom = 0.6;
 		FlxTween.tween(camGame, {zoom: 1/*, alpha: 1*/}, 0.5, {ease: FlxEase.quartInOut});
-		CustomFadeTransition.nextCamera = camOther;
 
 		disc.scale.x = 0;
 		FlxTween.tween(disc, {'scale.x': 1, y: 480, x: -25}, 0.5, {ease: FlxEase.quartInOut});
@@ -525,7 +523,7 @@ class MenuFreeplay extends MusicBeatState
 					changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -shiftMult : shiftMult));
 			}
 
-			if (FlxG.mouse.wheel != 0 && ClientPrefs.data.mouseCon)
+			if (FlxG.mouse.wheel != 0 && ClientPrefs.data.mouseControls)
 			{
 				FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 				changeSelection(-shiftMult * FlxG.mouse.wheel, false);
@@ -544,7 +542,7 @@ class MenuFreeplay extends MusicBeatState
 		}
 
 		if ((controls.BACK
-			|| (FlxG.mouse.justPressedRight && ClientPrefs.data.mouseCon))
+			|| (FlxG.mouse.justPressedRight && ClientPrefs.data.mouseControls))
 			&& !inEnter)
 		{
 			if (vocals != null)
@@ -596,11 +594,10 @@ class MenuFreeplay extends MusicBeatState
 					var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
 					Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
 					BPM = PlayState.SONG.bpm;
-					if (PlayState.SONG.needsVoices)
+					if (PlayState.SONG.needsVoices && ClientPrefs.data.haveVoices)
 					{
 						vocals = new FlxSound();
-						try
-						{
+						try {
 							var playerVocals:String = getVocalFromCharacter(PlayState.SONG.player1);
 							var loadedVocals = Paths.voices(PlayState.SONG.song, (playerVocals != null && playerVocals.length > 0) ? playerVocals : 'Player');
 							if(loadedVocals == null) loadedVocals = Paths.voices(PlayState.SONG.song);
@@ -710,7 +707,7 @@ class MenuFreeplay extends MusicBeatState
 						var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
 						Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
 						BPM = PlayState.SONG.bpm;
-						if (PlayState.SONG.needsVoices)
+						if (PlayState.SONG.needsVoices && ClientPrefs.data.haveVoices)
 						{
 							vocals = new FlxSound();
 							try
@@ -811,7 +808,7 @@ class MenuFreeplay extends MusicBeatState
 			}
 		}
 
-		if ((controls.ACCEPT || (FlxG.mouse.justPressed && ClientPrefs.data.mouseCon))
+		if ((controls.ACCEPT || (FlxG.mouse.justPressed && ClientPrefs.data.mouseControls))
 			&& !inEnter
 			&& !wared)
 		{
@@ -933,18 +930,17 @@ class MenuFreeplay extends MusicBeatState
 
 		innerDiscBottom.x = disc.x + disc.width / 2 - innerDiscBottom.width / 2;
 		innerDiscBottom.y = disc.y + disc.height / 2 - innerDiscBottom.height / 2;
-		innerDiscBottom.angle = disc.angle;
+		innerDiscBottom.angle = innerDiscTop.angle = disc.angle;
 		innerDiscBottom.scale.set(disc.scale.x, disc.scale.y);
 
 		innerDiscTop.x = disc.x + disc.width / 2 - innerDiscTop.width / 2;
 		innerDiscTop.y = disc.y + disc.height / 2 - innerDiscTop.height / 2;
-		innerDiscTop.angle = disc.angle;
 		innerDiscTop.scale.set(disc.scale.x, disc.scale.y);
 
-		discIcon.x = disc.x + disc.width / 2 - discIcon.width / 2;
-		discIcon.y = disc.y + disc.height / 2 - discIcon.height / 2;
-		discIcon.angle = disc.angle += (BPM/100) / (ClientPrefs.data.framerate / 60);
-		discIcon.scale.set(disc.scale.x, disc.scale.y);
+		discIcon.x = disc.getGraphicMidpoint().x-75;
+		discIcon.y = disc.getGraphicMidpoint().y-75;
+		discIcon.angle=disc.angle+=(BPM/100)/(ClientPrefs.data.framerate/60);
+		discIcon.scale.set(disc.scale.x,disc.scale.y);
 	}
 
 	function getVocalFromCharacter(char:String)

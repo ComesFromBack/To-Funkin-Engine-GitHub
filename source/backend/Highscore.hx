@@ -1,89 +1,27 @@
 package backend;
 
-class Highscore
-{
+import flixel.util.FlxSave;
+
+class Highscore {
 	public static var weekScores:Map<String, Int> = new Map();
 	public static var songScores:Map<String, Int> = new Map<String, Int>();
+	public static var songEndlessScores:Map<String, Int> = new Map<String, Int>();
 	public static var songRating:Map<String, Float> = new Map<String, Float>();
+	public static var songLoops:Map<String, Int> = new Map<String, Int>();
 	public static var weekRating:Map<String, Float> = new Map<String, Float>();
 	public static var songRanks:Map<String, Int> = new Map<String, Int>(); // Mic'd up
 
-	public static var profileRanks:Map<String, Map<String, Map<String, Dynamic>>> = new Map();
-	public static var profileList:Array<String> = [];
-	// profileName, []
-
-	public static function clearProfileRank(profileName:String, ?clearWeekRank:Bool = false):Void {
-		if (profileRanks.exists(profileName)) {
-			if (clearWeekRank)
-				profileRanks.get(profileName).set("week", new Map<String, Map<String, Dynamic>>());
-			else
-				profileRanks.get(profileName).set("song", new Map<String, Map<String, Dynamic>>());
-
-			FlxG.save.data.profileRanks = profileRanks;
-			FlxG.save.flush();
-		}
-	}
-
-	public static function removeProfile(profileName:String):Void {
-		if (profileRanks.exists(profileName)) {
-			profileRanks.remove(profileName);
-			for(i in profileList)
-				if (i == profileName) {
-					profileList.remove(i);
-					break; // end for
-				}
-			FlxG.save.data.profileRanks = profileRanks;
-			FlxG.save.data.profileList = profileList;
-			FlxG.save.flush();
-		}
-	}
-
-	public static function writeToProfile(profileName:String, key:String, value:Dynamic) {
-		if (profileRanks.exists(profileName)) {
-			profileRanks.get(profileName).set(key, value);
-			FlxG.save.data.profileRanks = profileRanks;
-			FlxG.save.flush();
-		}
-	}
-
-	public static function existsProfile(profileName:String):Bool {
-		if(profileRanks.exists(profileName))
-			return true;
-		return false;
-	}
-
-	public static function renameProfile(scrProfileName:String, newProfileName:String):Void {
-		if (profileRanks.exists(scrProfileName)) {
-			profileRanks.set(newProfileName, profileRanks.get(scrProfileName));
-			profileRanks.remove(scrProfileName);
-			for(i in profileList)
-				if (i == scrProfileName) {
-					profileList.remove(i);
-					profileList.push(newProfileName);
-				}
-			FlxG.save.data.profileRanks = profileRanks;
-			FlxG.save.data.profileList = profileList;
-			FlxG.save.flush();
-		}
-	}
-
-	public static function createProfile(name:String):Void {
-		if(!profileRanks.exists(name)) {
-			profileRanks.set(name, new Map<String, Map<String, Dynamic>>());
-			profileList.push(name);
-		} else Log.LogPrint("Highscore.hx -> Func=createProfile(name:String):The profile name is same");
-		FlxG.save.data.profileRanks = profileRanks;
-		FlxG.save.data.profileList = profileList;
-		FlxG.save.flush();
-	}
-
-	/* =================================================================== */
+	public static var ScoreSave:FlxSave;
+	public static var WeekSave:FlxSave;
+	public static var EndlessSave:FlxSave;
 
 	public static function resetSong(song:String, diff:Int = 0):Void
 	{
 		var daSong:String = formatSong(song, diff);
 		setScore(daSong, 0);
 		setRating(daSong, 0);
+		setEndlessScore(daSong, 0);
+		setLoops(daSong, 0);
 	}
 
 	public static function resetWeek(week:String, diff:Int = 0):Void
@@ -116,6 +54,28 @@ class Highscore
 		{
 			setScore(daSong, score);
 			if(rating >= 0) setRating(daSong, rating);
+		}
+	}
+
+	public static function saveEndlessScore(song:String, score:Int = 0, loops:Int = 0, ?diff:Int = 0, ?rating:Float = -1):Void
+	{
+		if(song == null) return;
+		var daSong:String = formatSong(song, diff);
+
+		if (songScores.exists(daSong))
+		{
+			if (songScores.get(daSong) < score)
+			{
+				setEndlessScore(daSong, score);
+				if(rating >= 0) setRating(daSong, rating);
+				setLoops(daSong, loops);
+			}
+		}
+		else
+		{
+			setEndlessScore(daSong, score);
+			if(rating >= 0) setRating(daSong, rating);
+			setLoops(daSong, loops);
 		}
 	}
 
@@ -156,43 +116,72 @@ class Highscore
 	{
 		// Reminder that I don't need to format this song, it should come formatted!
 		songScores.set(song, score);
-		FlxG.save.data.songScores = songScores;
-		FlxG.save.flush();
+		ScoreSave.data.songScores = songScores;
+		ScoreSave.flush();
 	}
+
+	static function setEndlessScore(song:String, score:Int):Void {
+		songEndlessScores.set(song, score);
+		EndlessSave.data.songEndlessScores = songEndlessScores;
+		EndlessSave.flush();
+	}
+
+	static function setLoops(song:String, loops:Int):Void {
+		songLoops.set(song, loops);
+		EndlessSave.data.songLoops = songLoops;
+		EndlessSave.flush();
+	}
+
 	static function setWeekScore(week:String, score:Int):Void
 	{
 		// Reminder that I don't need to format this song, it should come formatted!
 		weekScores.set(week, score);
-		FlxG.save.data.weekScores = weekScores;
-		FlxG.save.flush();
+		WeekSave.data.weekScores = weekScores;
+		WeekSave.flush();
 	}
+
 	static function setWeekAcc(week:String, acc:Float):Void
 	{
 		// Reminder that I don't need to format this song, it should come formatted!
 		weekRating.set(week, acc);
-		FlxG.save.data.weekRating = weekRating;
-		FlxG.save.flush();
+		WeekSave.data.weekRating = weekRating;
+		WeekSave.flush();
 	}
 
 	static function setRating(song:String, rating:Float):Void
 	{
 		// Reminder that I don't need to format this song, it should come formatted!
 		songRating.set(song, rating);
-		FlxG.save.data.songRating = songRating;
-		FlxG.save.flush();
+		ScoreSave.data.songRating = songRating;
+		ScoreSave.flush();
 	}
 
 	static function setRank(song:String, score:Int):Void
 	{
 		// Reminder that I don't need to format this song, it should come formatted!
 		songRanks.set(song, score);
-		FlxG.save.data.songRanks = songRanks;
-		FlxG.save.flush();
+		ScoreSave.data.songRanks = songRanks;
+		ScoreSave.flush();
 	}
 
-	public static function formatSong(song:String, diff:Int):String
-	{
-		return Paths.formatToSongPath(song) + Difficulty.getFilePath(diff);
+	public static function formatSong(song:String, diff:Int):String {
+		return '${Paths.formatToSongPath(song)}${Difficulty.getFilePath(diff)}';
+	}
+
+	public static function getEndless(song:String, diff:Int):Int {
+		var daSong:String = formatSong(song, diff);
+		if (!songEndlessScores.exists(daSong))
+			setEndlessScore(daSong, 0);
+
+		return songEndlessScores.get(daSong);
+	}
+
+	public static function getLoops(song:String, diff:Int):Int {
+		var daSong:String = formatSong(song, diff);
+		if (!songEndlessScores.exists(daSong))
+			setLoops(daSong, 0);
+
+		return songLoops.get(daSong);
 	}
 
 	public static function getScore(song:String, diff:Int):Int
@@ -239,27 +228,33 @@ class Highscore
 		return weekRating.get(daWeek);
 	}
 
-	public static function load():Void
-	{
-		if (FlxG.save.data.weekScores != null)
-			weekScores = FlxG.save.data.weekScores;
+	public static function load():Void {
+		ScoreSave = new FlxSave();
+		ScoreSave.bind("SingleSong",CoolUtil.getSavePath()+"/score/");
+		WeekSave = new FlxSave();
+		WeekSave.bind("WeekScore",CoolUtil.getSavePath()+"/score/");
+		EndlessSave = new FlxSave();
+		EndlessSave.bind("EndlessScore",CoolUtil.getSavePath()+"/score/");
 
-		if (FlxG.save.data.songScores != null)
-			songScores = FlxG.save.data.songScores;
+		if(WeekSave.data.weekScores != null)
+			weekScores = WeekSave.data.weekScores;
 
-		if (FlxG.save.data.songRating != null)
-			songRating = FlxG.save.data.songRating;
+		if(ScoreSave.data.songScores != null)
+			songScores = ScoreSave.data.songScores;
 
-		if (FlxG.save.data.weekRating != null)
-			weekRating = FlxG.save.data.weekRating;
+		if(EndlessSave.data.songEndlessScores != null)
+			songEndlessScores = EndlessSave.data.songEndlessScores;
 
-		if (FlxG.save.data.profileRanks != null)
-			profileRanks = FlxG.save.data.profileRanks;
+		if(EndlessSave.data.songLoops != null)
+			songLoops = EndlessSave.data.songLoops;
 
-		if (FlxG.save.data.profileList != null)
-			profileList = FlxG.save.data.profileList;
+		if (ScoreSave.data.songRating != null)
+			songRating = ScoreSave.data.songRating;
 
-		if (FlxG.save.data.songRanks != null)
-			songRanks = FlxG.save.data.songRanks;
+		if (WeekSave.data.weekRating != null)
+			weekRating = WeekSave.data.weekRating;
+
+		if (ScoreSave.data.songRanks != null)
+			songRanks = ScoreSave.data.songRanks;
 	}
 }

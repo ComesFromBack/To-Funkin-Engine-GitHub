@@ -151,7 +151,7 @@ class WeekData {
 					weekFile.folder = directory.substring(Paths.mods().length, directory.length-1);
 					#end
 				}
-				if((PlayState.modeOfPlayState == "Story Mode" && !weekFile.hideStoryMode) || (PlayState.modeOfPlayState == "Free Play" && !weekFile.hideFreeplay))
+				if((PlayState.isStoryMode && !weekFile.hideStoryMode) || (!PlayState.isStoryMode && !weekFile.hideFreeplay))
 				{
 					weeksLoaded.set(weekToCheck, weekFile);
 					weeksList.push(weekToCheck);

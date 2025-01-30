@@ -193,8 +193,11 @@ class NotesSubState extends MusicBeatSubstate
 				case "MicUp":
 					MusicBeatState.switchState(new options.micup.SettingsState());
 				case "Vanilla":
-					// MusicBeatState.switchState(new options.vanilla.VanillaOptions());
+					MusicBeatState.switchState(new options.vanilla.VanillaSettingState());
 			}
+
+			if(Arrays.engineList[ClientPrefs.data.styleEngine] == "MicUp")
+				MusicBeatState.reset
 			close();
 			return;
 		}

@@ -5,8 +5,7 @@ import objects.CheckboxThingie;
 
 import options.Option.OptionType;
 
-class GameplayChangersSubstate extends MusicBeatSubstate
-{
+class GameplayChangersSubstate extends MusicBeatSubstate {
 	private var curSelected:Int = 0;
 	private var optionsArray:Array<Dynamic> = [];
 
@@ -17,8 +16,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 	private var curOption(get, never):GameplayOption;
 	function get_curOption() return optionsArray[curSelected]; //shorter lol
 
-	function getOptions()
-	{
+	function getOptions() {
 		var goption:GameplayOption = new GameplayOption('Scroll Type', 'scrolltype', STRING, 'multiplicative', ["multiplicative", "constant"]);
 		optionsArray.push(goption);
 
@@ -69,7 +67,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(new GameplayOption('Instakill on Miss', 'instakill', BOOL, false));
 		optionsArray.push(new GameplayOption('Practice Mode', 'practice', BOOL, false));
 		optionsArray.push(new GameplayOption('Botplay', 'botplay', BOOL, false));
-		optionsArray.push(new GameplayOption('Opponent Play', 'opponentplay', BOOL, false));
+		optionsArray.push(new GameplayOption('Opponent Mode Play', 'opponentplay', BOOL, false));
 	}
 
 	public function getOptionByName(name:String)
@@ -153,9 +151,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 
 		if (controls.BACK)
 		{
-			if (states.mic.MenuFreeplay.vocals != null) states.mic.MenuFreeplay.vocals.fadeIn(0.4, 1);
-			if (states.mic.MenuFreeplay.opponentVocals != null) states.mic.MenuFreeplay.opponentVocals.fadeIn(0.4, 1);
-			states.mic.MenuFreeplay.inGameplay = true;
 			close();
 			ClientPrefs.saveSettings();
 			FlxG.sound.play(Paths.sound('cancelMenu'));
@@ -377,7 +372,7 @@ class GameplayOption
 
 	public function new(name:String, variable:String, type:OptionType, defaultValue:Dynamic = 'null variable value', ?options:Array<String> = null)
 	{
-		_variable = variable;
+		_name = name;
 		this.name = Language.getTextFromID('Setting_$variable');
 		this.variable = variable;
 		this.type = type;
@@ -441,7 +436,7 @@ class GameplayOption
 	public function setChild(child:Alphabet)
 		this.child = child;
 
-	var _variable:String = null;
+	var _name:String = null;
 	var _text:String = null;
 	private function get_text()
 		return _text;
@@ -451,7 +446,7 @@ class GameplayOption
 		if(child != null)
 		{
 			_text = newValue;
-			child.text = (_variable == "scrolltype" ? Language.getTextFromID('Setting_$_variable-$_text') : _text);
+			child.text = _text;
 			return _text;
 		}
 		return null;

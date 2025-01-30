@@ -1,5 +1,8 @@
 #if !macro
-//Psych
+#if DISCORD_ALLOWED
+import backend.Discord;
+#end
+
 #if LUA_ALLOWED
 import llua.*;
 import llua.Lua;
@@ -17,7 +20,7 @@ import js.html.*;
 #end
 
 import backend.Paths;
-import backend.Arrays;
+import backend.CoolUtil.ArrayUtil as Arrays;
 import backend.Controls;
 import backend.CoolUtil;
 import backend.MusicBeatState;
@@ -45,27 +48,26 @@ import states.LoadingState;
 // 请注意，32位Int不是标准int（至少Haxe是这么认为的）
 
 // Float
-import cpp.Float32 as CFloat;
-import cpp.Float64 as Double;
+// import cpp.Float32 as CFloat;
+// import cpp.Float64 as Double;
 // Int
-import cpp.Int8 as CByte;
-import cpp.Int16 as Short;
-import cpp.Int32 as CInt;
-import cpp.Int64 as Long;
+// import cpp.Int8 as CByte;
+// import cpp.Int16 as Short;
+// import cpp.Int32 as CInt;
+// import cpp.Int64 as Long;
 // Unsigned Int
-import cpp.UInt8 as UByte;
-import cpp.UInt16 as UShort;
+// import cpp.UInt8 as UByte;
+// import cpp.UInt16 as UShort;
 import cpp.UInt32 as UInt;
-import cpp.UInt64 as ULong;
+// import cpp.UInt64 as ULong;
 // Char
-import cpp.Char as Char;
+// import cpp.Char as Char;
 #elseif java
-import java.Char16 as Char; // Why does Java have this?
-import java.Int8 as Byte;
-import java.Int16 as Short;
+// import java.Char16 as Char;
+// import java.Int8 as Byte;
+// import java.Int16 as Short;
 // Not Int32(Int) lol.
-import java.Int64 as Long;
-
+// import java.Int64 as Long;
 #end
 
 // Mobile

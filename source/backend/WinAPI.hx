@@ -7,14 +7,13 @@ package backend;
 // ------------------------------------------------------------------------------------------------------
 // Extra by _Comes_FromBack
 
-#if openfl
-import openfl.system.System;
-#end
+import lime.system.Locale;
 
 #if (windows && cpp)
 @:buildXml('
 <target id="haxe">
 	<lib name="dwmapi.lib" if="windows" />
+	<lib name="Dsound.lib" if="windows" />
 </target>
 ')
 
@@ -23,10 +22,13 @@ import openfl.system.System;
 #include <winuser.h>
 #include <windows.h>
 #include <stdio.h>
+#include <comdef.h>
 #include <stdexcept>
 #include <psapi.h>
 #include <Windows.h>
 #include <memory>
+#include <string>
+#include <math.h> 
 #include <tlhelp32.h>
 #include <stdlib.h>
 #include <crtdbg.h>
@@ -94,7 +96,7 @@ class WinAPI {
     #if (windows && cpp)
     @:functionCode('
     char pName[MAX_PATH];
-    strcpy(pName,procressName);
+    strcpy(pName,processName);
     CharLowerBuff(pName,MAX_PATH);
     PROCESSENTRY32 currentProcess;
     currentProcess.dwSize = sizeof(currentProcess);
@@ -119,28 +121,46 @@ class WinAPI {
     return false;
     ')
     #end
-    public static function getProcess(procressName:String):Bool { return false; }
+    public static function getProcess(processName:String):Bool { return false; }
 
     #if (windows && cpp)
     @:functionCode('
-    DWORD processes[1024], processCount, cbNeeded;
-
-    if (!EnumProcesses(processes, sizeof(processes), &cbNeeded)) {
-        return 0;
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE) {
+        printf("Failed to create snapshot of processes.");
+        return 1;
     }
 
-    processCount = cbNeeded / sizeof(DWORD);
-    return processCount;
+    PROCESSENTRY32 pe32;
+    pe32.dwSize = sizeof(PROCESSENTRY32);
+
+    // Retrieve information about the first process
+    if (!Process32First(hSnapshot, &pe32)) {
+        printf("Failed to retrieve information about the first process.");
+        CloseHandle(hSnapshot);
+        return 1;
+    }
+
+    int instanceCount = 0;
+    const char* name = "TFEngine.exe";
+    do {
+        if (name == pe32.szExeFile) {
+            instanceCount++;
+        }
+    } while (Process32Next(hSnapshot, &pe32));
+
+    CloseHandle(hSnapshot);
+
+    printf("Count:",instanceCount);
+    return instanceCount;
     ')
     #end
 
     public static function getProcessCount():Int { return 0; }
 
-    #if (windows && cpp)
-    @:functionCode('')
-    #end
-
-    public static function getLocale():Dynamic { return "zh_CN.UTF8"; }
+    public static function getLocale():String {
+        return '${Locale.systemLocale.language}-${Locale.systemLocale.region}';
+    }
 
     #if (windows && cpp)
     @:functionCode('
@@ -191,19 +211,43 @@ class WinAPI {
         }
     }
 
+    #if (windows && cpp)
     @:functionCode('
-	if(MessageBox(NULL,ErrorMessage,"Oh,no.The game crashed!",MB_YESNO|MB_ICONHAND)==IDYES) {
+    int callback = MessageBox(NULL,ErrorMessage,"Oh,no.The game crashed!",MB_ABORTRETRYIGNORE|MB_ICONHAND);
+    TCHAR szPath[MAX_PATH];
+    GetModuleFileName(NULL, szPath, MAX_PATH); 
+    STARTUPINFO StartInfo;
+    PROCESS_INFORMATION procStruct;
+    memset(&StartInfo, 0, sizeof(STARTUPINFO));
+    StartInfo.cb = sizeof(STARTUPINFO);
+
+	if(callback==IDABORT) {
 		system("start https://github.com/ComesFromBack/To-Funkin-Engine-GitHub/issues");
 		if(needExit) exit(100);
+	} else if(callback==IDRETRY) {
+		if(::CreateProcess(
+            (LPCTSTR)szPath,
+            NULL,
+            NULL,
+            NULL,
+            FALSE,
+            NORMAL_PRIORITY_CLASS,
+            NULL,
+            NULL,
+            &StartInfo,
+            &procStruct))
+        exit(10);
 	} else {
-		if(needExit) exit(100);
-	}
+        if(needExit) exit(100);
+    }
     return 0;
 	')
+    #end
 	public static function createErrorWindow(ErrorMessage:String, ?needExit:Bool = true):Int {
         return 0;
     }
 
+    #if (windows && cpp)
     @:functionCode('
         TCHAR szPath[MAX_PATH];
         GetModuleFileName(NULL, szPath, MAX_PATH); 
@@ -225,7 +269,69 @@ class WinAPI {
         exit(10);
         return 0;
     ')
+    #end
     public static function restart(?bIsRunAgain:Bool = true):Int {
         return 0;
+    }
+
+    #if (windows && cpp)
+    @:functionCode('
+    #include <cstdlib>
+    DEVMODE NewDevMode;
+    EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, &NewDevMode);
+    return NewDevMode.dmDisplayFrequency;
+    ')
+    #end
+    public static function getFrequency():Int {
+        return 60;
+    }
+
+    #if(cpp||windows)
+    @:functionCode('
+    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+    if(getWidth) return screenWidth;
+    else return screenHeight;
+    ')
+    #end
+    public static function getScreenResolution(?getWidth:Bool = false):Int {
+        return 0;
+    }
+
+    #if(cpp||windows)
+    @:functionCode('
+    if (GetKeyState(VK_CAPITAL))
+        return true;
+    else
+        return false;
+    ')
+    #end
+    public static function getCapsLock():Bool {
+        return false;
+    }
+
+    #if(cpp||windows)
+    @:functionCode('
+    if (GetKeyState(VK_NUMLOCK))
+        return true;
+    else
+        return false;
+    ')
+    #end
+    public static function getNumLock():Bool {
+        return false;
+    }
+
+    #if(cpp||windows)
+    @:functionCode('
+    if (GetKeyState(VK_SCROLL))
+        return true;
+    else
+        return false;
+    ')
+    #end
+    public static function getScrollLock():Bool {
+        return false;
     }
 }

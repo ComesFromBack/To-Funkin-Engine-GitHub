@@ -8,6 +8,9 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 	var boyfriend:Character = null;
 	public function new()
 	{
+		title = 'Graphics Settings';
+		rpcTitle = 'Graphics Settings Menu'; //for Discord Rich Presence
+
 		boyfriend = new Character(840, 170, 'bf', true);
 		boyfriend.setGraphicSize(Std.int(boyfriend.width * 0.75));
 		boyfriend.updateHitbox();
@@ -78,7 +81,9 @@ class GraphicsSettingsSubState extends BaseOptionsMenu
 		{
 			FlxG.updateFramerate = ClientPrefs.data.framerate;
 			FlxG.drawFramerate = ClientPrefs.data.framerate;
-		} else {
+		}
+		else
+		{
 			FlxG.drawFramerate = ClientPrefs.data.framerate;
 			FlxG.updateFramerate = ClientPrefs.data.framerate;
 		}

@@ -1,8 +1,5 @@
 package backend;
 
-import flixel.FlxSubState;
-import openfl.utils.Assets;
-import flixel.FlxObject;
 import flixel.util.FlxGradient;
 
 class Fade {
@@ -29,9 +26,9 @@ class Fade {
 
 class CustomFadeTransition extends MusicBeatSubstate {
 	public static var finishCallback:Void->Void;
+	var isTransIn:Bool = false;
 	private var leTween:FlxTween = null;
 	public static var nextCamera:FlxCamera;
-	var isTransIn:Bool = false;
 	var transBlack:FlxSprite;
 	var transGradient:FlxSprite;
 	var duration:Float;
@@ -56,7 +53,7 @@ class CustomFadeTransition extends MusicBeatSubstate {
 
 		//trace(Fade.positionData);
 		if(Arrays.fadeStyleList[ClientPrefs.data.fadeStyle] != "default") {
-			if(ClientPrefs.data.fademode == 0){
+			if(ClientPrefs.data.fadeMode == 0){
 				loadRight = new FlxSprite(isTransIn ? 0 : 1280, 0).loadGraphic(Paths.image('CustomFadeTransition/${Arrays.fadeStyleList[ClientPrefs.data.fadeStyle]}/MR'));
 				loadRight.scrollFactor.set();
 				loadRight.antialiasing = ClientPrefs.data.antialiasing;		
@@ -71,7 +68,7 @@ class CustomFadeTransition extends MusicBeatSubstate {
 				loadLeft.setGraphicSize(FlxG.width, FlxG.height);
 				loadLeft.updateHitbox();
 				
-				WaterMark = new FlxText(isTransIn ? 50 : -1230, 720 - 50 - 50 * 2, 0, '${ClientPrefs.data._VERSION_}', 50);
+				WaterMark = new FlxText(isTransIn ? 50 : -1230, 720 - 50 - 50 * 2, 0, '${ClientPrefs.getVersion()}', 50);
 				WaterMark.scrollFactor.set();
 				WaterMark.setFormat(Language.fonts(), 50, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 				WaterMark.antialiasing = ClientPrefs.data.antialiasing;
@@ -168,7 +165,7 @@ class CustomFadeTransition extends MusicBeatSubstate {
 				loadAlpha.setGraphicSize(FlxG.width, FlxG.height);
 				loadAlpha.updateHitbox();
 				
-				WaterMark = new FlxText(50, 720 - 50 - 50 * 2, 0, '${ClientPrefs.data._VERSION_}', 30);
+				WaterMark = new FlxText(50, 720 - 50 - 50 * 2, 0, '${ClientPrefs.getVersion()}', 30);
 				WaterMark.scrollFactor.set();
 				WaterMark.setFormat(Language.fonts(), 30, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 				WaterMark.antialiasing = ClientPrefs.data.antialiasing;

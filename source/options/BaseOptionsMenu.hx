@@ -9,6 +9,7 @@ import objects.CheckboxThingie;
 import objects.AttachedText;
 import options.Option;
 import backend.InputFormatter;
+import flixel.effects.FlxFlicker;
 
 class BaseOptionsMenu extends MusicBeatSubstate
 {
@@ -30,6 +31,13 @@ class BaseOptionsMenu extends MusicBeatSubstate
 	public function new()
 	{
 		super();
+
+		if(title == null) title = 'Options';
+		if(rpcTitle == null) rpcTitle = 'Options Menu';
+		
+		#if DISCORD_ALLOWED
+		DiscordClient.changePresence(rpcTitle, null);
+		#end
 		
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = 0xFFea71fd;
@@ -144,10 +152,19 @@ class BaseOptionsMenu extends MusicBeatSubstate
 				case BOOL:
 					if(controls.ACCEPT)
 					{
-						FlxG.sound.play(Paths.sound('scrollMenu'));
-						curOption.setValue((curOption.getValue() == true) ? false : true);
-						curOption.change();
-						reloadCheckboxes();
+						if(Arrays.engineList[ClientPrefs.data.styleEngine] == "Vanilla") {
+							FlxG.sound.play(Paths.sound('confirmMenu'));
+							FlxFlicker.flicker(curOption.child, 1, 0.06, true, false, function(flick:FlxFlicker) {
+								curOption.setValue((curOption.getValue() == true) ? false : true);
+								curOption.change();
+								reloadCheckboxes();
+							});
+						} else {
+							FlxG.sound.play(Paths.sound('scrollMenu'));
+							curOption.setValue((curOption.getValue() == true) ? false : true);
+							curOption.change();
+							reloadCheckboxes();
+						}
 					}
 
 				case KEYBIND:
@@ -215,7 +232,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 											num = 0;
 		
 										curOption.curOption = num;
-										curOption.setValue(curOption.options[num]);
+										curOption.setValue(num);
 										//trace(curOption.options[num]);
 
 									default:
@@ -263,7 +280,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 					leOption.setValue(leOption.defaultValue);
 					if(leOption.type != BOOL)
 					{
-						if(leOption.type == STRING) leOption.curOption = leOption.options.indexOf(leOption.getValue());
+						if(leOption.type == STRING) leOption.curOption = leOption.getValue();
 						updateTextFrom(leOption);
 					}
 				}

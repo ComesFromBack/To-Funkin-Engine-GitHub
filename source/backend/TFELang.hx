@@ -22,7 +22,6 @@ class TFELang {
 		try{ usedLanguage = list[ClientPrefs.data.language]; }
 		catch(e:Dynamic) { Log.LogPrint("Not found using language, now using 'DEFAULT_LANGUAGE'(EN_US)","ERROR"); usedLanguage = DEFAULT_LANGUAGE; }
 		LANGUAGE = CoolUtil.coolTextFile('assets/shared/languages/$usedLanguage');
-		trace(LANGUAGE.length);
 	}
 
 	public static function getTextFromID(id:String, ?TYPE:String, ?Value:Int, ?Data:Array<Dynamic>):String {
@@ -31,7 +30,7 @@ class TFELang {
             if(i.startsWith(id)) {
                 ret = i.split("=")[1];
                 if(TYPE == "SPT") ret = ret.split(",")[Value];
-                else if(TYPE == "COL") ret = ret.split("#")[0];
+                else if(TYPE == "COL") ret = ret.split("#")[0]; 
                 else if(TYPE == "REP") {
 					for(j in 0...Data.length)
 						ret = ret.replace("{"+j+"}", Data[j]);
@@ -50,7 +49,9 @@ class TFELang {
     }
 
 	public static function returnTextureFromID(id:String) {
-		for(i in LANGUAGE) {}
+		for(i in LANGUAGE) {
+
+		}
 	}
 
 
@@ -70,15 +71,31 @@ class TFELang {
 
 	public static function replaceKeyWord():String {return "";}
 
-    public static function fonts() {
-        if(FileSystem.exists('${Sys.getCwd()}/assets/fonts/language${list[ClientPrefs.data.language]}/')) {
+    public static function fonts():String {
+        if(FileSystem.exists('${Sys.getCwd()}/assets/fonts/language/${list[ClientPrefs.data.language]}/')) {
             var fonts:Array<String> = FileSystem.readDirectory('${Sys.getCwd()}/assets/fonts/language/${list[ClientPrefs.data.language]}/');
             fonlist = fonts;
-            return fonts[ClientPrefs.data.usingfont];
+            return fonts[ClientPrefs.data.usingFont];
         } else {
+			FileSystem.createDirectory('${Sys.getCwd()}/assets/fonts/language/${list[ClientPrefs.data.language]}/');
             return "assets/fonts/vcr.ttf";
         }
+		return "assets/fonts/vcr.ttf";
     }
+
+	public static function fontsOnlyFileName():String {
+		final AUTO_GET_FONT:String = fonts();
+		var ret:String = null;
+		var splitList:Array<String> = null;
+
+		if(AUTO_GET_FONT == "assets/fonts/vcr.ttf") return "vcr.ttf (default)";
+		else {
+			splitList = AUTO_GET_FONT.split("/");
+			ret = splitList[splitList.length-1].split(".")[0];
+		}
+
+		return ret;
+	}
 
 	#if LUA_ALLOWED
 	public static function addLuaCallbacks(lua:State) {

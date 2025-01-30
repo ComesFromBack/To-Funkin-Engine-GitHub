@@ -51,15 +51,12 @@ class PsychFlxAnimate extends OriginalFlxAnimate
 				{
 					myData = haxe.Json.parse(myData);
 					isXml = false;
-					Log.LogPrint("PsychFlxAnimate.hx -> Unknown Mode using JSON parse successfully!","INFO");
 					//trace('JSON parsed successfully!');
 				}
 				catch(e)
 				{
 					myData = Xml.parse(myData);
 					isXml = true;
-					Log.LogPrint("PsychFlxAnimate.hx -> Unknown Mode using XML parse successfully!","WARN");
-
 					//trace('XML parsed successfully!');
 				}
 		}
@@ -84,12 +81,11 @@ class PsychFlxAnimate extends OriginalFlxAnimate
 		}
 		catch(e:haxe.Exception)
 		{
-			anim.curInstance.destroy();
-			anim.stageInstance.destroy();
+			anim.curInstance = FlxDestroyUtil.destroy(anim.curInstance);
+			anim.stageInstance = FlxDestroyUtil.destroy(anim.stageInstance);
 			//anim.metadata = FlxDestroyUtil.destroy(anim.metadata);
 			anim.metadata.destroy();
 			anim.symbolDictionary = null;
-			Log.LogPrint("PsychFlxAnimate.hx -> Destroy super callback error, has destroy some object.","ERROR");
 		}
 	}
 

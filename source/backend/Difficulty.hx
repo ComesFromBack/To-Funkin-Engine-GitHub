@@ -58,11 +58,11 @@ class Difficulty
 		list = diffs.copy();
 	}
 
-	inline public static function getString(?num:Null<Int> = null, ?canTranslate:Bool = false):String
+	inline public static function getString(?num:Null<Int> = null, ?canTranslate:Bool = true):String
 	{
 		var diffName:String = list[num == null ? PlayState.storyDifficulty : num];
 		if(diffName == null) diffName = defaultDifficulty;
-		return canTranslate ? Language.getTextFromID('Difficulty_$diffName') : diffName;
+		return diffName;
 	}
 
 	inline public static function getDefault():String

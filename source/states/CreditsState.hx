@@ -19,6 +19,11 @@ class CreditsState extends MusicBeatState
 
 	override function create()
 	{
+		#if DISCORD_ALLOWED
+		// Updating Discord Rich Presence
+		DiscordClient.changePresence("In the Menus", null);
+		#end
+
 		persistentUpdate = true;
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.antialiasing = ClientPrefs.data.antialiasing;
@@ -33,34 +38,32 @@ class CreditsState extends MusicBeatState
 		#end
 
 		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
-			["Freaky Back Team"],
-			["Comes_FromBack",		"cfb",				"Main Programmer of To Funkin Engine", 						"https://space.bilibili.com/525583987", "808080"],
 			["Psych Engine Team"],
-			["Shadow Mario",		"shadowmario",		"Main Programmer and Head of Psych Engine",					"https://ko-fi.com/shadowmario",		"444444"],
-			["Riveren",				"riveren",			"Main Artist/Animator of Psych Engine",						"https://twitter.com/riverennn",		"14967B"],
+			["Shadow Mario",		"shadowmario",		"Main Programmer and Head of Psych Engine",					"https://ko-fi.com/shadowmario",	"444444"],
+			["Riveren",				"riveren",			"Main Artist/Animator of Psych Engine",						"https://x.com/riverennn",			"14967B"],
 			[""],
 			["Former Engine Members"],
-			["bb-panzu",			"bb",				"Ex-Programmer of Psych Engine",							"https://twitter.com/bbsub3",			"3E813A"],
+			["bb-panzu",			"bb",				"Ex-Programmer of Psych Engine",							"https://x.com/bbsub3",				"3E813A"],
 			[""],
 			["Engine Contributors"],
-			["crowplexus",			"crowplexus",		"Input System v3, Major Help and Other PRs",				"https://twitter.com/crowplexus",		"A1A1A1"],
-			["Kamizeta",			"kamizeta",			"Creator of Pessy, Psych Engine's mascot.",					"https://twitter.com/LittleCewwy",		"D21C11"],
-			["MaxNeton",			"maxneton",			"Loading Screen Easter Egg Artist/Animator.",				"https://twitter.com/MaxNeton",			"3C2E4E"],
-			["Keoiki",				"keoiki",			"Note Splash Animations and Latin Alphabet",				"https://twitter.com/Keoiki_",			"D2D2D2"],
-			["SqirraRNG",			"sqirra",			"Crash Handler and Base code for\nChart Editor's Waveform",	"https://twitter.com/gedehari",			"E1843A"],
-			["EliteMasterEric",		"mastereric",		"Runtime Shaders support and Other PRs",					"https://twitter.com/EliteMasterEric",	"FFBD40"],
-			["MAJigsaw77",			"majigsaw",			".MP4 Video Loader Library (hxvlc)",						"https://twitter.com/MAJigsaw77",		"A1A1A1"],
-			["Tahir Toprak Karabekiroglu",	"tahir",	"Implementing & Maintaining SScript and Other PRs",			"https://twitter.com/TahirKarabekir",	"A04397"],
-			["iFlicky",				"flicky",			"Composer of Psync and Tea Time\nMade the Dialogue Sounds",	"https://twitter.com/flicky_i",			"9E29CF"],
-			["KadeDev",				"kade",				"Fixed some issues on Chart Editor and Other PRs",			"https://twitter.com/kade0912",			"64A250"],
-			["superpowers04",		"superpowers04",	"LUA JIT Fork",												"https://twitter.com/superpowers04",	"B957ED"],
-			["CheemsAndFriends",	"cheems",			"Creator of FlxAnimate",									"https://twitter.com/CheemsnFriendos",	"E1E1E1"],
+			["crowplexus",			"crowplexus",		"HScript Iris, Input System v3, and Other PRs",				"https://github.com/crowplexus",	"CFCFCF"],
+			["Kamizeta",			"kamizeta",			"Creator of Pessy, Psych Engine's mascot.",				"https://www.instagram.com/cewweey/",	"D21C11"],
+			["MaxNeton",			"maxneton",			"Loading Screen Easter Egg Artist/Animator.",	"https://bsky.app/profile/maxneton.bsky.social","3C2E4E"],
+			["Keoiki",				"keoiki",			"Note Splash Animations and Latin Alphabet",				"https://x.com/Keoiki_",			"D2D2D2"],
+			["SqirraRNG",			"sqirra",			"Crash Handler and Base code for\nChart Editor's Waveform",	"https://x.com/gedehari",			"E1843A"],
+			["EliteMasterEric",		"mastereric",		"Runtime Shaders support and Other PRs",					"https://x.com/EliteMasterEric",	"FFBD40"],
+			["MAJigsaw77",			"majigsaw",			".MP4 Video Loader Library (hxvlc)",						"https://x.com/MAJigsaw77",			"5F5F5F"],
+			["Tahir Toprak Karabekiroglu",	"tahir",	"Note Splash Editor and Other PRs",							"https://x.com/TahirKarabekir",		"A04397"],
+			["iFlicky",				"flicky",			"Composer of Psync and Tea Time\nAnd some sound effects",	"https://x.com/flicky_i",			"9E29CF"],
+			["KadeDev",				"kade",				"Fixed some issues on Chart Editor and Other PRs",			"https://x.com/kade0912",			"64A250"],
+			["superpowers04",		"superpowers04",	"LUA JIT Fork",												"https://x.com/superpowers04",		"B957ED"],
+			["CheemsAndFriends",	"cheems",			"Creator of FlxAnimate",									"https://x.com/CheemsnFriendos",	"E1E1E1"],
 			[""],
 			["Funkin' Crew"],
-			["ninjamuffin99",		"ninjamuffin99",	"Programmer of Friday Night Funkin'",						"https://twitter.com/ninja_muffin99",	"CF2D2D"],
-			["PhantomArcade",		"phantomarcade",	"Animator of Friday Night Funkin'",							"https://twitter.com/PhantomArcade3K",	"FADC45"],
-			["evilsk8r",			"evilsk8r",			"Artist of Friday Night Funkin'",							"https://twitter.com/evilsk8r",			"5ABD4B"],
-			["kawaisprite",			"kawaisprite",		"Composer of Friday Night Funkin'",							"https://twitter.com/kawaisprite",		"378FC7"],
+			["ninjamuffin99",		"ninjamuffin99",	"Programmer of Friday Night Funkin'",						"https://x.com/ninja_muffin99",		"CF2D2D"],
+			["PhantomArcade",		"phantomarcade",	"Animator of Friday Night Funkin'",							"https://x.com/PhantomArcade3K",	"FADC45"],
+			["evilsk8r",			"evilsk8r",			"Artist of Friday Night Funkin'",							"https://x.com/evilsk8r",			"5ABD4B"],
+			["kawaisprite",			"kawaisprite",		"Composer of Friday Night Funkin'",							"https://x.com/kawaisprite",		"378FC7"],
 			[""],
 			["Psych Engine Discord"],
 			["Join the Psych Ward!", "discord", "", "https://discord.gg/2ka77eMXDv", "5165F6"]
@@ -116,7 +119,7 @@ class CreditsState extends MusicBeatState
 		add(descBox);
 
 		descText = new FlxText(50, FlxG.height + offsetThing - 25, 1180, "", 32);
-		descText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER/*, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK*/);
+		descText.setFormat(Language.fonts(), 32, FlxColor.WHITE, CENTER/*, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK*/);
 		descText.scrollFactor.set();
 		//descText.borderSize = 2.4;
 		descBox.sprTracker = descText;
@@ -125,8 +128,6 @@ class CreditsState extends MusicBeatState
 		bg.color = CoolUtil.colorFromString(creditsStuff[curSelected][4]);
 		intendedColor = bg.color;
 		changeSelection();
-
-		addTouchPad('UP_DOWN', 'A_B');
 		super.create();
 	}
 
@@ -178,7 +179,7 @@ class CreditsState extends MusicBeatState
 			}
 			if (controls.BACK)
 			{
-				FlxG.sound.play(Paths.sound('cancelMenu'));
+				FlxG.sound.play(Arrays.getThemeSound('cancelMenu'), ClientPrefs.data.soundVolume);
 				MusicBeatState.switchState(new MainMenuState());
 				quitting = true;
 			}
@@ -207,7 +208,7 @@ class CreditsState extends MusicBeatState
 	var moveTween:FlxTween = null;
 	function changeSelection(change:Int = 0)
 	{
-		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
+		FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 		do
 		{
 			curSelected = FlxMath.wrap(curSelected + change, 0, creditsStuff.length - 1);

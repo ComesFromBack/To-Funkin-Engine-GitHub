@@ -98,11 +98,11 @@ class AchievementsMenuState extends MusicBeatState
 		add(box);
 		
 		nameText = new FlxText(50, box.y + 10, FlxG.width - 100, "", 32);
-		nameText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER);
+		nameText.setFormat(Language.fonts(), 32, FlxColor.WHITE, CENTER);
 		nameText.scrollFactor.set();
 
 		descText = new FlxText(50, nameText.y + 38, FlxG.width - 100, "", 24);
-		descText.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER);
+		descText.setFormat(Language.fonts(), 24, FlxColor.WHITE, CENTER);
 		descText.scrollFactor.set();
 
 		progressBar = new Bar(0, descText.y + 52);
@@ -111,7 +111,7 @@ class AchievementsMenuState extends MusicBeatState
 		progressBar.enabled = false;
 		
 		progressTxt = new FlxText(50, progressBar.y - 6, FlxG.width - 100, "", 32);
-		progressTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		progressTxt.setFormat(Language.fonts(), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		progressTxt.scrollFactor.set();
 		progressTxt.borderSize = 2;
 
@@ -121,18 +121,10 @@ class AchievementsMenuState extends MusicBeatState
 		add(nameText);
 		
 		_changeSelection();
-
-		addTouchPad('LEFT_FULL', 'B_C');
 		super.create();
 		
 		FlxG.camera.follow(camFollow, null, 0.15);
 		FlxG.camera.scroll.y = -FlxG.height;
-	}
-
-	override function closeSubState() {
-		super.closeSubState();
-                removeTouchPad();
-		addTouchPad('LEFT_FULL', 'B_C');
 	}
 
 	function makeAchievement(achievement:String, data:Achievement, unlocked:Bool, mod:String = null)
@@ -212,7 +204,7 @@ class AchievementsMenuState extends MusicBeatState
 		}
 
 		if (controls.BACK) {
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			FlxG.sound.play(Arrays.getThemeSound('cancelMenu'), ClientPrefs.data.soundVolume);
 			MusicBeatState.switchState(new MainMenuState());
 			goingBack = true;
 		}
@@ -222,7 +214,7 @@ class AchievementsMenuState extends MusicBeatState
 	public var barTween:FlxTween = null;
 	function _changeSelection()
 	{
-		FlxG.sound.play(Paths.sound('scrollMenu'));
+		FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 		var hasProgress = options[curSelected].maxProgress > 0;
 		nameText.text = options[curSelected].displayName;
 		descText.text = options[curSelected].description;
@@ -281,7 +273,7 @@ class ResetAchievementSubstate extends MusicBeatSubstate
 		
 		var state:AchievementsMenuState = cast FlxG.state;
 		var text:FlxText = new FlxText(50, text.y + 90, FlxG.width - 100, state.options[state.curSelected].displayName, 40);
-		text.setFormat(Paths.font("vcr.ttf"), 40, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		text.setFormat(Language.fonts(), 40, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		text.scrollFactor.set();
 		text.borderSize = 2;
 		add(text);
@@ -298,8 +290,6 @@ class ResetAchievementSubstate extends MusicBeatSubstate
 		noText.scrollFactor.set();
 		add(noText);
 		updateOptions();
-
-		addTouchPad('LEFT_RIGHT', 'A');
 	}
 
 	override function update(elapsed:Float)
@@ -307,7 +297,7 @@ class ResetAchievementSubstate extends MusicBeatSubstate
 		if(controls.BACK)
 		{
 			close();
-			FlxG.sound.play(Paths.sound('cancelMenu'));
+			FlxG.sound.play(Arrays.getThemeSound('cancelMenu'), ClientPrefs.data.soundVolume);
 			return;
 		}
 
@@ -345,7 +335,7 @@ class ResetAchievementSubstate extends MusicBeatSubstate
 				Achievements.save();
 				FlxG.save.flush();
 
-				FlxG.sound.play(Paths.sound('cancelMenu'));
+				FlxG.sound.play(Arrays.getThemeSound('cancelMenu'), ClientPrefs.data.soundVolume);
 			}
 			close();
 			return;
@@ -361,7 +351,7 @@ class ResetAchievementSubstate extends MusicBeatSubstate
 		yesText.scale.set(scales[confirmInt], scales[confirmInt]);
 		noText.alpha = alphas[1 - confirmInt];
 		noText.scale.set(scales[1 - confirmInt], scales[1 - confirmInt]);
-		FlxG.sound.play(Paths.sound('scrollMenu'));
+		FlxG.sound.play(Arrays.getThemeSound('scrollMenu'), ClientPrefs.data.soundVolume);
 	}
 }
 #end

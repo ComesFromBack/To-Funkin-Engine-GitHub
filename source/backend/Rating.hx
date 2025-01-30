@@ -19,18 +19,13 @@ class Rating
 		this.hitWindow = 0;
 
 		var window:String = name + 'Window';
-		try
-		{
+		try {
 			this.hitWindow = Reflect.field(ClientPrefs.data, window);
 		}
-		catch(e) {
-			Log.LogPrint("Rating.hx -> Create New Object:Not Field object from 'ClientPrefs.data'(ClientPrefs.hx)","ERROR");
-			FlxG.log.error(e);
-		}
+		catch(e) FlxG.log.error(e);
 	}
 
-	public static function loadDefault():Array<Rating>
-	{
+	public static function loadDefault():Array<Rating> {
 		var ratingsData:Array<Rating> = [new Rating('sick')]; //highest rating goes first
 
 		var rating:Rating = new Rating('good');

@@ -23,25 +23,26 @@ class Substate_Preset extends MusicBeatSubstate
 		add(blackBarThingie);
         blackBarThingie.scrollFactor.set();
         blackBarThingie.scale.y = 0;
-        FlxTween.tween(blackBarThingie, { 'scale.y': 230}, 0.5, { ease: FlxEase.expoOut});
+        FlxTween.tween(blackBarThingie, {'scale.y':230}, 0.5, { ease: FlxEase.expoOut});
+
+        if(!FileSystem.exists('presets/modifiers'))
+            FileSystem.createDirectory('presets/modifiers');
 
         presets = FileSystem.readDirectory('presets/modifiers');
-        presets.remove('current');
 
-        trace(presets);
+        if(presets!=null)
+            for(preset in presets)
+                if(preset=="current")
+                    presets.remove('current');
 
-        if (presets.length > 0)
-            optionShit = ['clear', 'save', 'load'];
-        else
-            optionShit = ['clear', 'save', 'no']; //get some presets first and then we can talk
+        optionShit=(presets.length>0?['clear','save','load']:['clear','save','no']);
 
         menuItems = new FlxTypedGroup<FlxSprite>();
         add(menuItems);
         
 		var tex = Paths.getSparrowAtlas('Modi_Buttons');
 
-		for (i in 0...optionShit.length)
-		{
+		for (i in 0...optionShit.length) {
 			var menuItem:FlxSprite = new FlxSprite(0, 0);
 			menuItem.frames = tex;
             menuItem.animation.addByPrefix('standard', optionShit[i], 24, true);
@@ -115,7 +116,6 @@ class Substate_Preset extends MusicBeatSubstate
                         });
                     case 'save':
                         goingBack = true;
-                        substates.mic.Substate_PresetSave.coming = "Modifiers";
                             
                         FlxTween.tween(blackBarThingie, { 'scale.y': 1500}, 0.5, { ease: FlxEase.expoIn});
     

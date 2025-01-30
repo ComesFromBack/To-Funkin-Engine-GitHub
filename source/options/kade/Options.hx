@@ -1,7 +1,9 @@
 package options.kade;
 
 import debug.FPSCounter;
-import backend.Arrays;
+
+import lime.system.DisplayMode;
+import lime.system.Display;
 
 typedef FadeOpti = {
 	styles:Array<String>
@@ -32,6 +34,7 @@ class Options {
 	public final function getRestart():Bool{return needRestart;}
 	public function getValue():String {return updateDisplay();}
 	public function onType(text:String) {}
+	public function setEnable(able:Bool) { enable = able; color = (able ? 0xFFFFFFFF : 0xFF808080); }
 	// Returns whether the label is to be updated.
 	public function press():Bool {ClientPrefs.saveSettings(); return true;}
 	private function updateDisplay():String {return "";}
@@ -61,8 +64,7 @@ class Downscroll extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.downScroll) ClientPrefs.data.downScroll = false;
-		else ClientPrefs.data.downScroll = true;
+		ClientPrefs.data.downScroll = !ClientPrefs.data.downScroll;
 		display = updateDisplay();
 		return true;
 	}
@@ -77,8 +79,7 @@ class Middlescroll extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.middleScroll) ClientPrefs.data.middleScroll = false;
-		else ClientPrefs.data.middleScroll = true;
+		ClientPrefs.data.middleScroll = !ClientPrefs.data.middleScroll;
 		display = updateDisplay();
 		return true;
 	}
@@ -93,8 +94,7 @@ class Voices extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.haveVoices) ClientPrefs.data.haveVoices = false;
-		else ClientPrefs.data.haveVoices = true;
+		ClientPrefs.data.haveVoices = !ClientPrefs.data.haveVoices;
 		display = updateDisplay();
 		return true;
 	}
@@ -109,8 +109,7 @@ class OpponentNotes extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.opponentStrums) ClientPrefs.data.opponentStrums = false;
-		else ClientPrefs.data.opponentStrums = true;
+		ClientPrefs.data.opponentStrums = !ClientPrefs.data.opponentStrums;
 		display = updateDisplay();
 		return true;
 	}
@@ -125,8 +124,7 @@ class GhostTapping extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.ghostTapping) ClientPrefs.data.ghostTapping = false;
-		else ClientPrefs.data.ghostTapping = true;
+		ClientPrefs.data.ghostTapping = !ClientPrefs.data.ghostTapping;
 		display = updateDisplay();
 		return true;
 	}
@@ -141,18 +139,12 @@ class AutoPause extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.autoPause) {
-			ClientPrefs.data.autoPause = false;
-			FlxG.autoPause = false;
-		} else {
-			ClientPrefs.data.autoPause = true;
-			FlxG.autoPause = true;
-		}
+		ClientPrefs.data.autoPause = FlxG.autoPause = !ClientPrefs.data.autoPause;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Auto Pause: [ ${ClientPrefs.data.autoPause ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String { color = (enable ? 0xFFFFFFFF : 0xFF909090); enable = !ClientPrefs.data.focusLostMusic; return 'Auto Pause: [ ${ClientPrefs.data.autoPause ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class DisableResetButton extends Options {
@@ -162,8 +154,7 @@ class DisableResetButton extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.noReset) ClientPrefs.data.noReset = false;
-		else ClientPrefs.data.noReset = true;
+		ClientPrefs.data.noReset = !ClientPrefs.data.noReset;
 		display = updateDisplay();
 		return true;
 	}
@@ -201,25 +192,29 @@ class FontsChange extends Options {
 	public function new(desc:String) {
 		super();
 		description = desc;
-		needRestart = true;
+		Language.fonts();
 	}
 
 	public override function left():Bool {
 		if(curSelected <= 0) curSelected = Language.fonlist.length-1;
 		else curSelected--;
-		ClientPrefs.data.usingfont = curSelected;
+		ClientPrefs.data.usingFont = curSelected;
 		display = updateDisplay();
 		return true;
 	}
 	public override function right():Bool {
 		if(curSelected >= Language.fonlist.length-1) curSelected = 0;
 		else curSelected++;
-		ClientPrefs.data.usingfont = curSelected;
+		ClientPrefs.data.usingFont = curSelected;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Change Fonts: <[Last] ${Language.fonlist[ClientPrefs.data.usingfont]} [Next]>';}
+	private override function updateDisplay():String {
+		if(ClientPrefs.data.usingFont > Language.fonlist.length-1) ClientPrefs.data.usingFont = Language.fonlist.length-1;
+		if(ClientPrefs.data.usingFont < 0) ClientPrefs.data.usingFont = 0;
+		return 'Change Fonts: <[Last] ${Language.fontsOnlyFileName()} [Next]>';
+	}
 }
 
 class AllowedChangesFont extends Options {
@@ -229,62 +224,56 @@ class AllowedChangesFont extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.languagefonts) ClientPrefs.data.languagefonts = false;
-		else ClientPrefs.data.languagefonts = true;
+		ClientPrefs.data.allowLanguageFonts = !ClientPrefs.data.allowLanguageFonts;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Allowed Changes Font: [ ${ClientPrefs.data.languagefonts ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String {return 'Allowed Changes Font: [ ${ClientPrefs.data.allowLanguageFonts ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class HitsoundChange extends Options {
-	var list:Array<String> = [];
 	public function new(desc:String) {
 		super();
 		description = desc;
-		for (i in FileSystem.readDirectory('assets/shared/sounds/hitsounds')) {
-            list.push(i.split('.')[0]);
-        }
 	}
 
 	public override function left():Bool {
-		if(ClientPrefs.data.hitsound <= 0) ClientPrefs.data.hitsound = list.length-1;
-		else ClientPrefs.data.hitsound--;
+		if(ClientPrefs.data.hitSoundChange <= 0) ClientPrefs.data.hitSoundChange = Arrays.hitSoundList.length-1;
+		else ClientPrefs.data.hitSoundChange--;
 		display = updateDisplay();
 		return true;
 	}
 	public override function right():Bool {
-		if(ClientPrefs.data.hitsound >= list.length-1) ClientPrefs.data.hitsound = 0;
-		else ClientPrefs.data.hitsound++;
+		if(ClientPrefs.data.hitSoundChange >= Arrays.hitSoundList.length-1) ClientPrefs.data.hitSoundChange = 0;
+		else ClientPrefs.data.hitSoundChange++;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Hitsound Choose: <[Last] ${list[ClientPrefs.data.hitsound]}.ogg [Next]>';}
+	private override function updateDisplay():String {return 'Hitsound Choose: <[Last] ${Arrays.hitSoundList[ClientPrefs.data.hitSoundChange]}.ogg [Next]>';}
 }
 
 class ThemesoundChange extends Options {
-	var list:Array<String> = FileSystem.readDirectory('assets/shared/sounds/theme');
 	public function new(desc:String) {
 		super();
 		description = desc;
 	}
 
 	public override function left():Bool {
-		if(ClientPrefs.data.southeme <= 0) ClientPrefs.data.southeme = list.length-1;
-		else ClientPrefs.data.southeme--;
+		if(ClientPrefs.data.soundTheme <= 0) ClientPrefs.data.soundTheme = Arrays.soundThemeList.length-1;
+		else ClientPrefs.data.soundTheme--;
 		display = updateDisplay();
 		return true;
 	}
 	public override function right():Bool {
-		if(ClientPrefs.data.southeme >= list.length-1) ClientPrefs.data.southeme = 0;
-		else ClientPrefs.data.southeme++;
+		if(ClientPrefs.data.soundTheme >= Arrays.soundThemeList.length-1) ClientPrefs.data.soundTheme = 0;
+		else ClientPrefs.data.soundTheme++;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Theme Sounds: <[Last] ${list[ClientPrefs.data.southeme]} [Next]>';}
+	private override function updateDisplay():String {return 'Theme Sounds: <[Last] ${Arrays.soundThemeList[ClientPrefs.data.soundTheme]} [Next]>';}
 }
 
 class SoundVolume extends Options {
@@ -383,18 +372,18 @@ class SickOffset extends Options {
 	}
 
 	public override function left():Bool {
-		if(ClientPrefs.data.MSPresetMode == 0 || ClientPrefs.data.MSPresetMode == 1) {
+		if(ClientPrefs.data.presetMs == 0 || ClientPrefs.data.presetMs == 1) {
 			if(value <= 15) value = 15;
 			else value--;
 		} else {
-			value = Arrays.hitDelayMap.get(ClientPrefs.data.MSPresetMode)[0];
+			value = Arrays.hitDelayMap.get(ClientPrefs.data.presetMs)[0];
 		}
 		ClientPrefs.data.sickWindow = value;
 		display = updateDisplay();
 		return true;
 	}
 	public override function right():Bool {
-		if(ClientPrefs.data.MSPresetMode == 0 || ClientPrefs.data.MSPresetMode == 1) {
+		if(ClientPrefs.data.presetMs == 0 || ClientPrefs.data.presetMs == 1) {
 			if(value >= 45) value = 45;
 			else value++;
 			ClientPrefs.data.sickWindow = value;
@@ -414,18 +403,18 @@ class GoodOffset extends Options {
 	}
 
 	public override function left():Bool {
-		if(ClientPrefs.data.MSPresetMode == 0 || ClientPrefs.data.MSPresetMode == 1) {
+		if(ClientPrefs.data.presetMs == 0 || ClientPrefs.data.presetMs == 1) {
 			if(value <= 15) value = 15;
 			else value--;
 		} else {
-			value = Arrays.hitDelayMap.get(ClientPrefs.data.MSPresetMode)[1];
+			value = Arrays.hitDelayMap.get(ClientPrefs.data.presetMs)[1];
 		}
 		ClientPrefs.data.goodWindow = value;
 		display = updateDisplay();
 		return true;
 	}
 	public override function right():Bool {
-		if(ClientPrefs.data.MSPresetMode == 0 || ClientPrefs.data.MSPresetMode == 1) {
+		if(ClientPrefs.data.presetMs == 0 || ClientPrefs.data.presetMs == 1) {
 			if(value >= 90) value = 90;
 			else value++;
 			ClientPrefs.data.goodWindow = value;
@@ -445,19 +434,19 @@ class BadOffset extends Options {
 	}
 
 	public override function left():Bool {
-		if(ClientPrefs.data.MSPresetMode == 0 || ClientPrefs.data.MSPresetMode == 1) {
+		if(ClientPrefs.data.presetMs == 0 || ClientPrefs.data.presetMs == 1) {
 			if(value <= 15) value = 15;
 			else value--;
 			display = updateDisplay();
 		} else {
-			value = Arrays.hitDelayMap.get(ClientPrefs.data.MSPresetMode)[2];
+			value = Arrays.hitDelayMap.get(ClientPrefs.data.presetMs)[2];
 		}
 		ClientPrefs.data.badWindow = value;
 		display = updateDisplay();
 		return true;
 	}
 	public override function right():Bool {
-		if(ClientPrefs.data.MSPresetMode == 0 || ClientPrefs.data.MSPresetMode == 1) {
+		if(ClientPrefs.data.presetMs == 0 || ClientPrefs.data.presetMs == 1) {
 			if(value >= 135) value = 135;
 			else value++;
 			ClientPrefs.data.badWindow = value;
@@ -503,8 +492,7 @@ class LowQuality extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.lowQuality) ClientPrefs.data.lowQuality = false;
-		else ClientPrefs.data.lowQuality = true;
+		ClientPrefs.data.lowQuality = !ClientPrefs.data.lowQuality;
 		display = updateDisplay();
 		return true;
 	}
@@ -519,15 +507,14 @@ class AntiAliasing extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.antialiasing) ClientPrefs.data.antialiasing = false;
-		else ClientPrefs.data.antialiasing = true;
+		ClientPrefs.data.antialiasing = !ClientPrefs.data.antialiasing;
 
-		/*for (sprite in members) {
-			var sprite:FlxSprite = cast sprite;
-			if(sprite != null && (sprite is FlxSprite) && !(sprite is FlxText)) {
-				sprite.antialiasing = ClientPrefs.data.antialiasing;
-			}
-		}*/
+		// for (sprite in members) {
+		// 	var sprite:FlxSprite = cast sprite;
+		// 	if(sprite != null && (sprite is FlxSprite) && !(sprite is FlxText)) {
+		// 		sprite.antialiasing = ClientPrefs.data.antialiasing;
+		// 	}
+		// }
 
 		display = updateDisplay();
 		return true;
@@ -543,8 +530,7 @@ class Shaders extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.shaders) ClientPrefs.data.shaders = false;
-		else ClientPrefs.data.shaders = true;
+		ClientPrefs.data.shaders = !ClientPrefs.data.shaders;
 		display = updateDisplay();
 		return true;
 	}
@@ -559,8 +545,7 @@ class GPUCache extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.cacheOnGPU) ClientPrefs.data.cacheOnGPU = false;
-		else ClientPrefs.data.cacheOnGPU = true;
+		ClientPrefs.data.cacheOnGPU = !ClientPrefs.data.cacheOnGPU;
 		display = updateDisplay();
 		return true;
 	}
@@ -572,18 +557,16 @@ class PersistentCachedData extends Options {
 	public function new(desc:String) {
 		super();
 		description = desc;
-		enable = !ClientPrefs.data.prebase;
-		ClientPrefs.data.imagesPersist = ClientPrefs.data.prebase;
+		if(!enable) ClientPrefs.data.imagesPersist = true;
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.imagesPersist) ClientPrefs.data.imagesPersist = false;
-		else ClientPrefs.data.imagesPersist = true;
+		ClientPrefs.data.imagesPersist = !ClientPrefs.data.imagesPersist;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Persistent Cached Data: [ ${ClientPrefs.data.imagesPersist ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String { color = (enable ? 0xFFFFFFFF : 0xFF909090); enable = !ClientPrefs.data.loadBaseRes; return 'Persistent Cached Data: [ ${ClientPrefs.data.imagesPersist ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class FullScreen extends Options {
@@ -593,49 +576,47 @@ class FullScreen extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.fullscr) ClientPrefs.data.fullscr = false;
-		else ClientPrefs.data.fullscr = true;
-		FlxG.fullscreen = ClientPrefs.data.fullscr;
+		ClientPrefs.data.fullScreen = !ClientPrefs.data.fullScreen;
+		FlxG.fullscreen = ClientPrefs.data.fullScreen;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Fullscreen: [ ${ClientPrefs.data.fullscr ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String {return 'Fullscreen: [ ${ClientPrefs.data.fullScreen ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class Resolution extends Options {
-	var list:Array<String> = ['1920x1080', '1600x900','1366x768','1280x720', '1024x576', '960x540', '854x480', '720x405', '640x360', '480x270', '320x180', '160x90', '80x45'];
 	public function new(desc:String) {
 		super();
 		description = desc;
 	}
 
 	public override function left():Bool {
-		if(ClientPrefs.data.resolution >= list.length-1) ClientPrefs.data.resolution = 0;
+		if(ClientPrefs.data.resolution >= Arrays.resolutionList.length-1) ClientPrefs.data.resolution = 0;
 		else ClientPrefs.data.resolution++;
-		var any:String = list[ClientPrefs.data.resolution];
+		var any:String = Arrays.resolutionList[ClientPrefs.data.resolution];
         var any0:Array<String> = any.split('x');
 		#if desktop
-        if(!ClientPrefs.data.fullscr) FlxG.resizeWindow(Std.parseInt(any0[0]), Std.parseInt(any0[1]));
+        if(!ClientPrefs.data.fullScreen) FlxG.resizeWindow(Std.parseInt(any0[0]), Std.parseInt(any0[1]));
         #end
         FlxG.resizeGame(Std.parseInt(any0[0]), Std.parseInt(any0[1]));
 		display = updateDisplay();
 		return true;
 	}
 	public override function right():Bool {
-		if(ClientPrefs.data.resolution <= 0) ClientPrefs.data.resolution = list.length-1;
+		if(ClientPrefs.data.resolution <= 0) ClientPrefs.data.resolution = Arrays.resolutionList.length-1;
 		else ClientPrefs.data.resolution--;
-		var any:String = list[ClientPrefs.data.resolution];
+		var any:String = Arrays.resolutionList[ClientPrefs.data.resolution];
         var any0:Array<String> = any.split('x');
 		#if desktop
-        if(!ClientPrefs.data.fullscr) FlxG.resizeWindow(Std.parseInt(any0[0]), Std.parseInt(any0[1]));
+        if(!ClientPrefs.data.fullScreen) FlxG.resizeWindow(Std.parseInt(any0[0]), Std.parseInt(any0[1]));
         #end
         FlxG.resizeGame(Std.parseInt(any0[0]), Std.parseInt(any0[1]));
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Resolution: <[-] ${list[ClientPrefs.data.resolution]} [+]>';}
+	private override function updateDisplay():String {return 'Resolution: <[-] ${Arrays.resolutionList[ClientPrefs.data.resolution]} [+]>';}
 }
 
 //VAU
@@ -738,8 +719,7 @@ class HideHUD extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.hideHud) ClientPrefs.data.hideHud = false;
-		else ClientPrefs.data.hideHud = true;
+		ClientPrefs.data.hideHud = !ClientPrefs.data.hideHud;
 		display = updateDisplay();
 		return true;
 	}
@@ -754,13 +734,12 @@ class ComboDisplay extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.comboDisplay) ClientPrefs.data.comboDisplay = false;
-		else ClientPrefs.data.comboDisplay = true;
+		ClientPrefs.data.comboSprVisible = !ClientPrefs.data.comboSprVisible;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Combo Display: [ ${ClientPrefs.data.comboDisplay ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String {return 'Combo Display: [ ${ClientPrefs.data.comboSprVisible ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class MSDisplay extends Options {
@@ -770,13 +749,12 @@ class MSDisplay extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.msDisplay) ClientPrefs.data.msDisplay = false;
-		else ClientPrefs.data.msDisplay = true;
+		ClientPrefs.data.msVisible = !ClientPrefs.data.msVisible;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'MS Display: [ ${ClientPrefs.data.msDisplay ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String {return 'MS Display: [ ${ClientPrefs.data.msVisible ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class TimeBar extends Options {
@@ -809,8 +787,7 @@ class FlashingLights extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.flashing) ClientPrefs.data.flashing = false;
-		else ClientPrefs.data.flashing = true;
+		ClientPrefs.data.flashing = !ClientPrefs.data.flashing;
 		display = updateDisplay();
 		return true;
 	}
@@ -825,8 +802,7 @@ class CameraZooms extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.camZooms) ClientPrefs.data.camZooms = false;
-		else ClientPrefs.data.camZooms = true;
+		ClientPrefs.data.camZooms = !ClientPrefs.data.camZooms;
 		display = updateDisplay();
 		return true;
 	}
@@ -841,6 +817,7 @@ class EngineStyle extends Options {
 		#if !StyleUnlock
 		enable = false;
 		#end
+		needRestart = true;
 	}
 
 	public override function left():Bool {
@@ -865,8 +842,7 @@ class ScoreZoom extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.scoreZoom) ClientPrefs.data.scoreZoom = false;
-		else ClientPrefs.data.scoreZoom = true;
+		ClientPrefs.data.scoreZoom = !ClientPrefs.data.scoreZoom;
 		display = updateDisplay();
 		return true;
 	}
@@ -900,7 +876,7 @@ class HealthBarOpacity extends Options {
 }
 
 class HitVolume extends Options {
-	var	value:Float = ClientPrefs.data.hitVolume;
+	var	value:Float = ClientPrefs.data.hitSoundVolume;
 	public function new(desc:String) {
 		super();
 		description = desc;
@@ -909,19 +885,19 @@ class HitVolume extends Options {
 	public override function left():Bool {
 		if(value <= 0) value = 0;
 		else value -= 0.05;
-		ClientPrefs.data.hitVolume = value;
+		ClientPrefs.data.hitSoundVolume = value;
 		display = updateDisplay();
 		return true;
 	}
 	public override function right():Bool {
 		if(value >= 1) value = 1;
 		else value += 0.05;
-		ClientPrefs.data.hitVolume = value;
+		ClientPrefs.data.hitSoundVolume = value;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Hit Note Volume: [-] ${ClientPrefs.data.hitVolume*100}% [+]';}
+	private override function updateDisplay():String {return 'Hit Note Volume: [-] ${ClientPrefs.data.hitSoundVolume*100}% [+]';}
 }
 
 class FPSCount extends Options {
@@ -931,8 +907,7 @@ class FPSCount extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.showFPS) ClientPrefs.data.showFPS = false;
-		else ClientPrefs.data.showFPS = true;
+		ClientPrefs.data.showFPS = !ClientPrefs.data.showFPS;
 		Main.fpsVar.visible = ClientPrefs.data.showFPS;
 		display = updateDisplay();
 		return true;
@@ -979,8 +954,7 @@ class CheckUpdates extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.checkForUpdates) ClientPrefs.data.checkForUpdates = false;
-		else ClientPrefs.data.checkForUpdates = true;
+		ClientPrefs.data.checkForUpdates = !ClientPrefs.data.checkForUpdates;
 		display = updateDisplay();
 		return true;
 	}
@@ -1010,38 +984,13 @@ class ELDisplay extends Options {
 		description = desc;	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.eld) ClientPrefs.data.eld = false;
-		else ClientPrefs.data.eld = true;
+		if(ClientPrefs.data.earlyLateVisible) ClientPrefs.data.earlyLateVisible = false;
+		else ClientPrefs.data.earlyLateVisible = true;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Early / Late Display: [ ${ClientPrefs.data.eld ? "ENABLE" : "DISABLE"} ]';}
-}
-
-class CamZomMul extends Options {
-	var value:Float = ClientPrefs.data.camZoomingMult;
-	public function new(desc:String) {
-		super();
-		description = desc;
-	}
-
-	public override function left():Bool {
-		if(value <= 0.5) value = 0.5;
-		else value -= 0.1;
-		ClientPrefs.data.camZoomingMult = value;
-		display = updateDisplay();
-		return true;
-	}
-	public override function right():Bool {
-		if(value >= 3) value = 3;
-		else value += 0.1;
-		ClientPrefs.data.camZoomingMult = value;
-		display = updateDisplay();
-		return true;
-	}
-
-	private override function updateDisplay():String {return 'Camera Zooming Mult: [-] ${ClientPrefs.data.camZoomingMult} / 3 [+]';}
+	private override function updateDisplay():String {return 'Early / Late Display: [ ${ClientPrefs.data.earlyLateVisible ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class SM extends Options {
@@ -1052,21 +1001,21 @@ class SM extends Options {
 	}
 
 	public override function left():Bool {
-			if(ClientPrefs.data.mouse >= list.length-1) ClientPrefs.data.mouse = 0;
-			else ClientPrefs.data.mouse++;
+			if(ClientPrefs.data.mouseDisplayType >= list.length-1) ClientPrefs.data.mouseDisplayType = 0;
+			else ClientPrefs.data.mouseDisplayType++;
 			display = updateDisplay();
-			backend.Mouse.reloadMouseGraphics();
+			backend.CoolUtil.reloadMouseGraphics();
 		return true;
 	}
 	public override function right():Bool {
-			if(ClientPrefs.data.mouse <= 0) ClientPrefs.data.mouse = list.length-1;
-			else ClientPrefs.data.mouse--;
+			if(ClientPrefs.data.mouseDisplayType <= 0) ClientPrefs.data.mouseDisplayType = list.length-1;
+			else ClientPrefs.data.mouseDisplayType--;
 			display = updateDisplay();
-			backend.Mouse.reloadMouseGraphics();
+			backend.CoolUtil.reloadMouseGraphics();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Mouse Cursor: <[Last] ${list[ClientPrefs.data.mouse]} [Next]>';}
+	private override function updateDisplay():String {return 'Mouse Cursor: <[Last] ${list[ClientPrefs.data.mouseDisplayType]} [Next]>';}
 }
 
 
@@ -1141,30 +1090,29 @@ class LuaEx extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.debug.luaExtend) ClientPrefs.debug.luaExtend = false;
-		else ClientPrefs.debug.luaExtend = true;
+		if(ClientPrefs.addons.luaExtend) ClientPrefs.addons.luaExtend = false;
+		else ClientPrefs.addons.luaExtend = true;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'LUA Extend (BETA): [ ${ClientPrefs.debug.luaExtend ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String {return 'LUA Extend (BETA): [ ${ClientPrefs.addons.luaExtend ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class FoucsMusic extends Options {
 	public function new(desc:String) {
 		super();
 		description = desc;
-		if(ClientPrefs.data.autoPause) enable = false;
+		ClientPrefs.data.focusLostMusic = (ClientPrefs.data.autoPause ? false : ClientPrefs.data.focusLostMusic);
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.foucsMusic) ClientPrefs.data.foucsMusic = false;
-		else ClientPrefs.data.foucsMusic = true;
+		ClientPrefs.data.focusLostMusic = !ClientPrefs.data.focusLostMusic;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Foucs Low Volume: [ ${ClientPrefs.data.foucsMusic ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String { color = (enable ? 0xFFFFFFFF : 0xFF909090); enable = !ClientPrefs.data.autoPause; return 'Focus Low Volume: [ ${ClientPrefs.data.focusLostMusic ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class AdvanCrash extends Options {
@@ -1174,37 +1122,37 @@ class AdvanCrash extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.acrash) ClientPrefs.data.acrash = false;
-		else ClientPrefs.data.acrash = true;
+		if(ClientPrefs.data.advancedCrash) ClientPrefs.data.advancedCrash = false;
+		else ClientPrefs.data.advancedCrash = true;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Advanced Crashes: [ ${ClientPrefs.data.acrash ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String {return 'Advanced Crashes: [ ${ClientPrefs.data.advancedCrash ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class FadeMode extends Options {
-	var list:Array<String> = ['Move', 'Fade'];
+	var list:Array<String> = Arrays.fadeModeList;
 	public function new(desc:String) {
 		super();
 		description = desc;
 	}
 
 	public override function left():Bool {
-		if(ClientPrefs.data.fademode >= list.length-1) ClientPrefs.data.fademode = 0;
-		else ClientPrefs.data.fademode++;
+		if(ClientPrefs.data.fadeMode >= list.length-1) ClientPrefs.data.fadeMode = 0;
+		else ClientPrefs.data.fadeMode++;
 		display = updateDisplay();
 		return true;
 	}
 	public override function right():Bool {
-		if(ClientPrefs.data.fademode <= 0) ClientPrefs.data.fademode = list.length-1;
-		else ClientPrefs.data.fademode--;
+		if(ClientPrefs.data.fadeMode <= 0) ClientPrefs.data.fadeMode = list.length-1;
+		else ClientPrefs.data.fadeMode--;
 		display = updateDisplay();
 		return true;
 	}
 
 	private override function updateDisplay():String {
-		return 'Fade Mode: <[Last] ${list[ClientPrefs.data.fademode]} [Next]>';
+		return 'Fade Mode: <[Last] ${list[ClientPrefs.data.fadeMode]} [Next]>';
 	}
 }
 
@@ -1352,7 +1300,7 @@ class FPSCap extends Options {
 		return true;
 	}
 
-	function onChange() {
+	static function onChange() {
 		if(ClientPrefs.data.framerate > FlxG.drawFramerate) {
 			FlxG.updateFramerate = ClientPrefs.data.framerate;
 			FlxG.drawFramerate = ClientPrefs.data.framerate;
@@ -1362,7 +1310,7 @@ class FPSCap extends Options {
 		}
 	}
 
-	private override function updateDisplay():String {return "FPS Cap: [-] "+(value == 60 ? "60Hz" : '${ClientPrefs.data.framerate}')+" / 360 [+]";}
+	private override function updateDisplay():String {return "FPS Cap: [-] "+(value == backend.WinAPI.getFrequency() ? '${ClientPrefs.data.framerate}Hz' : '${ClientPrefs.data.framerate}')+" / 360 [+]";}
 }
 
 class SasO extends Options {
@@ -1388,13 +1336,13 @@ class PreBase extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.prebase) ClientPrefs.data.prebase = false;
-		else ClientPrefs.data.prebase = true;
+		if(ClientPrefs.data.loadBaseRes) ClientPrefs.data.loadBaseRes = false;
+		else ClientPrefs.data.loadBaseRes = true;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Preload Base Data: [ ${ClientPrefs.data.prebase ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String {return 'Preload Base Data: [ ${ClientPrefs.data.loadBaseRes ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class MouseCONT extends Options {
@@ -1404,13 +1352,13 @@ class MouseCONT extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.mouseCon) ClientPrefs.data.mouseCon = false;
-		else ClientPrefs.data.mouseCon = true;
+		if(ClientPrefs.data.mouseControls) ClientPrefs.data.mouseControls = false;
+		else ClientPrefs.data.mouseControls = true;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Mouse Control: [ ${ClientPrefs.data.mouseCon ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String {return 'Mouse Control: [ ${ClientPrefs.data.mouseControls ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class DUI extends Options {
@@ -1452,13 +1400,13 @@ class MemoeyPrivate extends Options {
 	}
 
 	public override function press():Bool {
-		if(ClientPrefs.data.MemPirvate) ClientPrefs.data.MemPirvate = false;
-		else ClientPrefs.data.MemPirvate = true;
+		if(ClientPrefs.data.MemPrivate) ClientPrefs.data.MemPrivate = false;
+		else ClientPrefs.data.MemPrivate = true;
 		display = updateDisplay();
 		return true;
 	}
 
-	private override function updateDisplay():String {return 'Memory Private Using: [ ${ClientPrefs.data.MemPirvate ? "ENABLE" : "DISABLE"} ]';}
+	private override function updateDisplay():String {return 'Memory Private Using: [ ${ClientPrefs.data.MemPrivate ? "ENABLE" : "DISABLE"} ]';}
 }
 
 class MemoryType extends Options {
@@ -1486,7 +1434,7 @@ class MemoryType extends Options {
 }
 
 class PresetMS extends Options {
-	var list:Array<String> = ["Psych", "Kade", "Mush Dash", "Touhou", "Touhou_Strict"];
+	var list:Array<String> = Arrays.preOffsetList;
 	public function new(desc:String) {
 		super();
 		color = 0x00FFFF;
@@ -1494,25 +1442,100 @@ class PresetMS extends Options {
 	}
 
 	public override function left():Bool {
-		if(ClientPrefs.data.MSPresetMode >= list.length-1) ClientPrefs.data.MSPresetMode = 0;
-		else ClientPrefs.data.MSPresetMode++;
-		ClientPrefs.data.sickWindow = Arrays.hitDelayMap.get(ClientPrefs.data.MSPresetMode)[0];
-		ClientPrefs.data.goodWindow = Arrays.hitDelayMap.get(ClientPrefs.data.MSPresetMode)[1];
-		ClientPrefs.data.badWindow = Arrays.hitDelayMap.get(ClientPrefs.data.MSPresetMode)[2];
+		if(ClientPrefs.data.presetMs >= list.length-1) ClientPrefs.data.presetMs = 0;
+		else ClientPrefs.data.presetMs++;
+		ClientPrefs.data.sickWindow = Arrays.hitDelayMap.get(ClientPrefs.data.presetMs)[0];
+		ClientPrefs.data.goodWindow = Arrays.hitDelayMap.get(ClientPrefs.data.presetMs)[1];
+		ClientPrefs.data.badWindow = Arrays.hitDelayMap.get(ClientPrefs.data.presetMs)[2];
 		display = updateDisplay();
 		return true;
 	}
 	public override function right():Bool {
-		if(ClientPrefs.data.MSPresetMode <= 0) ClientPrefs.data.MSPresetMode = list.length-1;
-		else ClientPrefs.data.MSPresetMode--;
-		ClientPrefs.data.sickWindow = Arrays.hitDelayMap.get(ClientPrefs.data.MSPresetMode)[0];
-		ClientPrefs.data.goodWindow = Arrays.hitDelayMap.get(ClientPrefs.data.MSPresetMode)[1];
-		ClientPrefs.data.badWindow = Arrays.hitDelayMap.get(ClientPrefs.data.MSPresetMode)[2];
+		if(ClientPrefs.data.presetMs <= 0) ClientPrefs.data.presetMs = list.length-1;
+		else ClientPrefs.data.presetMs--;
+		ClientPrefs.data.sickWindow = Arrays.hitDelayMap.get(ClientPrefs.data.presetMs)[0];
+		ClientPrefs.data.goodWindow = Arrays.hitDelayMap.get(ClientPrefs.data.presetMs)[1];
+		ClientPrefs.data.badWindow = Arrays.hitDelayMap.get(ClientPrefs.data.presetMs)[2];
 		display = updateDisplay();
 		return true;
 	}
 
 	private override function updateDisplay():String {
-		return 'MS Preset Mode: <[Last] ${list[ClientPrefs.data.MSPresetMode]} [Next]>';
+		return 'MS Preset Mode: <[Last] ${list[ClientPrefs.data.presetMs]} [Next]>';
 	}
+}
+
+class FlyingSound extends Options {
+	public function new(desc:String) {
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool {
+		ClientPrefs.data.onExitPlaySound = !ClientPrefs.data.onExitPlaySound;
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String {return 'Play Sound of Exited: [ ${ClientPrefs.data.onExitPlaySound ? "ENABLE" : "DISABLE"} ]';}
+}
+
+class StartingAnimation extends Options {
+	public function new(desc:String) {
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool {
+		ClientPrefs.data.startingAnim = !ClientPrefs.data.startingAnim;
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String {return 'Has Tween on Starting Game: [ ${ClientPrefs.data.startingAnim ? "ENABLE" : "DISABLE"} ]';}
+}
+
+class PlayKEMenuMusic extends Options {
+	public function new(desc:String) {
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool {
+		ClientPrefs.data.playingKadeMenuMusic = !ClientPrefs.data.playingKadeMenuMusic;
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String {return 'Play KE Menu Music: [ ${ClientPrefs.data.playingKadeMenuMusic ? "ENABLE" : "DISABLE"} ]';}
+}
+
+class ShowKESongText extends Options {
+	public function new(desc:String) {
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool {
+		ClientPrefs.data.showKadeSongTxt = !ClientPrefs.data.showKadeSongTxt;
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String {return 'Show KE Text: [ ${ClientPrefs.data.showKadeSongTxt ? "ENABLE" : "DISABLE"} ]';}
+}
+
+class UseKEOldHealthColor extends Options {
+	public function new(desc:String) {
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool {
+		ClientPrefs.data.oldHealthBarColor = !ClientPrefs.data.oldHealthBarColor;
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String {return 'Use old health color: [ ${ClientPrefs.data.oldHealthBarColor ? "ENABLE" : "DISABLE"} ]';}
 }

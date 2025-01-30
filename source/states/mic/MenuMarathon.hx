@@ -5,29 +5,31 @@ import backend.WeekData;
 import haxe.Json;
 import sys.io.File;
 import sys.FileSystem;
-import flixel.addons.transition.FlxTransitionableState;
 import flixel.util.FlxGradient;
 import flixel.util.FlxAxes;
 import flixel.addons.display.FlxBackdrop;
 import objects.AlphabetMic as Alphabet;
 import objects.Alphabet as AlphabetPsych;
 
-typedef MarathonVars =
-{
+typedef MarathonVars = {
 	var songNames:Array<String>;
 	var songDifficulties:Array<String>;
+	var songFolder:Array<String>;
+	var weekNumList:Array<String>;
 }
 
-class MenuMarathon extends MusicBeatState
-{
+class MenuMarathon extends MusicBeatState {
 	public static var _marathon:MarathonVars;
 
-	var bg:FlxSprite = new FlxSprite(-89).loadGraphic(Paths.image('MaraBG_Main'));
+	public static var instance:MenuMarathon;
+
+	var bg:FlxSprite = new FlxSprite(-89).loadGraphic(Paths.image('menuDesat'));
 	var checker:FlxBackdrop = new FlxBackdrop(Paths.image('Mara_Checker'), FlxAxes.XY, 0.2, 0.2);
 	var gradientBar:FlxSprite = new FlxSprite(0, 0).makeGraphic(FlxG.width, 300, 0xFFAA00AA);
 	var side:FlxSprite = new FlxSprite(0).loadGraphic(Paths.image('Mara_Bottom'));
 
-	public static var curSelected:Int = 0;
+	public var curSelected:Int = 0;
+	public static var canChangeable:Bool = true;
 
 	var camLerp:Float = 0.1;
 	var selectable:Bool = false;
@@ -39,7 +41,8 @@ class MenuMarathon extends MusicBeatState
 	public static var substated:Bool = false;
 	public static var no:Bool = false;
 
-	var songs:Array<SongTitles> = [];
+	public var songs:Array<SongTitles> = [];
+	public var songsNames:Array<String> = [];
 
 	public static var curDifficulty:Int = -1;
 
@@ -52,8 +55,7 @@ class MenuMarathon extends MusicBeatState
 
 	var sprDifficulty:AlphabetPsych;
 
-	override function create()
-	{
+	override function create() {
 		camGame = new FlxCamera();
 		camOther = new FlxCamera();
 		camOther.bgColor.alpha = 0;
@@ -61,38 +63,35 @@ class MenuMarathon extends MusicBeatState
 		FlxG.cameras.add(camOther, false);
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
-		CustomFadeTransition.nextCamera = camOther;
 		substated = false;
 		PlayState.modeOfPlayState = "Marathon";
 
-		lime.app.Application.current.window.title = lime.app.Application.current.meta.get('name');
-
 		loadCurrent();
-		WeekData.reloadWeekFiles(true);
 		WeekData.reloadWeekFiles(false);
 
 		persistentUpdate = persistentDraw = true;
+		if(PlayState.folderPlayList == null) PlayState.folderPlayList = [];
+		if(PlayState.weekNumberList == null) PlayState.weekNumberList = [];
 
-		for (i in 0...WeekData.weeksList.length)
-		{
+		for (i in 0...WeekData.weeksList.length) {
 			if(weekIsLocked(WeekData.weeksList[i])) continue;
 
 			var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
 			var leSongs:Array<String> = [];
 
-			for (j in 0...leWeek.songs.length)
-			{
-				leSongs.push(leWeek.songs[j][0]);
-			}
+			for (item in leWeek.songs)
+				leSongs.push(item[0]);
 
 			WeekData.setDirectoryFromWeek(leWeek);
 			for (song in leWeek.songs)
 			{
-				songs.push(new SongTitles(song[0], i, song[1]));
+				songs.push(new SongTitles(song[0], i));
+				songsNames.push(song[0].toLowerCase());
 			}
 		}
 		Mods.loadTopMod();
 
+		bg.color = 0xFFE90AE9;
 		bg.scrollFactor.x = 0;
 		bg.scrollFactor.y = 0.03;
 		bg.setGraphicSize(Std.int(bg.width * 1.1));
@@ -114,21 +113,20 @@ class MenuMarathon extends MusicBeatState
 		grpSongs = new FlxTypedGroup<Alphabet>();
 		add(grpSongs);
 
-		for (i in 0...songs.length)
-		{
+		for (i in 0...songs.length) {
 			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, songs[i].songName, true, false);
 			songText.itemType = "Vertical";
 			songText.targetY = i;
 			grpSongs.add(songText);
-			Mods.currentModDirectory = songs[i].songfolder;
+			Mods.currentModDirectory = songs[i].songFolder;
 
 			// songText.x += 40;
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
 			// songText.screenCenter(X);
 		}
+		WeekData.setDirectoryFromWeek();
 
-		side.scrollFactor.x = 0;
-		side.scrollFactor.y = 0;
+		side.scrollFactor.x = side.scrollFactor.y = 0;
 		side.antialiasing = true;
 		side.screenCenter();
 		add(side);
@@ -143,9 +141,7 @@ class MenuMarathon extends MusicBeatState
 		sprDifficulty = new AlphabetPsych(130, 0, Difficulty.getString(curDifficulty), true);
 		sprDifficulty.screenCenter(X);
 		sprDifficulty.y = FlxG.height - sprDifficulty.height - 8;
-		sprDifficulty.color = 0x00EE88;
 		add(sprDifficulty);
-		trace(Difficulty.getString(curDifficulty));
 
 		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, "", 32);
 		scoreText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, RIGHT);
@@ -174,26 +170,26 @@ class MenuMarathon extends MusicBeatState
 
 		super.create();
 
-		CustomFadeTransition.nextCamera = camOther;
+		instance = this;
+		checker.scroll.set(-0.67,0.2);
 	}
 
-	function weekIsLocked(name:String):Bool
-	{
+	function weekIsLocked(name:String):Bool {
 		var leWeek:WeekData = WeekData.weeksLoaded.get(name);
 		return (!leWeek.startUnlocked
 			&& leWeek.weekBefore.length > 0
 			&& (!states.mic.StoryMenu.weekCompleted.exists(leWeek.weekBefore) || !states.mic.StoryMenu.weekCompleted.get(leWeek.weekBefore)));
 	}
 
-	override function update(elapsed:Float)
-	{
-		checker.x -= -0.67 / (ClientPrefs.data.framerate / 60);
-		checker.y -= 0.2 / (ClientPrefs.data.framerate / 60);
-
+	override function update(elapsed:Float) {
 		super.update(elapsed);
 
-		for (bullShit => item in grpSongs.members)
-		{
+		/**
+		 * Bullshit == loopCount,
+		 * item == grpSongs.members[bullShit]
+		 * grpSongs.members is array
+		 */
+		for (bullShit => item in grpSongs.members) {
 			item.targetY = bullShit - curSelected;
 			var scaledY = FlxMath.remapToRange(item.targetY, 0, 1, 0, 1.3);
 
@@ -242,20 +238,27 @@ class MenuMarathon extends MusicBeatState
 
 			if (accepted)
 			{
+				Mods.currentModDirectory = songs[curSelected].songFolder;
+				PlayState.storyWeek = songs[curSelected].weekNum;
+				Difficulty.loadFromWeek();
 				PlayState.difficultyPlaylist.push(Std.string(curDifficulty));
 				PlayState.storyPlaylist.push(Std.string(songs[curSelected].songName.toLowerCase()));
-				PlayState.folderPlayList.push(Std.string(songs[curSelected].songfolder));
+				PlayState.folderPlayList.push(Mods.currentModDirectory);
+				PlayState.weekNumberList.push(Std.string(songs[curSelected].weekNum));
 
 				FlxG.sound.play(Paths.sound('confirmMenu'), ClientPrefs.data.soundVolume);
 
 				saveCurrent();
 			}
+
+			if(FlxG.keys.justPressed.I) {
+				trace('INFO:\nMod Directory: ${Mods.currentModDirectory}\nDifficulty Array: ${PlayState.difficultyPlaylist}\nSong Array: ${PlayState.storyPlaylist}\nWeek Num: ${PlayState.weekNumberList}\n');
+			}
 		}
 		scoreText.x = FlxG.width / 2 - scoreText.width / 2;
 	}
 
-	function changeDiff(change:Int = 0)
-	{
+	function changeDiff(change:Int = 0) {
 		curDifficulty = FlxMath.wrap(curDifficulty + change, 0, Difficulty.list.length-1);
 		lastDifficultyName = Difficulty.getString(curDifficulty, false);
 		var displayDiff:String = Difficulty.getString(curDifficulty);
@@ -272,7 +275,7 @@ class MenuMarathon extends MusicBeatState
 		sprDifficulty.x = FlxG.width / 2 - sprDifficulty.width / 2;
 	}
 
-	function changeSelection(change:Int = 0)
+	public function changeSelection(change:Int = 0)
 	{
 		// NGio.logEvent('Fresh');
 		FlxG.sound.play(Paths.sound('scrollMenu'), ClientPrefs.data.soundVolume);
@@ -290,20 +293,17 @@ class MenuMarathon extends MusicBeatState
 		intendedScore = Std.int(FlxG.save.data.marathonScore);
 		#end
 
-		Mods.currentModDirectory = songs[curSelected].songfolder;
+		Mods.currentModDirectory = songs[curSelected].songFolder;
 		PlayState.storyWeek = songs[curSelected].weekNum;
 		Difficulty.loadFromWeek();
 
-		for (bullShit => item in grpSongs.members)
-		{
+		for (bullShit => item in grpSongs.members) {
 			item.targetY = bullShit - curSelected;
-			bullShit++;
 
 			item.alpha = 0.6;
 			// item.setGraphicSize(Std.int(item.width * 0.8));
 
-			if (item.targetY == 0)
-			{
+			if (item.targetY == 0) {
 				item.alpha = 1;
 				// item.setGraphicSize(Std.int(item.width));
 			}
@@ -313,12 +313,10 @@ class MenuMarathon extends MusicBeatState
 		var lastDiff:Int = Difficulty.list.indexOf(lastDifficultyName);
 		if(savedDiff != null && !Difficulty.list.contains(savedDiff) && Difficulty.list.contains(savedDiff))
 			curDifficulty = Math.round(Math.max(0, Difficulty.list.indexOf(savedDiff)));
-		else if(lastDiff > -1)
-			curDifficulty = lastDiff;
+		else if(lastDiff > -1) curDifficulty = lastDiff;
 		else if(Difficulty.list.contains(Difficulty.getDefault()))
 			curDifficulty = Math.round(Math.max(0, Difficulty.defaultList.indexOf(Difficulty.getDefault())));
-		else
-			curDifficulty = 0;
+		else curDifficulty = 0;
 
 		_updateSongLastDifficulty();
 		changeDiff();
@@ -336,7 +334,9 @@ class MenuMarathon extends MusicBeatState
 		{
 			_marathon = {
 				songDifficulties: [],
-				songNames: []
+				songNames: [],
+				songFolder: [],
+				weekNumList: []
 			}
 
 			File.saveContent(('presets/marathon/current'), Json.stringify(_marathon, null, '    '));
@@ -347,6 +347,8 @@ class MenuMarathon extends MusicBeatState
 			_marathon = Json.parse(data);
 			PlayState.difficultyPlaylist = _marathon.songDifficulties;
 			PlayState.storyPlaylist = _marathon.songNames;
+			PlayState.folderPlayList = _marathon.songFolder;
+			PlayState.weekNumberList = _marathon.weekNumList;
 		}
 	}
 
@@ -354,7 +356,9 @@ class MenuMarathon extends MusicBeatState
 	{
 		_marathon = {
 			songDifficulties: PlayState.difficultyPlaylist,
-			songNames: PlayState.storyPlaylist
+			songNames: PlayState.storyPlaylist,
+			songFolder: PlayState.folderPlayList,
+			weekNumList: PlayState.weekNumberList
 		}
 		File.saveContent(('presets/marathon/current'), Json.stringify(_marathon, null, '    '));
 	}
@@ -366,6 +370,8 @@ class MenuMarathon extends MusicBeatState
 
 		PlayState.difficultyPlaylist = _marathon.songDifficulties;
 		PlayState.storyPlaylist = _marathon.songNames;
+		PlayState.folderPlayList = _marathon.songFolder;
+		PlayState.weekNumberList = _marathon.weekNumList;
 
 		saveCurrent();
 	}
@@ -374,7 +380,9 @@ class MenuMarathon extends MusicBeatState
 	{
 		_marathon = {
 			songDifficulties: PlayState.difficultyPlaylist,
-			songNames: PlayState.storyPlaylist
+			songNames: PlayState.storyPlaylist,
+			songFolder: PlayState.folderPlayList,
+			weekNumList: PlayState.weekNumberList
 		}
 		File.saveContent(('presets/marathon/' + input), Json.stringify(_marathon, null, '    ')); // just an example for now
 	}
@@ -394,13 +402,14 @@ class SongTitles
 {
 	public var songName:String = "";
 	public var weekNum:Int = 0;
-	public var songfolder:String = "";
+	public var songFolder:String = "";
 	public var lastDifficulty:String = null;
 
-	public function new(song:String, week:Int, folder:String)
+	public function new(song:String, week:Int)
 	{
 		this.songName = song;
 		this.weekNum = week;
-		this.songfolder = folder;
+		this.songFolder = Mods.currentModDirectory;
+		if(this.songFolder == null) this.songFolder = '';
 	}
 }

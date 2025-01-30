@@ -95,7 +95,11 @@ class Controls
 	public var PAUSE_S(get, never):String;
 	public var RESET_S(get, never):String;
 	public var FULLSCREEN_S(get, never):String;
-	// public var SHIFT_S(get, never):String;
+	public var VOL_PLUS_S(get, never):String;
+	public var VOL_MINUS_S(get, never):String;
+	public var VOL_MUTE_S(get, never):String;
+	public var DEBUG_M_S(get, never):String;
+	public var DEBUG_S(get, never):String;
 	private function get_UI_UP_S() return getControlString('ui_up');
 	private function get_UI_DOWN_S() return getControlString('ui_down');
 	private function get_UI_LEFT_S() return getControlString('ui_left');
@@ -104,7 +108,12 @@ class Controls
 	private function get_ACCEPT_S() return getControlString('accept');
 	private function get_PAUSE_S() return getControlString('pause');
 	private function get_RESET_S() return getControlString('reset');
-	private function get_FULLSCREEN_S() return getControlString('fullscreen');
+	private function get_FULLSCREEN_S() return getControlString('full_screen');
+	private function get_VOL_PLUS_S() return getControlString('volume_up');
+	private function get_VOL_MINUS_S() return getControlString('volume_down');
+	private function get_VOL_MUTE_S() return getControlString('volume_mute');
+	private function get_DEBUG_M_S() return getControlString('debug_1');
+	private function get_DEBUG_S() return getControlString('debug_2');
 
 	//Gamepad & Keyboard stuff
 	public var keyboardBinds:Map<String, Array<FlxKey>>;
@@ -116,11 +125,11 @@ class Controls
 		var savKey:Array<Null<Any>> = (controllerMode ? ClientPrefs.gamepadBinds.get(str) : ClientPrefs.keyBinds.get(str));
 		var ret:String = null;
 		var hasKey:Bool = false;
-		if (savKey[0] != null) {
+		if(savKey[0] != null && InputFormatter.getKeyName(savKey[0]) != "") {
 			ret = InputFormatter.getKeyName(savKey[0]);
 			hasKey = true;
 		}
-		if (savKey[1] != null) {
+		if (savKey[1] != null && InputFormatter.getKeyName(savKey[1]) != "") {
 			if(savKey[0] != null) ret += " or " + InputFormatter.getKeyName(savKey[1]);
 			else ret = InputFormatter.getKeyName(savKey[1]);
 			hasKey = true;

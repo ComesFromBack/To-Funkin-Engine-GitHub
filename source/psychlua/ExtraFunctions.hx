@@ -1,5 +1,8 @@
 package psychlua;
 
+import substates.GameOverSubstate;
+import lime.app.Application;
+import states.FreeplayState;
 import flixel.util.FlxSave;
 import openfl.utils.Assets;
 
@@ -245,6 +248,74 @@ class ExtraFunctions
 		});
 		Lua_helper.add_callback(lua, "getRandomBool", function(chance:Float = 50) {
 			return FlxG.random.bool(chance);
+		});
+
+		// States | For Custom States.
+		Lua_helper.add_callback(lua, "switchToMenu", function(?anim:Bool = false) {
+			if(anim) MusicBeatState.switchState(new states.MainMenuState());
+			else FlxG.switchState(new states.MainMenuState());
+		});
+
+		Lua_helper.add_callback(lua, "switchToFreeplay", function(?anim:Bool = false) {
+			if(Arrays.engineList[ClientPrefs.data.styleEngine] != "MicUp") {
+				if(anim) MusicBeatState.switchState(new FreeplayState());
+				else FlxG.switchState(new FreeplayState());
+			} else {
+				if(anim) MusicBeatState.switchState(new states.mic.MenuFreeplay());
+				else FlxG.switchState(new states.mic.MenuFreeplay());
+			}
+		});
+
+		Lua_helper.add_callback(lua, "startMoveWindow", function() {
+			if(ClientPrefs.data.startingAnim)
+			FlxTween.tween(Application.current.window, {y: Main.ANIM_TWEEN_Y}, 0.85, {ease: FlxEase.backOut});
+		});
+
+		// Extra from Sprite(like bg, animations)
+		Lua_helper.add_callback(lua, "addSplitedBG", function(RAW_PATH:String, FILE_HEAD:String, SPR_LINE_NUM:UInt, BasicX:Float, BasicY:Float, Width:Float, Hight:Float) {
+			var SPR_LIST:Array<String> = [];
+			var TEMP:UInt = 0;
+			var LINECount:UInt = 0;
+			var BGCount:String = null;
+			var TAGS_LIST:Array<String> = [];
+
+			if(RAW_PATH != null && RAW_PATH != "")
+				SPR_LIST = FileSystem.readDirectory(RAW_PATH);
+			else
+				return;
+
+			for(num => item in SPR_LIST) {
+				BGCount = (num == 10 || num < 10 ? "0"+Std.string(num) : Std.string(num));
+				if(TEMP > SPR_LINE_NUM) {
+					TEMP = 0;
+					LINECount++;
+				}
+				var leSprite:ModchartSprite = new ModchartSprite(BasicX+(Width*TEMP), BasicY+(Hight*TEMP));
+				var tag:String = 'line$LINECount-BG$BGCount-$FILE_HEAD';
+				tag = tag.replace('.', '');
+				LuaUtils.destroyObject(tag); // For safely.
+				if(SPR_LIST[num] != null && SPR_LIST[num].length > 0) {
+					if(RAW_PATH.endsWith('/')) {
+						leSprite.loadGraphic('./$RAW_PATH${SPR_LIST[num]}');
+						trace('./$RAW_PATH${SPR_LIST[num]}');
+					} else {
+						leSprite.loadGraphic('./$RAW_PATH/${SPR_LIST[num]}');
+						trace('./$RAW_PATH/${SPR_LIST[num]}');
+					}
+					leSprite.antialiasing = ClientPrefs.data.antialiasing;
+					MusicBeatState.getVariables().set(tag, leSprite);
+					leSprite.active = true;
+
+					var mySprite:FlxSprite = MusicBeatState.getVariables().get(tag);
+					var instance = LuaUtils.getTargetInstance();
+
+					if(PlayState.instance == null || !PlayState.instance.isDead)
+						instance.insert(instance.members.indexOf(LuaUtils.getLowestCharacterGroup()), mySprite);
+					else
+						GameOverSubstate.instance.insert(GameOverSubstate.instance.members.indexOf(GameOverSubstate.instance.boyfriend), mySprite);
+				}
+				TEMP++;
+			}
 		});
 	}
 }

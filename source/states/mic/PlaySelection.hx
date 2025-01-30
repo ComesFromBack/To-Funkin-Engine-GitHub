@@ -5,8 +5,7 @@ import flixel.addons.display.FlxGridOverlay;
 import flixel.addons.display.FlxBackdrop;
 import flixel.util.FlxGradient;
 
-class PlaySelection extends MusicBeatState
-{
+class PlaySelection extends MusicBeatState {
 	public static var curSelected:Int = 0;
 
 	var menuItems:FlxTypedGroup<FlxSprite>;
@@ -14,18 +13,20 @@ class PlaySelection extends MusicBeatState
 	var optionShit:Array<String> = ['week', 'freeplay', 'marathon', 'endless', 'survival', 'modifier'];
 	var camFollow:FlxObject;
 
-	var bg:FlxSprite = new FlxSprite(-89).loadGraphic(Paths.image('pBG_Main'));
+	var bg:FlxSprite = new FlxSprite(-89).loadGraphic(Paths.image('menuDesat'));
 	var checker:FlxBackdrop = new FlxBackdrop(FlxGridOverlay.createGrid(80, 80, 160, 160, true, 0x80808080, 0x08080808));
 	var gradientBar:FlxSprite = new FlxSprite(0,0).makeGraphic(FlxG.width, 300, 0xFFAA00AA);
 	var side:FlxSprite = new FlxSprite(0).loadGraphic(Paths.image('Play_Bottom'));
 
 	var camLerp:Float = 0.1;
+	var tipText:FlxText = new FlxText(370*5,1500,FlxG.width,"Hold \"SHIFT\"",48);
 
 	override function create()
 	{
 		persistentUpdate = persistentDraw = true;
 		lime.app.Application.current.window.title = lime.app.Application.current.meta.get('name');
 
+		bg.color = 0xFFDF271A;
 		bg.scrollFactor.x = 0;
 		bg.scrollFactor.y = 0.03;
 		bg.setGraphicSize(Std.int(bg.width * 1.1));
@@ -79,6 +80,12 @@ class PlaySelection extends MusicBeatState
 
 		FlxG.camera.follow(camFollow, null, camLerp);
 
+		tipText.setFormat(Language.fonts(), 32, FlxColor.WHITE, CENTER);
+		tipText.setBorderStyle(OUTLINE, 0xFF000000, 5, 1);
+		tipText.alpha = 0;
+		tipText.scrollFactor.set();
+		add(tipText);
+
 		FlxG.camera.zoom = 3;
 		side.alpha = checker.alpha = 0;
 		FlxTween.tween(FlxG.camera, { zoom: 1}, 1.2, { ease: FlxEase.expoInOut });
@@ -89,6 +96,8 @@ class PlaySelection extends MusicBeatState
 		new FlxTimer().start(1.1, function(tmr:FlxTimer) {
 			selectable = true;
 		});
+
+		checker.scroll.set(0.03,0.2);
 	}
 
 	var selectedSomethin:Bool = false;
@@ -111,8 +120,13 @@ class PlaySelection extends MusicBeatState
 			spr.updateHitbox();
 		});
 
-		checker.x -= 0.03/(ClientPrefs.data.framerate/60);
-		checker.y -= 0.20/(ClientPrefs.data.framerate/60);
+		if(optionShit[curSelected] == "modifier") {
+			FlxTween.cancelTweensOf(tipText);
+			FlxTween.tween(tipText, {alpha: 1}, 0.85, {ease: FlxEase.circOut});
+		} else {
+			FlxTween.cancelTweensOf(tipText);
+			FlxTween.tween(tipText, {alpha: 0}, 0.85, {ease: FlxEase.circOut});
+		}
 
 		if (!selectedSomethin && selectable)
 		{
@@ -128,7 +142,7 @@ class PlaySelection extends MusicBeatState
 				changeItem(1);
 			}
 
-			if (controls.BACK || (FlxG.mouse.justPressedRight && ClientPrefs.data.mouseCon))
+			if (controls.BACK || (FlxG.mouse.justPressedRight && ClientPrefs.data.mouseControls))
 			{
 				selectedSomethin = true;
 				FlxG.sound.play(Arrays.getThemeSound('cancelMenu'), ClientPrefs.data.soundVolume);
@@ -140,7 +154,7 @@ class PlaySelection extends MusicBeatState
 				MusicBeatState.switchState(new states.MainMenuState());
 			}
 
-			if (controls.ACCEPT || (FlxG.mouse.justPressed && ClientPrefs.data.mouseCon))
+			if (controls.ACCEPT || (FlxG.mouse.justPressed && ClientPrefs.data.mouseControls))
 			{
 				selectedSomethin = true;
 				FlxG.sound.play(Arrays.getThemeSound('confirmMenu'), ClientPrefs.data.soundVolume);
@@ -172,13 +186,16 @@ class PlaySelection extends MusicBeatState
 								case 'freeplay':
 									MusicBeatState.switchState(new states.mic.MenuFreeplay());
 								case 'modifier':
-									MusicBeatState.switchState(new ModsMenuState());
+									if(FlxG.keys.pressed.SHIFT)
+										MusicBeatState.switchState(new states.ModsMenuState());
+									else
+										MusicBeatState.switchState(new states.mic.MenuModifiers());
 								case 'marathon':
 									MusicBeatState.switchState(new states.mic.MenuMarathon());
 								case 'survival':
-									// MusicBeatState.switchState(new MenuSurvival());
+									MusicBeatState.switchState(new states.mic.MenuSurvival());
 								case 'endless':
-									// MusicBeatState.switchState(new MenuEndless());
+									MusicBeatState.switchState(new states.mic.MenuEndless());
 
 							}
 						});
